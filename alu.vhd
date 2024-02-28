@@ -13,6 +13,6 @@ END alu;
 ARCHITECTURE Structure OF alu IS
 BEGIN
 	WITH op SELECT
-		w <=	(y and x"00FF")							WHEN '0',
-				(x and x"00FF") or (y and x"FF00")	WHEN '1';
+		w <=	y WHEN '0',
+				y(7 DOWNTO 0) & x(7 DOWNTO 0)	WHEN OTHERS;
 END Structure;
