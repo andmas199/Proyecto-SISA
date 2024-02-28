@@ -7,8 +7,10 @@ ENTITY regfile IS
           wrd    : IN  STD_LOGIC;
           d      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
           addr_a : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+			 addr_b : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_d : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-          a      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+          a      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			 b      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
 END regfile;
 
 
@@ -22,5 +24,6 @@ BEGIN
 			regs(to_integer(unsigned(addr_d))) := d;
 		END IF;
 		a <= regs(to_integer(unsigned(addr_a)));
+		b <= regs(to_integer(unsigned(addr_b)));
 	END PROCESS;
 END Structure;
