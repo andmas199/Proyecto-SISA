@@ -32,14 +32,17 @@ BEGIN
 				"10"			WHEN "1101",
 				"10"			WHEN "1110",
 				"--"			WHEN OTHERS;
+				
 	ldpc <= '0' WHEN ir = x"FFFF" ELSE '1';
-	wrd <= '1' WHEN op_code = "0101" or op_code = "0100" or op_code = "1110" ELSE '0';
+	wrd <= '1' WHEN op_code = "0101" or op_code = "0011" or op_code = "1101" ELSE '0';
 	addr_a <= ir(11 DOWNTO 9) WHEN op_code = "0101" ELSE ir(8 DOWNTO 6);
 	addr_b <= ir(11 DOWNTO 9);
 	addr_d <= ir(11 DOWNTO 9);
+	
 	WITH op_code SELECT
 		immed <= std_logic_vector(resize(signed(ir(7 DOWNTO 0)), immed'length)) WHEN "0101",
 					std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN OTHERS;
+					
 	wr_m <= '1' WHEN op_code = "0100" or op_code = "1110" ELSE '0';
 	in_d <= '0' WHEN op_code = "0101" ELSE '1';
 	immed_x2 <= '1' WHEN op_code = "0011" or op_code = "0100" ELSE '0';
