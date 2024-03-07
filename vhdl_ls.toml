@@ -1,2 +1,2 @@
 [libraries]
-work.files = [ 'src/**/*.vhd' ]
+all.files = [ 'src/**/*.vhd' ]
