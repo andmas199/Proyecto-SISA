@@ -81,6 +81,7 @@ PLLJ_PLLSPE_INFO.txt
 *.jpg
 *.html
 *.bsf
+*.prw
 
 # ignore simulation output of ModelSim
 wlf*

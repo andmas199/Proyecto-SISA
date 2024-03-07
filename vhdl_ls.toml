@@ -1,11 +1,2 @@
 [libraries]
-proc.files = [
-    'alu.vhd',
-    'control_l.vhd',
-    'datapath.vhd',
-    'multi.vhd',
-    'proc.vhd',
-    'regfile.vhd',
-    'SRAMController.vhd',
-    'unidad_control.vhd',
-]
+work.files = [ 'src/**/*.vhd' ]
