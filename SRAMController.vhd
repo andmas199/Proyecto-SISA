@@ -38,16 +38,16 @@ begin
 			CASE state IS
 				WHEN IDLE => 
 					IF WR = '0' THEN 
-						state := READ_SETUP;
+						state <= READ_SETUP;
 					ELSE
-						state := WRITE_SETUP;
+						state <= WRITE_SETUP;
 					END IF;
-				WHEN READ_SETUP => state := READ_ACQUIRE;
-				WHEN READ_ACQUIRE => state := READ_PROVIDE;
-				WHEN READ_PROVIDE => state := IDLE;
-				WHEN WRITE_SETUP => state := WRITE_START;
-				WHEN WRITE_START => state := WRITE_END;
-				WHEN WRITE_END => state := IDLE;
+				WHEN READ_SETUP => state <= READ_ACQUIRE;
+				WHEN READ_ACQUIRE => state <= READ_PROVIDE;
+				WHEN READ_PROVIDE => state <= IDLE;
+				WHEN WRITE_SETUP => state <= WRITE_START;
+				WHEN WRITE_START => state <= WRITE_END;
+				WHEN WRITE_END => state <= IDLE;
 			END CASE;
 		END IF;
 		
