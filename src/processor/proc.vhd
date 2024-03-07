@@ -1,7 +1,6 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 
-LIBRARY work;
 USE work.datapath_components.datapath;
 USE work.control_unit_components.unidad_control;
 
