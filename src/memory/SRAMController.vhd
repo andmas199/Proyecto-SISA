@@ -1,7 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
-use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 
 entity SRAMController is
     port (clk         : in    std_logic;
@@ -55,13 +54,45 @@ begin
 	END PROCESS;
 	
 	PROCESS (state)
+		VARIABLE read_buff: STD_LOGIC_VECTOR(15 DOWNTO 0);
 	BEGIN
-		IF state = READ_SETUP or state = READ_ACQUIRE or state = READ_PROVIDE THEN
-		
-		ELSIF state = WRITE_SETUP or state = WRITE_START or state = WRITE_END THEN
-		
-		END IF;
-	
+		CASE state IS
+			WHEN IDLE =>
+				SRAM_WE_N <= '1';
+
+			WHEN READ_SETUP =>
+				SRAM_UB_N <= '0';
+				SRAM_LB_N <= '0';
+				SRAM_ADDR <= "000" & address(15 DOWNTO 1);
+				SRAM_DQ <= (OTHERS => 'Z');
+			WHEN READ_ACQUIRE =>
+				IF byte_m = '1' and address(0) = '0' THEN
+					read_buff := STD_LOGIC_VECTOR(resize(signed(SRAM_DQ(7 DOWNTO 0)), 16));
+				ELSIF byte_m = '1' and address(0) = '1' THEN
+					read_buff := STD_LOGIC_VECTOR(resize(signed(SRAM_DQ(15 DOWNTO 8)), 16));
+				ELSE
+					read_buff := SRAM_DQ;
+				END IF;
+			WHEN READ_PROVIDE =>
+				dataReaded <= read_buff;
+
+			WHEN WRITE_SETUP =>
+				IF byte_m = '1' THEN
+					SRAM_UB_N <= not address(0);
+					SRAM_LB_N <= address(0);
+					SRAM_DQ <= dataToWrite(7 DOWNTO 0) & dataToWrite(7 DOWNTO 0);
+				ELSE
+					SRAM_UB_N <= '0';
+					SRAM_LB_N <= '0';
+					SRAM_DQ <= dataToWrite;
+				END IF;
+
+				SRAM_ADDR <= "000" & address(15 DOWNTO 1);
+			WHEN WRITE_START =>
+				SRAM_WE_N <= '0';
+			WHEN WRITE_END =>
+				SRAM_WE_N <= '1';
+		END CASE;
 	END PROCESS;
 
 end comportament;
