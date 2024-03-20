@@ -23,11 +23,11 @@ ARCHITECTURE Structure OF sisa IS
     SIGNAL data_addr: STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL data_byte: STD_LOGIC;
     SIGNAL we: STD_LOGIC;
-    SIGNAL clock4: STD_LOGIC;
+    SIGNAL clock8: STD_LOGIC;
 BEGIN
 
     pro0: proc
-        PORT MAP(   clk => clock4,
+        PORT MAP(   clk => clock8,
                     boot => SW(9),
                     datard_m => data_rd,
                     addr_m => data_addr,
@@ -36,7 +36,8 @@ BEGIN
                     word_byte => data_byte);
 
     mem0: MemoryController
-    PORT MAP (  CLOCK_50  => CLOCK_50, 
+    PORT MAP (  CLOCK_50  => CLOCK_50,
+                proc_clk  => clock8,
                 addr      => data_addr, 
                 wr_data   => data_wr, 
                 rd_data   => data_rd, 
@@ -51,11 +52,11 @@ BEGIN
                 SRAM_WE_N => SRAM_WE_N);
 
     PROCESS (CLOCK_50)
-        VARIABLE clock4_counter: unsigned(1 DOWNTO 0) := to_unsigned(2, 2);
+        VARIABLE clock8_counter: unsigned(2 DOWNTO 0) := to_unsigned(0, 3);
     BEGIN
         IF rising_edge(CLOCK_50) THEN
-            clock4_counter := clock4_counter + 1;
-            clock4 <= clock4_counter(1);
+            clock8_counter := clock8_counter + 1;
+            clock8 <= clock8_counter(2);
         END IF;
     END PROCESS;
 

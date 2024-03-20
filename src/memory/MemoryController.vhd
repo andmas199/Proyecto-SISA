@@ -6,6 +6,7 @@ use work.memory_components.SRAMController;
 
 entity MemoryController is
     port (CLOCK_50  : in  std_logic;
+          proc_clk  : in  std_logic;
 	      addr      : in  std_logic_vector(15 downto 0);
           wr_data   : in  std_logic_vector(15 downto 0);
           rd_data   : out std_logic_vector(15 downto 0);
@@ -29,6 +30,7 @@ begin
 
     sramContr: SRAMController
         PORT MAP(   clk         => CLOCK_50,
+                    proc_clk  => proc_clk,
                     SRAM_ADDR   => SRAM_ADDR,
                     SRAM_DQ     => SRAM_DQ,
                     SRAM_UB_N   => SRAM_UB_N,
