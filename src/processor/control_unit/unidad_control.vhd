@@ -20,6 +20,7 @@ ENTITY unidad_control IS
           pc        : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           ins_dad   : OUT STD_LOGIC;
           in_d      : OUT STD_LOGIC;
+			 Rb_N		  : OUT STD_LOGIC;	
           immed_x2  : OUT STD_LOGIC;
           wr_m      : OUT STD_LOGIC;
           word_byte : OUT STD_LOGIC);
@@ -48,6 +49,7 @@ BEGIN
 					 immed => immed,
 					 wr_m => wr_m_l,
 					 in_d => in_d,
+					 Rb_N => Rb_N,
 					 immed_x2 => immed_x2,
 					 word_byte => w_b);
 	
