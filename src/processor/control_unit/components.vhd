@@ -5,7 +5,8 @@ PACKAGE control_unit_components IS
 
     COMPONENT control_l IS
         PORT (  ir     		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-                op     		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+					 op_group	: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+                op     		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
                 ldpc   		: OUT STD_LOGIC;
                 wrd    		: OUT STD_LOGIC;
                 addr_a 		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -48,7 +49,8 @@ PACKAGE control_unit_components IS
         PORT (  boot        : IN  STD_LOGIC;
                 clk         : IN  STD_LOGIC;
                 datard_m    : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-                op          : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+					 op_group	 : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+                op          : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
                 wrd         : OUT STD_LOGIC;
                 addr_a      : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
                 addr_b      : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);

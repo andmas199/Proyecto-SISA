@@ -10,7 +10,8 @@ ENTITY unidad_control IS
     PORT (boot      : IN  STD_LOGIC;
           clk       : IN  STD_LOGIC;
           datard_m  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-          op        : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			 op_group  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+          op        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           wrd       : OUT STD_LOGIC;
           addr_a    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_b    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -37,6 +38,7 @@ ARCHITECTURE Structure OF unidad_control IS
 BEGIN
 	c0: control_l
 		PORT MAP (ir => ir,
+					 op_group => op_group,
 					 op => op,
 					 ldpc => ldpc_l,
 					 wrd => wrd_l,
