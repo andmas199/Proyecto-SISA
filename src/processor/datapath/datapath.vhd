@@ -19,6 +19,7 @@ ENTITY datapath IS
 			 ins_dad : IN STD_LOGIC;
 			 pc :	IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 in_d : IN STD_LOGIC;
+			 Rb_N	: IN STD_LOGIC;
 			 addr_m : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 data_wr : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
 END datapath;
@@ -28,6 +29,8 @@ ARCHITECTURE Structure OF datapath IS
 
 	SIGNAL w: STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL reg_out: STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL immediate: STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL b: STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL y: STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL d: STD_LOGIC_VECTOR(15 DOWNTO 0);
 	
@@ -47,9 +50,10 @@ BEGIN
 						addr_b	=> addr_b,
 						addr_d 	=> addr_d,
 						a 			=> reg_out,
-						b			=> data_wr);
-						
-	y <= immed WHEN immed_x2 = '0' ELSE immed(14 DOWNTO 0) & '0';
+						b			=> b);
+	data_wr <= b;					
+	immediate <= immed WHEN immed_x2 = '0' ELSE immed(14 DOWNTO 0) & '0';				
+	y <= immediate WHEN Rb_N = '0' ELSE b;
 	d <= w WHEN in_d = '0' ELSE datard_m;
 	addr_m <= pc WHEN ins_dad = '0' ELSE w;
 	

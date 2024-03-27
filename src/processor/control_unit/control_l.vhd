@@ -14,6 +14,7 @@ ENTITY control_l IS
           immed  		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 wr_m	  		: OUT STD_LOGIC;
 			 in_d   		: OUT STD_LOGIC;
+			 Rb_N			: OUT STD_LOGIC;
 			 immed_x2	: OUT STD_LOGIC;
 			 word_byte	: OUT STD_LOGIC);
 END control_l;
@@ -38,7 +39,7 @@ BEGIN
 						"11" WHEN "0111",
 						"00" WHEN "1101",
 						"00" WHEN "1110",
-						"---"	WHEN OTHERS;
+						"--"	WHEN OTHERS;
 	WITH op_code SELECT
 		op <= func 				WHEN "0000",
 				func 				WHEN "0001",
@@ -53,6 +54,7 @@ BEGIN
 				"---"				WHEN OTHERS;
 				
 	ldpc <= '0' WHEN ir = x"FFFF" ELSE '1';
+	Rb_N <= '1' WHEN op_code = "0000" or op_code = "0001" or op_code = "1000" ELSE '0';
 	wrd <= '1' WHEN op_code = "0101" or op_code = "0011" or op_code = "1101" ELSE '0';
 	addr_a <= ir(11 DOWNTO 9) WHEN op_code = "0101" ELSE ir(8 DOWNTO 6);
 	addr_b <= ir(11 DOWNTO 9);
