@@ -4,7 +4,8 @@ USE ieee.numeric_std.all;
 
 ENTITY control_l IS
     PORT (ir     		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-          op     		: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+			 op_group	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+          op     		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           ldpc   		: OUT STD_LOGIC;
           wrd    		: OUT STD_LOGIC;
           addr_a 		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -21,17 +22,35 @@ END control_l;
 ARCHITECTURE Structure OF control_l IS
 
 	SIGNAL op_code: STD_LOGIC_VECTOR(3 DOWNTO 0);
+	SIGNAL func:	 STD_LOGIC_VECTOR(2 DOWNTO 0);
 
 BEGIN
 	op_code <= ir(15 DOWNTO 12);
 	
 	WITH op_code SELECT
-		op <= "0" & ir(8) WHEN "0101",
-				"10"			WHEN "0011",
-				"10"			WHEN "0100",
-				"10"			WHEN "1101",
-				"10"			WHEN "1110",
-				"--"			WHEN OTHERS;
+		op_group <= "00" WHEN "0000",
+						"01" WHEN "0001",
+						"00" WHEN "0010",
+						"00"	WHEN "0011",
+						"00" WHEN "0100",
+						"10" WHEN "0101",
+						"10" WHEN "0110",
+						"11" WHEN "0111",
+						"00" WHEN "1101",
+						"00" WHEN "1110",
+						"---"	WHEN OTHERS;
+	WITH op_code SELECT
+		op <= func 				WHEN "0000",
+				func 				WHEN "0001",
+				"000" 			WHEN "0010",
+				"000"				WHEN "0011",
+				"000" 			WHEN "0100",
+				"00" & ir(8) 	WHEN "0101",
+				"00" & ir(8)	WHEN "0110",
+				"00" & ir(8)	WHEN "0111",
+				"000" 			WHEN "1101",
+				"000" 			WHEN "1110",
+				"---"				WHEN OTHERS;
 				
 	ldpc <= '0' WHEN ir = x"FFFF" ELSE '1';
 	wrd <= '1' WHEN op_code = "0101" or op_code = "0011" or op_code = "1101" ELSE '0';

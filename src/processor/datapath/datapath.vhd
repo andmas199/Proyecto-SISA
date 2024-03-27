@@ -7,7 +7,8 @@ USE work.datapath_components.regfile;
 
 ENTITY datapath IS
     PORT (clk    : IN STD_LOGIC;
-          op     : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+			 op_group: IN STD_LOGIC_VECTOR(1 DOWNTO 0);
+          op     : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
           wrd    : IN STD_LOGIC;
           addr_a : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
 			 addr_b : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -35,6 +36,7 @@ BEGIN
 	alu0: alu
 		PORT MAP (	x 	=> reg_out,
 						y 	=> y,
+						op_group => op_group,
 						op => op,
 						w 	=> w);
 	reg0: regfile

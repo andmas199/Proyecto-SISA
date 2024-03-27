@@ -4,15 +4,18 @@ USE ieee.std_logic_1164.all;
 PACKAGE datapath_components IS
 
     COMPONENT alu IS
-        PORT (  x  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-                y  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-                op : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
-                w  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+        PORT (  x  		 : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+					 y  		 : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+					 op_group : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+					 op 		 : IN	 STD_LOGIC_VECTOR(2 DOWNTO 0);
+					 w  		 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+					 z	 		 :	OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT datapath IS
         PORT (  clk         : IN  STD_LOGIC;
-                op          : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
+					 op_group	 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+                op          : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
                 wrd         : IN  STD_LOGIC;
                 addr_a      : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
                 addr_b      : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);

@@ -17,7 +17,8 @@ END proc;
 
 ARCHITECTURE Structure OF proc IS
 	
-	SIGNAL op :			STD_LOGIC_VECTOR(1 DOWNTO 0);
+	SIGNAL op_groupS : STD_LOGIC_VECTOR(2 DOWNTO 0);
+	SIGNAL op :			STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL wrd	:		STD_LOGIC;
 	SIGNAL addr_a :	STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL addr_b :	STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -31,6 +32,7 @@ ARCHITECTURE Structure OF proc IS
 BEGIN
 	e0: datapath
 		PORT MAP	(	 clk => clk,
+						 op_group => op_groupS,
 						 op => op,
 						 wrd => wrd,
 						 addr_a => addr_a,
@@ -49,6 +51,7 @@ BEGIN
 		PORT MAP	(	 boot => boot,
 						 clk => clk,
 						 datard_m => datard_m,
+						 op_group => op_groupS,
 						 op => op,
 						 wrd => wrd,
 						 addr_a => addr_a,
