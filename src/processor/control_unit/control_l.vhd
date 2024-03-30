@@ -57,7 +57,7 @@ BEGIN
 	Rb_N <= '1' WHEN op_code = "0000" or op_code = "0001" or op_code = "1000" ELSE '0';
 	wrd <= '1' WHEN op_code = "0101" or op_code = "0011" or op_code = "1101" ELSE '0';
 	addr_a <= ir(11 DOWNTO 9) WHEN op_code = "0101" ELSE ir(8 DOWNTO 6);
-	addr_b <= ir(11 DOWNTO 9);
+	addr_b <= ir(11 DOWNTO 9) WHEN op_code = "0100" or op_code = "0110" or op_code = "0111" ELSE ir(2 DOWNTO 0);
 	addr_d <= ir(11 DOWNTO 9);
 	
 	WITH op_code SELECT
