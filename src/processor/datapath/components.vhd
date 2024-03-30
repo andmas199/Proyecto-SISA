@@ -24,6 +24,7 @@ PACKAGE datapath_components IS
                 immed_x2    : IN  STD_LOGIC;
                 datard_m    : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
                 ins_dad     : IN  STD_LOGIC;
+					 Rb_N			 : IN STD_LOGIC;
                 pc          : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
                 in_d        : IN  STD_LOGIC;
                 addr_m      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);

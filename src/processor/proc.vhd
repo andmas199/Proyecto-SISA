@@ -26,6 +26,7 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL immed :		STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL immed_x2: 	STD_LOGIC;
 	SIGNAL ins_dad:	STD_LOGIC;
+	SIGNAL Rb_N :		STD_LOGIC;
 	SIGNAL pc:			STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL in_d:		STD_LOGIC;
 
@@ -42,6 +43,7 @@ BEGIN
 						 immed_x2 => immed_x2,
 						 datard_m => datard_m,
 						 ins_dad => ins_dad,
+						 Rb_N => Rb_N,
 						 pc => pc,
 						 in_d => in_d,
 						 addr_m => addr_m,
@@ -58,6 +60,7 @@ BEGIN
 						 addr_b => addr_b,
 						 addr_d => addr_d,
 						 immed => immed,
+						 Rb_N => Rb_N,
 						 pc => pc,
 						 ins_dad => ins_dad,
 						 in_d => in_d,
