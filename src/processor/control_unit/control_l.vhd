@@ -27,6 +27,7 @@ ARCHITECTURE Structure OF control_l IS
 
 BEGIN
 	op_code <= ir(15 DOWNTO 12);
+	func <= ir(5 DOWNTO 3);
 	
 	WITH op_code SELECT
 		op_group <= "00" WHEN "0000",
@@ -43,19 +44,19 @@ BEGIN
 	WITH op_code SELECT
 		op <= func 				WHEN "0000",
 				func 				WHEN "0001",
-				"000" 			WHEN "0010",
-				"000"				WHEN "0011",
-				"000" 			WHEN "0100",
+				"100" 			WHEN "0010",
+				"100"				WHEN "0011",
+				"100" 			WHEN "0100",
 				"00" & ir(8) 	WHEN "0101",
 				"00" & ir(8)	WHEN "0110",
 				"00" & ir(8)	WHEN "0111",
-				"000" 			WHEN "1101",
-				"000" 			WHEN "1110",
+				"100" 			WHEN "1101",
+				"100" 			WHEN "1110",
 				"---"				WHEN OTHERS;
 				
 	ldpc <= '0' WHEN ir = x"FFFF" ELSE '1';
 	Rb_N <= '1' WHEN op_code = "0000" or op_code = "0001" or op_code = "1000" ELSE '0';
-	wrd <= '1' WHEN op_code = "0101" or op_code = "0011" or op_code = "1101" ELSE '0';
+	wrd <= '0' WHEN op_code = "0100" or op_code = "0111" or op_code = "0110" or op_code = "1110" ELSE '1';
 	addr_a <= ir(11 DOWNTO 9) WHEN op_code = "0101" ELSE ir(8 DOWNTO 6);
 	addr_b <= ir(11 DOWNTO 9) WHEN op_code = "0100" or op_code = "0110" or op_code = "0111" ELSE ir(2 DOWNTO 0);
 	addr_d <= ir(11 DOWNTO 9);
@@ -65,7 +66,7 @@ BEGIN
 					std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN OTHERS;
 					
 	wr_m <= '1' WHEN op_code = "0100" or op_code = "1110" ELSE '0';
-	in_d <= '0' WHEN op_code = "0101" ELSE '1';
+	in_d <= '1' WHEN op_code = "0100" or op_code = "0110" ELSE '0';
 	immed_x2 <= '1' WHEN op_code = "0011" or op_code = "0100" ELSE '0';
 	word_byte <= '1' WHEN op_code = "1101" or op_code = "1110" ELSE '0';
 	
