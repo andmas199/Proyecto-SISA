@@ -33,14 +33,15 @@ BEGIN
 		op_group <= "00" WHEN "0000",
 						"01" WHEN "0001",
 						"00" WHEN "0010",
-						"00"	WHEN "0011",
+						"00" WHEN "0011",
 						"00" WHEN "0100",
 						"10" WHEN "0101",
 						"10" WHEN "0110",
 						"11" WHEN "0111",
+						"11" WHEN "1000",
 						"00" WHEN "1101",
 						"00" WHEN "1110",
-						"--"	WHEN OTHERS;
+						"--" WHEN OTHERS;
 	WITH op_code SELECT
 		op <= func 				WHEN "0000",
 				func 				WHEN "0001",
@@ -50,6 +51,7 @@ BEGIN
 				"00" & ir(8) 	WHEN "0101",
 				"00" & ir(8)	WHEN "0110",
 				"00" & ir(8)	WHEN "0111",
+				func				WHEN "1000",
 				"100" 			WHEN "1101",
 				"100" 			WHEN "1110",
 				"---"				WHEN OTHERS;
