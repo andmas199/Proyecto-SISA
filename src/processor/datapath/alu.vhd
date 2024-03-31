@@ -87,13 +87,13 @@ BEGIN
 			IF y(15) = '0' THEN
 				output := STD_LOGIC_VECTOR(shift_left(signed(x), natural(to_integer(unsigned(y(4 DOWNTO 0))))));
 			ELSE
-				output := STD_LOGIC_VECTOR(shift_right(signed(x), natural(to_integer(unsigned(y(4 DOWNTO 0))))));
+				output := STD_LOGIC_VECTOR(shift_right(signed(x), natural(to_integer(abs(signed(y(4 DOWNTO 0)))))));
 			END IF;
 		WHEN "00111" =>
 			IF y(15) = '0' THEN
 				output := STD_LOGIC_VECTOR(shift_left(unsigned(x), natural(to_integer(unsigned(y(4 DOWNTO 0))))));
 			ELSE
-				output := STD_LOGIC_VECTOR(shift_right(unsigned(x), natural(to_integer(unsigned(y(4 DOWNTO 0))))));
+				output := STD_LOGIC_VECTOR(shift_right(unsigned(x), natural(to_integer(abs(signed(y(4 DOWNTO 0)))))));
 			END IF;
 
 -- Comparison instructions
@@ -121,9 +121,9 @@ BEGIN
 		WHEN "11010" =>
 			MUL := STD_LOGIC_VECTOR(unsigned(x) * unsigned(y));
 			output := MUL(31 DOWNTO 16);
-		WHEN "11011" =>
-			output := STD_LOGIC_VECTOR(signed(x) / signed(y));
 		WHEN "11100" =>
+			output := STD_LOGIC_VECTOR(signed(x) / signed(y));
+		WHEN "11101" =>
 			output := STD_LOGIC_VECTOR(unsigned(x) / unsigned(y));
 			
 			
