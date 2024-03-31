@@ -44,23 +44,29 @@ PROCESS(x, y, op_group, op)
 	VARIABLE shift_value : unsigned(4 DOWNTO 0);
 	VARIABLE output : STD_LOGIC_VECTOR(15 DOWNTO 0);
 	VARIABLE ALU_sel: STD_LOGIC_VECTOR(4 DOWNTO 0);
-	VARIABLE LTU :		STD_LOGIC := '0';
-	VARIABLE LT :		STD_LOGIC := '0';
-	VARIABLE EQ :		STD_LOGIC := '0';
+	VARIABLE LTU :		STD_LOGIC;
+	VARIABLE LT :		STD_LOGIC;
+	VARIABLE EQ :		STD_LOGIC;
 	VARIABLE MUL : 	STD_LOGIC_VECTOR(31 DOWNTO 0);
 BEGIN
 	
 	ALU_sel := op_group & op;
 	IF unsigned(x) < unsigned(y) THEN
 		LTU := '1';
+	ELSE
+		LTU := '0';
 	END IF;
 	
 	IF signed(x) < signed(y) THEN
 		LT := '1';
+	ELSE
+		LT := '0';
 	END IF;
 	
 	IF x = y THEN
 		EQ := '1';
+	ELSE
+		EQ := '0';
 	END IF;
 	
 	CASE ALU_sel IS
