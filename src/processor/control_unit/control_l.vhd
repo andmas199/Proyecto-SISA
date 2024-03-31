@@ -68,7 +68,7 @@ BEGIN
 					std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length)) WHEN OTHERS;
 					
 	wr_m <= '1' WHEN op_code = "0100" or op_code = "1110" ELSE '0';
-	in_d <= '1' WHEN op_code = "0100" or op_code = "0110" ELSE '0';
+	in_d <= '1' WHEN op_code = "0011" or op_code = "1101" ELSE '0';
 	immed_x2 <= '1' WHEN op_code = "0011" or op_code = "0100" ELSE '0';
 	word_byte <= '1' WHEN op_code = "1101" or op_code = "1110" ELSE '0';
 	
