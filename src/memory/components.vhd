@@ -5,6 +5,7 @@ PACKAGE memory_components IS
 
     COMPONENT MemoryController IS
         PORT (CLOCK_50  : IN  STD_LOGIC;
+            proc_clk  : IN STD_LOGIC;
             addr      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
             wr_data   : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
             rd_data   : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -21,6 +22,7 @@ PACKAGE memory_components IS
 
     COMPONENT SRAMController is
         PORT (clk         : IN    STD_LOGIC;
+              proc_clk    : IN    STD_LOGIC;
               SRAM_ADDR   : OUT   STD_LOGIC_VECTOR(17 DOWNTO 0);
               SRAM_DQ     : INOUT STD_LOGIC_VECTOR(15 DOWNTO 0);
               SRAM_UB_N   : OUT   STD_LOGIC;

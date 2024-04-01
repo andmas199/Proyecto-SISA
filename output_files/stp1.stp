@@ -1,0 +1,36 @@
+<session jtag_chain="USB-Blaster [1-1]" jtag_device="@1: EP2C(15|20) (0x020B30DD)" sof_file="Proyecto-SISA.sof">
+  <display_tree gui_logging_enabled="0">
+  </display_tree>
+  <mnemonics>
+    <table name="state_table" width="11">
+      <symbol name="IDLE" value="00000000001"/>
+      <symbol name="IDLE0" value="00000000010"/>
+      <symbol name="IDLE1" value="00000000100"/>
+      <symbol name="IDLE2" value="00000001000"/>
+      <symbol name="IDLE3" value="00000010000"/>
+      <symbol name="READ_ACQUIRE" value="00000100000"/>
+      <symbol name="READ_PROVIDE" value="00001000000"/>
+      <symbol name="READ_SETUP" value="00010000000"/>
+      <symbol name="WRITE_END" value="00100000000"/>
+      <symbol name="WRITE_SETUP" value="01000000000"/>
+      <symbol name="WRITE_START" value="10000000000"/>
+    </table>
+    <table name="state_uc : width = 1" width="1">
+      <symbol name="DEMW" value="0"/>
+      <symbol name="F" value="1"/>
+    </table>
+  </mnemonics>
+  <static_plugin_mnemonics/>
+  <global_info>
+    <single attribute="active instance" value="0"/>
+    <single attribute="config widget visible" value="1"/>
+    <single attribute="data log widget visible" value="1"/>
+    <single attribute="hierarchy widget visible" value="1"/>
+    <single attribute="instance widget visible" value="1"/>
+    <single attribute="jtag widget visible" value="1"/>
+    <single attribute="sof manager visible" value="0"/>
+    <multi attribute="column width" size="23" value="34,34,152,74,68,70,88,88,98,98,88,88,110,101,101,101,101,101,101,101,101,107,78"/>
+    <multi attribute="frame size" size="2" value="1128,752"/>
+    <multi attribute="jtag widget size" size="2" value="366,133"/>
+  </global_info>
+</session>

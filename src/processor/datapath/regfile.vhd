@@ -17,7 +17,7 @@ END regfile;
 ARCHITECTURE Structure OF regfile IS
     TYPE regs_t IS ARRAY(7 DOWNTO 0) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
 BEGIN
-	PROCESS(clk)
+	PROCESS(clk, wrd, addr_a, addr_b)
 		VARIABLE regs: regs_t;
 	BEGIN
 		IF rising_edge(clk) and wrd = '1' THEN
