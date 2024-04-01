@@ -23,8 +23,7 @@ end SRAMController;
 
 architecture comportament of SRAMController is
 
---	TYPE state_t IS (IDLE3, IDLE2, IDLE1, IDLE0, IDLE, READ_SETUP, READ_ACQUIRE, READ_PROVIDE, WRITE_SETUP, WRITE_START, WRITE_END);
-	TYPE state_t IS (IDLE, OPERATE);
+	TYPE state_t IS (IDLE, SETUP, WRITE, STOP);
 	SIGNAL state: state_t := IDLE;
 begin
 
@@ -35,38 +34,67 @@ begin
 	SRAM_UB_N <= not address(0) WHEN byte_m = '1' ELSE '0';
 	SRAM_LB_N <= address(0) WHEN byte_m = '1' ELSE '0';
 
-	dataReaded <= SRAM_DQ;
-
 	PROCESS (clk)
 	BEGIN
+		
 		IF rising_edge(clk) THEN
 			CASE state IS
-				WHEN IDLE => state <= OPERATE;
-				WHEN OPERATE => state <= IDLE;
+				WHEN IDLE => IF proc_clk = '0' THEN state <= SETUP; END IF;
+				WHEN SETUP => state <= WRITE;
+				WHEN WRITE => state <= STOP;
+				WHEN STOP => state <= IDLE;
 			END CASE;
 		END IF;
+
 	END PROCESS;
 
-	PROCESS (clk)
+	PROCESS (state)
 	BEGIN
-		IF rising_edge(clk) and state = OPERATE THEN
 
-		ELSIF falling_edge(clk) and state = OPERATE THEN
-			SRAM_WE_N <= not WR;
-			
-			IF WR = '1' THEN
-				IF byte_m = '1' THEN
-					SRAM_DQ <= dataToWrite(7 DOWNTO 0) & dataToWrite(7 DOWNTO 0);
+		CASE state IS
+			WHEN IDLE =>
+
+			WHEN SETUP =>
+				IF WR = '1' THEN
+					IF byte_m = '1' THEN
+						SRAM_DQ <= dataToWrite(7 DOWNTO 0) & dataToWrite(7 DOWNTO 0);
+					ELSE
+						SRAM_DQ <= dataToWrite;
+					END IF;
 				ELSE
-					SRAM_DQ <= dataToWrite;
+					SRAM_DQ <= (others => 'Z');
 				END IF;
-			ELSE
-				SRAM_DQ <= (others => 'Z');
-			END IF;
-		ELSIF rising_edge(clk) and state = IDLE THEN
-			SRAM_WE_N <= '1';
-		END IF;
+
+			WHEN WRITE =>
+				SRAM_WE_N <= not WR;
+
+			WHEN STOP =>
+				SRAM_WE_N <= '1';
+				dataReaded <= SRAM_DQ;
+		END CASE;
+
 	END PROCESS;
+
+	-- PROCESS (clk)
+	-- BEGIN
+	-- 	IF rising_edge(clk) and state = OPERATE THEN
+
+	-- 	ELSIF falling_edge(clk) and state = OPERATE THEN
+	-- 		SRAM_WE_N <= not WR;
+			
+	-- 		IF WR = '1' THEN
+	-- 			IF byte_m = '1' THEN
+	-- 				SRAM_DQ <= dataToWrite(7 DOWNTO 0) & dataToWrite(7 DOWNTO 0);
+	-- 			ELSE
+	-- 				SRAM_DQ <= dataToWrite;
+	-- 			END IF;
+	-- 		ELSE
+	-- 			SRAM_DQ <= (others => 'Z');
+	-- 		END IF;
+	-- 	ELSIF rising_edge(clk) and state = IDLE THEN
+	-- 		SRAM_WE_N <= '1';
+	-- 	END IF;
+	-- END PROCESS;
 
 	-- PROCESS (clk)
 	-- BEGIN

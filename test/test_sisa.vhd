@@ -63,7 +63,7 @@ architecture comportament of test_sisa is
 	
 begin
    
-   ce_m2 <= '1', ce_m after 100ns;
+   ce_m2 <= '1', ce_m after 100 ns;
    -- Instanciacions de moduls
    SoC : sisa
       port map (
