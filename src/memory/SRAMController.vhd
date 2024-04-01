@@ -70,7 +70,14 @@ begin
 
 			WHEN STOP =>
 				SRAM_WE_N <= '1';
-				dataReaded <= SRAM_DQ;
+
+				IF byte_m = '1' and address(0) = '0' THEN
+					dataReaded <= STD_LOGIC_VECTOR(resize(signed(SRAM_DQ(7 DOWNTO 0)), 16));
+				ELSIF byte_m = '1' and address(0) = '1' THEN
+					dataReaded <= STD_LOGIC_VECTOR(resize(signed(SRAM_DQ(15 DOWNTO 8)), 16));
+				ELSE
+					dataReaded <= SRAM_DQ;
+				END IF;
 		END CASE;
 
 	END PROCESS;
