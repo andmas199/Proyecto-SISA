@@ -48,13 +48,16 @@ begin
 
 	END PROCESS;
 
-	PROCESS (state)
+	PROCESS (state, WR, byte_m, dataToWrite, address(0), SRAM_DQ)
 	BEGIN
 
 		CASE state IS
 			WHEN IDLE =>
+				SRAM_WE_N <= '1';
 
 			WHEN SETUP =>
+				SRAM_WE_N <= '1';
+
 				IF WR = '1' THEN
 					IF byte_m = '1' THEN
 						SRAM_DQ <= dataToWrite(7 DOWNTO 0) & dataToWrite(7 DOWNTO 0);
