@@ -1,10 +1,14 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 
+USE work.datapath_components.regfile_input_t;
+
 PACKAGE control_unit_components IS
+    TYPE sequencing_mode_t IS (IMPLICIT, RELATIVE, ABSOLUTE);
 
     COMPONENT control_l IS
         PORT (  ir     		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+                z           : IN STD_LOGIC;
 					 op_group	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
                 op     		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
                 ldpc   		: OUT STD_LOGIC;
@@ -14,10 +18,11 @@ PACKAGE control_unit_components IS
                 addr_d 		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
                 immed  		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
                 wr_m	  	: OUT STD_LOGIC;
-                in_d   		: OUT STD_LOGIC;
+                regfile_input: OUT regfile_input_t;
 					 Rb_N			: OUT STD_LOGIC;
                 immed_x2	: OUT STD_LOGIC;
-                word_byte   : OUT STD_LOGIC);
+                word_byte   : OUT STD_LOGIC;
+                sequencing_mode : OUT sequencing_mode_t);
     END COMPONENT;
 
     COMPONENT multi is
@@ -50,6 +55,8 @@ PACKAGE control_unit_components IS
         PORT (  boot        : IN  STD_LOGIC;
                 clk         : IN  STD_LOGIC;
                 datard_m    : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+                alu_out     : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+                z           : IN STD_LOGIC;
 					 op_group	 : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
                 op          : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
                 wrd         : OUT STD_LOGIC;
@@ -59,7 +66,7 @@ PACKAGE control_unit_components IS
                 immed       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
                 pc          : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
                 ins_dad     : OUT STD_LOGIC;
-                in_d        : OUT STD_LOGIC;
+                regfile_input : OUT regfile_input_t;
 					 Rb_N			 : OUT STD_LOGIC;
                 immed_x2    : OUT STD_LOGIC;
                 wr_m        : OUT STD_LOGIC;

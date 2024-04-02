@@ -2,6 +2,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
+USE work.datapath_components.regfile_input_t;
 USE work.datapath_components.alu;
 USE work.datapath_components.regfile;
 
@@ -14,14 +15,16 @@ ENTITY datapath IS
 			 addr_b : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_d : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
           immed  : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+		  regfile_input: IN regfile_input_t;
 			 immed_x2: IN STD_LOGIC;
 			 datard_m : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 ins_dad : IN STD_LOGIC;
 			 pc :	IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 in_d : IN STD_LOGIC;
 			 Rb_N	: IN STD_LOGIC;
 			 addr_m : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 data_wr : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+			 data_wr : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			 alu_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			 z : OUT STD_LOGIC);
 END datapath;
 
 
@@ -41,7 +44,8 @@ BEGIN
 						y 	=> y,
 						op_group => op_group,
 						op => op,
-						w 	=> w);
+						w 	=> w,
+						z => z);
 	reg0: regfile
 		PORT MAP (	clk		=> clk,
 						wrd		=> wrd,
@@ -54,7 +58,13 @@ BEGIN
 	data_wr <= b;					
 	immediate <= immed WHEN immed_x2 = '0' ELSE immed(14 DOWNTO 0) & '0';				
 	y <= immediate WHEN Rb_N = '0' ELSE b;
-	d <= w WHEN in_d = '0' ELSE datard_m;
+
+	WITH regfile_input SELECT
+		d <= w 									WHEN ALU_OUTPUT,
+			 datard_m							WHEN MEM,
+			 STD_LOGIC_VECTOR(unsigned(pc) + 2) WHEN PC_UPD;
+
 	addr_m <= pc WHEN ins_dad = '0' ELSE w;
+	alu_out <= w;
 	
 END Structure;
