@@ -66,9 +66,9 @@ BEGIN
 				
 	ldpc <= '0' WHEN ir = x"FFFF" ELSE '1';
 	Rb_N <= '1' WHEN op_code = "0000" or op_code = "0001" or op_code = "1000" or op_code = "0110" or op_code = "1010" ELSE '0';
-	wrd <= '0' WHEN op_code = "0100" or op_code = "0111" or op_code = "0110" or op_code = "1110"  or (op_code = "1010" and ir(2) = '0') ELSE '1';
+	wrd <= '0' WHEN op_code = "0100" or op_code = "0111" or op_code = "0110" or op_code = "1110"  or (op_code = "1010" and ir(2) = '0') or op_code = "1111" ELSE '1';
 	addr_a <= ir(11 DOWNTO 9) WHEN op_code = "0101" ELSE ir(8 DOWNTO 6);
-	addr_b <= ir(11 DOWNTO 9) WHEN op_code = "0100" or op_code = "0110" or op_code = "0111" or op_code = "0110" or op_code = "1010" ELSE ir(2 DOWNTO 0);
+	addr_b <= ir(11 DOWNTO 9) WHEN op_code = "0100" or op_code = "0110" or op_code = "0111" or op_code = "0110" or op_code = "1010" or op_code = "1110" ELSE ir(2 DOWNTO 0);
 	addr_d <= ir(11 DOWNTO 9);
 	
 	WITH op_code SELECT
