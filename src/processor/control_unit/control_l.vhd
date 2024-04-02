@@ -29,7 +29,7 @@ ARCHITECTURE Structure OF control_l IS
 
 	SIGNAL op_code: STD_LOGIC_VECTOR(3 DOWNTO 0);
 	SIGNAL func:	 STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL take_branch: STD_LOGIC;
+	SIGNAL take_branch: BOOLEAN;
 
 BEGIN
 	op_code <= ir(15 DOWNTO 12);
@@ -81,12 +81,12 @@ BEGIN
 	word_byte <= '1' WHEN op_code = "1101" or op_code = "1110" ELSE '0';
 
 	WITH op_code SELECT
-		take_branch <= 	not ir(8) 					WHEN "0110",
-						not ir(8) or ir(2) or ir(1) WHEN "1010",
-						'-' WHEN OTHERS;
+		take_branch <= 	ir(8) /= z								 WHEN "0110",
+						ir(0) /= z or ir(2) = '1' or ir(1) = '1' WHEN "1010",
+						false WHEN OTHERS;
 	
-	sequencing_mode <= 	RELATIVE WHEN op_code = "0110" AND take_branch = '1' ELSE
-						ABSOLUTE WHEN op_code = "1010" AND take_branch = '1' ELSE
+	sequencing_mode <= 	RELATIVE WHEN op_code = "0110" AND take_branch ELSE
+						ABSOLUTE WHEN op_code = "1010" AND take_branch ELSE
 						IMPLICIT;
 
 END Structure;
