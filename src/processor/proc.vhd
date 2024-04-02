@@ -1,8 +1,7 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 
-USE work.datapath_components.regfile_input_t;
-USE work.datapath_components.datapath;
+USE work.datapath_components.all;
 USE work.control_unit_components.unidad_control;
 
 ENTITY proc IS
