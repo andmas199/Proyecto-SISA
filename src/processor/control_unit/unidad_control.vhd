@@ -3,6 +3,8 @@ USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 USE ieee.std_logic_unsigned.all;
 
+USE work.control_unit_components.sequencing_mode_t;
+USE work.datapath_components.regfile_input_t;
 USE work.control_unit_components.control_l;
 USE work.control_unit_components.multi;
 
@@ -10,6 +12,8 @@ ENTITY unidad_control IS
     PORT (boot      : IN  STD_LOGIC;
           clk       : IN  STD_LOGIC;
           datard_m  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+		  alu_out   : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+		  z			: IN STD_LOGIC;
 			 op_group  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
           op        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           wrd       : OUT STD_LOGIC;
@@ -19,7 +23,7 @@ ENTITY unidad_control IS
           immed     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           pc        : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           ins_dad   : OUT STD_LOGIC;
-          in_d      : OUT STD_LOGIC;
+          regfile_input : OUT regfile_input_t;
 			 Rb_N		  : OUT STD_LOGIC;	
           immed_x2  : OUT STD_LOGIC;
           wr_m      : OUT STD_LOGIC;
@@ -36,9 +40,16 @@ ARCHITECTURE Structure OF unidad_control IS
 	
 	SIGNAL ldpc: STD_LOGIC;
 	SIGNAL ldir: STD_LOGIC;
+
+	SIGNAL immediate: STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL sequencing_mode: sequencing_mode_t;
 BEGIN
+
+	immed <= immediate;
+
 	c0: control_l
 		PORT MAP (ir => ir,
+					 z => z,
 					 op_group => op_group,
 					 op => op,
 					 ldpc => ldpc_l,
@@ -46,12 +57,13 @@ BEGIN
 					 addr_a => addr_a,
 					 addr_b => addr_b,
 					 addr_d => addr_d,
-					 immed => immed,
+					 immed => immediate,
 					 wr_m => wr_m_l,
-					 in_d => in_d,
+					 regfile_input => regfile_input,
 					 Rb_N => Rb_N,
 					 immed_x2 => immed_x2,
-					 word_byte => w_b);
+					 word_byte => w_b,
+					 sequencing_mode => sequencing_mode);
 	
 	m0: multi
 		PORT MAP(clk => clk,
@@ -73,7 +85,11 @@ BEGIN
 	BEGIN
 		IF rising_edge(clk) THEN
 			IF booted = '1' and ldpc = '1' THEN
-				pc_reg := pc_reg + 2;
+				CASE sequencing_mode IS
+					WHEN IMPLICIT => pc_reg := pc_reg + 2;
+					WHEN RELATIVE => pc_reg := STD_LOGIC_VECTOR(signed(unsigned(pc_reg)) + 2 + signed(immediate(7 DOWNTO 0)));
+					WHEN ABSOLUTE => pc_reg := alu_out;
+				END CASE;
 			ELSIF boot = '1' THEN
 				pc_reg := x"C000";
 				booted := '1';

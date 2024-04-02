@@ -17,13 +17,13 @@ USE ieee.numeric_std.all;
   ------------------------------------------------------------------
   -- 010            |    XOR   |    --    |    --    |    MULHU   --
   ------------------------------------------------------------------
-  -- 011            |    NOT   |   CMPEQ  |    --    |    DIV     --
+  -- 011            |    NOT   |   CMPEQ  |    --    |     --     --
   ------------------------------------------------------------------
-  -- 100            |    ADD   |   CMPLTU |    --    |    DIVU    --
+  -- 100            |    ADD   |   CMPLTU |    --    |    DIV     --
   ------------------------------------------------------------------
-  -- 101            |    SUB   |   CMPLEU |    --    |     --     --
+  -- 101            |    SUB   |   CMPLEU |    --    |    DIVU    --
   ------------------------------------------------------------------
-  -- 110            |    SHA   |    --    |    --    |     --     --
+  -- 110            |    SHA   |    --    |    --    |     X      --
   ------------------------------------------------------------------
   -- 111            |    SHL   |    --    |    --    |     --     --
   ------------------------------------------------------------------
@@ -43,7 +43,6 @@ ARCHITECTURE Structure OF alu IS
 BEGIN
 
 PROCESS(x, y, op_group, op)
-	VARIABLE shift_value : unsigned(4 DOWNTO 0);
 	VARIABLE output : STD_LOGIC_VECTOR(15 DOWNTO 0);
 	VARIABLE ALU_sel: STD_LOGIC_VECTOR(4 DOWNTO 0);
 	VARIABLE LTU :		STD_LOGIC;
@@ -127,15 +126,17 @@ BEGIN
 			output := STD_LOGIC_VECTOR(signed(x) / signed(y));
 		WHEN "11101" =>
 			output := STD_LOGIC_VECTOR(unsigned(x) / unsigned(y));
-			
-			
+	
+	-- Special
+		WHEN "11110" =>
+			output := x;
 		WHEN OTHERS =>
 			output := y;
 			
 
 	END CASE;
 	
-	 IF unsigned(output) = x"00" THEN
+	 IF unsigned(y) = x"00" THEN
 		z <= '1';
 	 ELSE
 		z <= '0';

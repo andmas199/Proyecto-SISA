@@ -2,6 +2,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 
 PACKAGE datapath_components IS
+    TYPE regfile_input_t IS (MEM, ALU_OUTPUT, PC_UPD);
 
     COMPONENT alu IS
         PORT (  x  		 : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -26,9 +27,11 @@ PACKAGE datapath_components IS
                 ins_dad     : IN  STD_LOGIC;
 					 Rb_N			 : IN STD_LOGIC;
                 pc          : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-                in_d        : IN  STD_LOGIC;
+                regfile_input: IN regfile_input_t;
                 addr_m      : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-                data_wr     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+                data_wr     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+                alu_out     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+                z           : OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT regfile IS

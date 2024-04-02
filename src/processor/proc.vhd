@@ -1,6 +1,7 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 
+USE work.datapath_components.regfile_input_t;
 USE work.datapath_components.datapath;
 USE work.control_unit_components.unidad_control;
 
@@ -28,7 +29,9 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL ins_dad:	STD_LOGIC;
 	SIGNAL Rb_N :		STD_LOGIC;
 	SIGNAL pc:			STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL in_d:		STD_LOGIC;
+	SIGNAL regfile_input : regfile_input_t;
+	SIGNAL alu_out : STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL z : STD_LOGIC;
 
 BEGIN
 	e0: datapath
@@ -45,9 +48,11 @@ BEGIN
 						 ins_dad => ins_dad,
 						 Rb_N => Rb_N,
 						 pc => pc,
-						 in_d => in_d,
+						 regfile_input => regfile_input,
 						 addr_m => addr_m,
-						 data_wr => data_wr);
+						 data_wr => data_wr,
+						 alu_out => alu_out,
+						 z => z);
 	
 	co: unidad_control
 		PORT MAP	(	 boot => boot,
@@ -63,8 +68,10 @@ BEGIN
 						 Rb_N => Rb_N,
 						 pc => pc,
 						 ins_dad => ins_dad,
-						 in_d => in_d,
+						 regfile_input => regfile_input,
 						 immed_x2 => immed_x2,
 						 wr_m => wr_m,
-						 word_byte => word_byte);
+						 word_byte => word_byte,
+						 alu_out => alu_out,
+						 z => z);
 END Structure;
