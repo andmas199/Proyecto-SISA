@@ -2,8 +2,8 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
-USE work.control_unit_components.sequencing_mode_t;
-USE work.datapath_components.regfile_input_t;
+USE work.control_unit_components.all;
+USE work.datapath_components.all;
 
 ENTITY control_l IS
     PORT (ir     		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);

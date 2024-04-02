@@ -3,7 +3,7 @@ USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 USE ieee.std_logic_unsigned.all;
 
-USE work.control_unit_components.sequencing_mode_t;
+USE work.control_unit_components.all;
 USE work.datapath_components.regfile_input_t;
 USE work.control_unit_components.control_l;
 USE work.control_unit_components.multi;

@@ -2,9 +2,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
-USE work.datapath_components.regfile_input_t;
-USE work.datapath_components.alu;
-USE work.datapath_components.regfile;
+USE work.datapath_components.all;
 
 ENTITY datapath IS
     PORT (clk    : IN STD_LOGIC;
