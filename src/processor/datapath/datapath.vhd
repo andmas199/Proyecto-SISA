@@ -3,6 +3,7 @@ USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
 USE work.datapath_components.all;
+USE work.io_components.all;
 
 ENTITY datapath IS
     PORT (clk    : IN STD_LOGIC;
@@ -22,7 +23,9 @@ ENTITY datapath IS
 			 addr_m : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 data_wr : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 alu_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 z : OUT STD_LOGIC);
+			 z : OUT STD_LOGIC;
+			 rd_io : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+			 wr_io : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
 END datapath;
 
 
@@ -60,9 +63,11 @@ BEGIN
 	WITH regfile_input SELECT
 		d <= w 									WHEN ALU_OUTPUT,
 			 datard_m							WHEN MEM,
-			 STD_LOGIC_VECTOR(unsigned(pc) + 2) WHEN PC_UPD;
+			 STD_LOGIC_VECTOR(unsigned(pc) + 2) WHEN PC_UPD,
+			 rd_io								WHEN IO_RD;
 
 	addr_m <= pc WHEN ins_dad = '0' ELSE w;
 	alu_out <= w;
 	
+	wr_io <= b;
 END Structure;

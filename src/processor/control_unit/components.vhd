@@ -22,7 +22,10 @@ PACKAGE control_unit_components IS
 					 Rb_N			: OUT STD_LOGIC;
                 immed_x2	: OUT STD_LOGIC;
                 word_byte   : OUT STD_LOGIC;
-                sequencing_mode : OUT sequencing_mode_t);
+                sequencing_mode: OUT sequencing_mode_t;
+                addr_io: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+                rd_in: OUT STD_LOGIC;
+                wr_out: OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT multi is
@@ -70,6 +73,9 @@ PACKAGE control_unit_components IS
 					 Rb_N			 : OUT STD_LOGIC;
                 immed_x2    : OUT STD_LOGIC;
                 wr_m        : OUT STD_LOGIC;
-                word_byte   : OUT STD_LOGIC);
+                word_byte : OUT STD_LOGIC;
+                addr_io: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+                rd_in: OUT STD_LOGIC;
+                wr_out: OUT STD_LOGIC);
     END COMPONENT;
 END PACKAGE;

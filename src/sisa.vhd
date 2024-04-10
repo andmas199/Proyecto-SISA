@@ -2,6 +2,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
+USE work.io_components.controladores_IO;
 USE work.memory_components.MemoryController;
 USE work.processor_components.proc;
 
@@ -14,6 +15,8 @@ ENTITY sisa IS
           SRAM_CE_N : out   std_logic := '1';
           SRAM_OE_N : out   std_logic := '1';
           SRAM_WE_N : out   std_logic := '1';
+          LEDG      : out   std_logic_vector(7 downto 0);
+          LEDR      : out   std_logic_vector(7 downto 0);
           SW        : in std_logic_vector(9 downto 9));
 END sisa;
 
@@ -24,16 +27,27 @@ ARCHITECTURE Structure OF sisa IS
     SIGNAL data_byte: STD_LOGIC;
     SIGNAL we: STD_LOGIC;
     SIGNAL clock8: STD_LOGIC;
+    SIGNAL boot: STD_LOGIC;
+    SIGNAL addr_io: STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL wr_io: STD_LOGIC_VECTOR(15 DOWNTO 0);  
+    SIGNAL rd_io: STD_LOGIC_VECTOR(15 DOWNTO 0);  
+    SIGNAL wr_out: STD_LOGIC; 
+    SIGNAL rd_in: STD_LOGIC;  
 BEGIN
 
     pro0: proc
         PORT MAP(   clk => clock8,
-                    boot => SW(9),
+                    boot => boot,
                     datard_m => data_rd,
                     addr_m => data_addr,
                     data_wr => data_wr,
                     wr_m => we,
-                    word_byte => data_byte);
+                    word_byte => data_byte,
+                    addr_io     => addr_io,
+                    wr_io       => wr_io,
+                    rd_io       => rd_io,
+                    wr_out      => wr_out,
+                    rd_in       => rd_in);
 
     mem0: MemoryController
     PORT MAP (  CLOCK_50  => CLOCK_50,
@@ -50,6 +64,19 @@ BEGIN
                 SRAM_CE_N => SRAM_CE_N,
                 SRAM_OE_N => SRAM_OE_N,
                 SRAM_WE_N => SRAM_WE_N);
+    
+    io: controladores_IO
+        PORT MAP (  boot        => boot,
+                    CLOCK_50    => clock8,
+                    addr_io     => addr_io,
+                    wr_io       => wr_io,
+                    rd_io       => rd_io,
+                    wr_out      => wr_out,
+                    rd_in       => rd_in,
+                    led_verdes  => LEDG,
+                    led_rojos   => LEDR);
+
+    boot <= SW(9);
 
     PROCESS (CLOCK_50)
         VARIABLE clock8_counter: unsigned(2 DOWNTO 0) := to_unsigned(0, 3);

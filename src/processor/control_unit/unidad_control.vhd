@@ -27,7 +27,10 @@ ENTITY unidad_control IS
 			 Rb_N		  : OUT STD_LOGIC;	
           immed_x2  : OUT STD_LOGIC;
           wr_m      : OUT STD_LOGIC;
-          word_byte : OUT STD_LOGIC);
+          word_byte : OUT STD_LOGIC;
+		  addr_io: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+		  rd_in: OUT STD_LOGIC;
+		  wr_out: OUT STD_LOGIC);
 END unidad_control;
 
 ARCHITECTURE Structure OF unidad_control IS
@@ -63,7 +66,10 @@ BEGIN
 					 Rb_N => Rb_N,
 					 immed_x2 => immed_x2,
 					 word_byte => w_b,
-					 sequencing_mode => sequencing_mode);
+					 sequencing_mode => sequencing_mode,
+					 addr_io => addr_io,
+					 rd_in => rd_in,
+					 wr_out => wr_out);
 	
 	m0: multi
 		PORT MAP(clk => clk,

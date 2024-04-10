@@ -11,7 +11,12 @@ ENTITY proc IS
           addr_m    : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           data_wr   : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           wr_m      : OUT STD_LOGIC;
-          word_byte : OUT STD_LOGIC);
+          word_byte : OUT STD_LOGIC;
+		  addr_io   : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+		  rd_io		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+		  wr_io		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+		  rd_in		: OUT STD_LOGIC;
+		  wr_out	: OUT STD_LOGIC);
 END proc;
 
 
@@ -51,7 +56,9 @@ BEGIN
 						 addr_m => addr_m,
 						 data_wr => data_wr,
 						 alu_out => alu_out,
-						 z => z);
+						 z => z,
+						 rd_io => rd_io,
+						 wr_io => wr_io);
 	
 	co: unidad_control
 		PORT MAP	(	 boot => boot,
@@ -72,5 +79,8 @@ BEGIN
 						 wr_m => wr_m,
 						 word_byte => word_byte,
 						 alu_out => alu_out,
-						 z => z);
+						 z => z,
+						 addr_io => addr_io,
+						 rd_in => rd_in,
+						 wr_out => wr_out);
 END Structure;
