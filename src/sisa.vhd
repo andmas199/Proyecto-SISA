@@ -57,7 +57,6 @@ BEGIN
 
     mem0: MemoryController
     PORT MAP (  CLOCK_50  => CLOCK_50,
-                proc_clk  => clock8,
                 addr      => data_addr, 
                 wr_data   => data_wr, 
                 rd_data   => data_rd, 
