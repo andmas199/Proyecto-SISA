@@ -20,6 +20,26 @@
               pythonWithPackages
             ];
           };
+
+          checks = {
+            vunitTest = pkgs.stdenv.mkDerivation {
+              name = "vunitTest";
+              src = ./.;
+
+              dontBuild = true;
+
+              doCheck = true;
+
+              nativeCheckInputs = [ self.devShells.${system}.default.nativeBuildInputs ];
+
+              checkPhase = ''
+                cd test_ci
+                python3 ./run.py
+              '';
+
+              installPhase = "mkdir $out";
+            };
+          };
         }
       );
 }
