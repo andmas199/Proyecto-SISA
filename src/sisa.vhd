@@ -26,6 +26,7 @@ ENTITY sisa IS
 END sisa;
 
 ARCHITECTURE Structure OF sisa IS
+    SIGNAL clock8_counter: unsigned(2 DOWNTO 0) := to_unsigned(0, 3);
     SIGNAL data_rd: STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL data_wr: STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL data_addr: STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -90,12 +91,13 @@ BEGIN
     boot <= SW(9);
 
     PROCESS (CLOCK_50)
-        VARIABLE clock8_counter: unsigned(2 DOWNTO 0) := to_unsigned(0, 3);
     BEGIN
         IF rising_edge(CLOCK_50) THEN
-            clock8_counter := clock8_counter + 1;
-            clock8 <= clock8_counter(2);
+            clock8_counter <= clock8_counter + 1;
         END IF;
     END PROCESS;
 
+    clock8 <= clock8_counter(2);
+
 END Structure;
+

@@ -35,6 +35,8 @@ END unidad_control;
 
 ARCHITECTURE Structure OF unidad_control IS
 	SIGNAL ir: STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL pc_reg: STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL booted: STD_LOGIC := '0';
 
 	SIGNAL ldpc_l: STD_LOGIC;
 	SIGNAL wrd_l: STD_LOGIC;
@@ -85,20 +87,18 @@ BEGIN
 					ins_dad => ins_dad,
 					word_byte => word_byte);
 	
-	PROCESS(clk)
-		VARIABLE pc_reg: STD_LOGIC_VECTOR(15 DOWNTO 0);
-		VARIABLE booted: STD_LOGIC := '0';
+	PROCESS(clk, pc_reg)
 	BEGIN
 		IF rising_edge(clk) THEN
 			IF booted = '1' and ldpc = '1' THEN
 				CASE sequencing_mode IS
-					WHEN IMPLICIT => pc_reg := pc_reg + 2;
-					WHEN RELATIVE => pc_reg := STD_LOGIC_VECTOR(signed(unsigned(pc_reg)) + 2 + signed(immediate(7 DOWNTO 0)));
-					WHEN ABSOLUTE => pc_reg := alu_out;
+					WHEN IMPLICIT => pc_reg <= pc_reg + 2;
+					WHEN RELATIVE => pc_reg <= STD_LOGIC_VECTOR(signed(unsigned(pc_reg)) + 2 + signed(immediate(7 DOWNTO 0)));
+					WHEN ABSOLUTE => pc_reg <= alu_out;
 				END CASE;
 			ELSIF boot = '1' THEN
-				pc_reg := x"C000";
-				booted := '1';
+				pc_reg <= x"C000";
+				booted <= '1';
 			END IF;
 		END IF;
 		
