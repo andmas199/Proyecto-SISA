@@ -17,7 +17,12 @@ ENTITY sisa IS
           SRAM_WE_N : out   std_logic := '1';
           LEDG      : out   std_logic_vector(7 downto 0);
           LEDR      : out   std_logic_vector(7 downto 0);
-          SW        : in std_logic_vector(9 downto 9));
+          KEY       : in std_logic_vector(3 downto 0);
+          SW        : in std_logic_vector(9 downto 0);
+          HEX0      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+          HEX1      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+          HEX2      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+          HEX3      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0));
 END sisa;
 
 ARCHITECTURE Structure OF sisa IS
@@ -74,7 +79,13 @@ BEGIN
                     wr_out      => wr_out,
                     rd_in       => rd_in,
                     led_verdes  => LEDG,
-                    led_rojos   => LEDR);
+                    led_rojos   => LEDR,
+                    keys        => KEY,
+                    switches    => SW(7 DOWNTO 0),
+                    HEX0        => HEX0,
+                    HEX1        => HEX1,
+                    HEX2        => HEX2,
+                    HEX3        => HEX3);
 
     boot <= SW(9);
 

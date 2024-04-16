@@ -47,10 +47,14 @@ architecture comportament of tb_sisa is
 				SRAM_OE_N 	: out std_logic := '1';
 				SRAM_WE_N 	: out std_logic := '1';
 								
-				SW : in std_logic_vector(9 downto 9);
+				SW : in std_logic_vector(9 downto 0);
+        KEY : in std_logic_vector(3 downto 0);
         LEDG : out std_logic_vector(7 downto 0);
-        LEDR : out std_logic_vector(7 downto 0)
-				);
+        LEDR : out std_logic_vector(7 downto 0);
+        HEX0      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        HEX1      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        HEX2      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        HEX3      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0));
    end component;
 
    
@@ -71,7 +75,12 @@ architecture comportament of tb_sisa is
    signal we_m           : std_logic;
    signal ce_m2           : std_logic;
 
-   signal botones      : std_logic_vector(9 downto 9);
+   signal botones      : std_logic_vector(9 downto 0) := "0000000000";
+   signal keys         : std_logic_vector(3 downto 0) := "1111";
+   signal HEX0         : std_logic_vector(6 downto 0);
+   signal HEX1         : std_logic_vector(6 downto 0);
+   signal HEX2         : std_logic_vector(6 downto 0);
+   signal HEX3         : std_logic_vector(6 downto 0);
    signal LEDG         : std_logic_vector(7 downto 0);
    signal LEDR         : std_logic_vector(7 downto 0);
 
@@ -83,8 +92,13 @@ begin
       port map (
          CLOCK_50   => clk,
          SW        => botones,
+         KEY       => keys,
          LEDG      => LEDG,
          LEDR      => LEDR,
+         HEX0      => HEX0,
+         HEX1      => HEX1,
+         HEX2      => HEX2,
+         HEX3      => HEX3,
 
          SRAM_ADDR  => addr_SoC,
          SRAM_DQ    => data_mem,

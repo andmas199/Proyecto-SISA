@@ -11,6 +11,18 @@ PACKAGE io_components IS
                 wr_out: IN STD_LOGIC;
                 rd_in: IN STD_LOGIC;
                 led_verdes: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-                led_rojos: OUT STD_LOGIC_VECTOR(7 DOWNTO 0));
+                led_rojos: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+                keys: IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+                switches: IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+                HEX0: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+                HEX1: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+                HEX2: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+                HEX3: OUT STD_LOGIC_VECTOR(6 DOWNTO 0));
+    END COMPONENT;
+
+    COMPONENT seg7_driver IS
+      PORT (enable: in  std_logic;
+            value:  in  std_logic_vector(3 DOWNTO 0);
+            hex:    out std_logic_vector(6 DOWNTO 0));
     END COMPONENT;
 END PACKAGE;
