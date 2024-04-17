@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity SRAMController is
     port (clk         : in    std_logic;
-          -- seÃ±ales para la placa de desarrollo
+          -- señales para la placa de desarrollo
           SRAM_ADDR   : out   std_logic_vector(17 downto 0);
           SRAM_DQ     : inout std_logic_vector(15 downto 0);
           SRAM_UB_N   : out   std_logic;
@@ -12,7 +12,7 @@ entity SRAMController is
           SRAM_CE_N   : out   std_logic;
           SRAM_OE_N   : out   std_logic;
           SRAM_WE_N   : out   std_logic;
-          -- seÃ±ales internas del procesador
+          -- señales internas del procesador
           address     : in    std_logic_vector(15 downto 0) := "0000000000000000";
           dataReaded  : out   std_logic_vector(15 downto 0);
           dataToWrite : in    std_logic_vector(15 downto 0);
@@ -27,7 +27,7 @@ architecture comportament of SRAMController is
 begin
 
 	SRAM_CE_N <= '0';
-	SRAM_OE_N <= WR;
+	SRAM_OE_N <= '0';
 
 	SRAM_ADDR <= "000" & address(15 DOWNTO 1);
 	SRAM_UB_N <= not address(0) WHEN byte_m = '1' ELSE '0';
@@ -51,9 +51,9 @@ begin
 		
 		IF rising_edge(clk) THEN
 			CASE state IS
-				WHEN IDLE => IF WR = '1' THEN state <= WRITE; END IF;
+				WHEN IDLE => IF WR = '1' THEN state <= WRITE; ELSE state <= IDLE; END IF;
 				WHEN WRITE => state <= DONE;
-				WHEN DONE => IF WR = '0' THEN state <= IDLE; END IF;
+				WHEN DONE => IF WR = '0' THEN state <= IDLE; ELSE state <= DONE; END IF;
 			END CASE;
 		END IF;
 
