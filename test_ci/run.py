@@ -25,26 +25,26 @@ def make_post_check(test_name):
         with output_file.open("r") as fread:
             memory_dump = fread.read().splitlines()
 
-            if len(memory_dump) != 65536:
-                print("Invalid dump")
+        if len(memory_dump) != 65536:
+            print("Invalid dump")
+            return False
+
+        code_start = 24576
+        for i in range(len(code)):
+            expected = code[i]
+            got = memory_dump[code_start + i]
+            if expected != got:
+                print(f"Code corruption @ {hex((code_start + i) * 2)} ({i}th instruction). Expected {expected}, got {got}.")
                 return False
 
-            code_start = 24576
-            for i in range(len(code)):
-                expected = code[i]
-                got = memory_dump[code_start + i]
-                if expected != got:
-                    print(f"Code corruption @ {hex((code_start + i) * 2)} ({i}th instruction). Expected {expected}, got {got}.")
-                    return False
+        dumps = dict(
+            memory=memory_dump
+        )
 
-            dumps = dict(
-                memory=memory_dump
-            )
-
-            for assertion in assertions:
-                if not assertion.passes(dumps):
-                    print(assertion.describe_failure(dumps))
-                    return False
+        for assertion in assertions:
+            if not assertion.passes(dumps):
+                print(assertion.describe_failure(dumps))
+                return False
 
         return True
 
