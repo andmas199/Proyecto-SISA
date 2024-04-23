@@ -52,7 +52,7 @@ BEGIN
             regs(KEYS_PORT)(3 DOWNTO 0) <= keys;
             regs(SWITCHES_PORT)(7 DOWNTO 0) <= switches;
         
-            IF wr_out = '1' and IsReadOnlyPort(addr_io) THEN
+            IF wr_out = '1' and not IsReadOnlyPort(addr_io) THEN
                 regs(to_integer(unsigned(addr_io))) <= wr_io;
             END IF;
         END IF;
