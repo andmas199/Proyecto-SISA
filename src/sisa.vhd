@@ -22,7 +22,9 @@ ENTITY sisa IS
           HEX0      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
           HEX1      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
           HEX2      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-          HEX3      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0));
+          HEX3      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+          PS2_CLK   : INOUT std_logic;
+          PS2_DAT   : INOUT std_logic);
 END sisa;
 
 ARCHITECTURE Structure OF sisa IS
@@ -85,7 +87,9 @@ BEGIN
                     HEX0        => HEX0,
                     HEX1        => HEX1,
                     HEX2        => HEX2,
-                    HEX3        => HEX3);
+                    HEX3        => HEX3,
+                    ps2_clk     => PS2_CLK,
+                    ps2_data    => PS2_DAT);
 
     boot <= SW(9);
 

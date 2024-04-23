@@ -71,6 +71,10 @@ for test_file in os.listdir("test_files"):
 
     if ext != ".hex":
         continue
+
+    # TODO: IO tests
+    if "keyboard" in test_name:
+        continue
     
     tb.add_config(
         test_name,
