@@ -74,7 +74,8 @@ BEGIN
     
     io: controladores_IO
         PORT MAP (  boot        => boot,
-                    CLOCK_50    => clock8,
+                    CLOCK_50    => CLOCK_50,
+                    clk         => clock8,
                     addr_io     => addr_io,
                     wr_io       => wr_io,
                     rd_io       => rd_io,

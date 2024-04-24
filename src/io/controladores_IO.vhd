@@ -8,6 +8,7 @@ USE work.keyboard_components.keyboard_controller;
 ENTITY controladores_IO IS
     PORT (  boot: IN STD_LOGIC;
             CLOCK_50: IN STD_LOGIC;
+            clk: IN STD_LOGIC;
             addr_io: IN STD_LOGIC_VECTOR(7 DOWNTO 0);
             wr_io: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
             rd_io: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -57,9 +58,9 @@ ARCHITECTURE Structure OF controladores_IO IS
 
 BEGIN
 
-    PROCESS(CLOCK_50, wr_out)
+    PROCESS(clk, wr_out)
     BEGIN
-        IF rising_edge(CLOCK_50) THEN
+        IF rising_edge(clk) THEN
             -- IO Inputs
             regs(KEYS_PORT)(3 DOWNTO 0) <= keys;
             regs(SWITCHES_PORT)(7 DOWNTO 0) <= switches;
