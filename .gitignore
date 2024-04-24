@@ -95,7 +95,3 @@ vsim.dbg
 
 # Direnv
 .direnv/
-
-# Vunit
-__pycache__/
-vunit_out

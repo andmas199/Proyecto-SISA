@@ -2,17 +2,25 @@
 
 import os
 from pathlib import Path
+import tomllib
 
 from vunit import VUnit
 from vunit.json4vhdl import encode_json
 
 import sisa_assertions
 
+with open("config.toml", "rb") as f:
+    config = tomllib.load(f)
+
+
+test_files_dir = Path(config['test_files_dir'])
+source_glob = config['source_glob']
+
 def make_post_check(test_name):
     def post_check(output_path):
         output_file = Path(output_path) / "dump.hex"
-        code_file = Path("test_files") / f"{test_name}.hex"
-        assertions_file = Path("test_files") / f"{test_name}.assertions"
+        code_file = test_files_dir / f"{test_name}.hex"
+        assertions_file = test_files_dir / f"{test_name}.assertions"
 
         with code_file.open("r") as fread:
             code = fread.read().splitlines()
@@ -55,8 +63,8 @@ vu = VUnit.from_argv(compile_builtins=False)
 vu.add_vhdl_builtins()
 
 lib = vu.add_library("lib")
-lib.add_source_files("*.vhd")
-lib.add_source_files("../src/**/*.vhd")
+lib.add_source_files("./*.vhd")
+lib.add_source_files(source_glob)
 
 vu.add_compile_option("ghdl.a_flags", ["-fsynopsys"])
 vu.set_sim_option("ghdl.elab_flags", ["-fsynopsys"])
@@ -65,7 +73,7 @@ vu.set_sim_option("ghdl.elab_flags", ["-fsynopsys"])
 
 tb = lib.get_test_benches()[0];
 
-for test_file in os.listdir("test_files"):
+for test_file in os.listdir(test_files_dir):
     [test_name, ext] = os.path.splitext(test_file)
     print(test_name)
 
@@ -74,7 +82,7 @@ for test_file in os.listdir("test_files"):
     
     tb.add_config(
         test_name,
-        generics = dict(mem_path = f"test_files/{test_file}"),
+        generics = dict(mem_path = test_files_dir / test_file),
         post_check=make_post_check(test_name)
     )
 
