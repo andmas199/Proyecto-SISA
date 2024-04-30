@@ -61,6 +61,8 @@ BEGIN
     PROCESS(clk, wr_out)
     BEGIN
         IF rising_edge(clk) THEN
+            kb_clear_char <= '0';
+
             -- IO Inputs
             regs(KEYS_PORT)(3 DOWNTO 0) <= keys;
             regs(SWITCHES_PORT)(7 DOWNTO 0) <= switches;
@@ -75,8 +77,6 @@ BEGIN
             -- IO-mapped registers Writes side-effects
             IF wr_out = '1' and to_integer(unsigned(addr_io)) = KEYBOARD_CONTROL_PORT THEN
                 kb_clear_char <= '1';
-            ELSE
-                kb_clear_char <= '0';
             END IF;
         END IF;
     END PROCESS;

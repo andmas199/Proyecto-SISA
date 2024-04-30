@@ -93,7 +93,7 @@ BEGIN
 			IF booted = '1' and ldpc = '1' THEN
 				CASE sequencing_mode IS
 					WHEN IMPLICIT => pc_reg <= pc_reg + 2;
-					WHEN RELATIVE => pc_reg <= STD_LOGIC_VECTOR(signed(unsigned(pc_reg)) + 2 + signed(immediate(7 DOWNTO 0)));
+					WHEN RELATIVE => pc_reg <= STD_LOGIC_VECTOR(signed(unsigned(pc_reg)) + 2 + signed(immediate(6 DOWNTO 0) & '0'));
 					WHEN ABSOLUTE => pc_reg <= alu_out;
 				END CASE;
 			ELSIF boot = '1' THEN

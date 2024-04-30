@@ -78,7 +78,7 @@ BEGIN
 					
 	wr_m <= '1' WHEN op_code = "0100" or op_code = "1110" ELSE '0';
 	regfile_input <= MEM WHEN op_code = "0011" or op_code = "1101" ELSE PC_UPD WHEN op_code = "1010" ELSE IO_RD WHEN op_code = "0111" ELSE ALU_OUTPUT;
-	immed_x2 <= '1' WHEN op_code = "0011" or op_code = "0100" or op_code = "0110" ELSE '0';
+	immed_x2 <= '1' WHEN op_code = "0011" or op_code = "0100" ELSE '0';
 	word_byte <= '1' WHEN op_code = "1101" or op_code = "1110" ELSE '0';
 
 	WITH op_code SELECT
