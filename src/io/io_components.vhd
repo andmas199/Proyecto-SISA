@@ -17,7 +17,8 @@ PACKAGE io_components IS
                 HEX0: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
                 HEX1: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
                 HEX2: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-                HEX3: OUT STD_LOGIC_VECTOR(6 DOWNTO 0));
+                HEX3: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+					 intr: OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT seg7_driver IS

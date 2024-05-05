@@ -20,9 +20,14 @@ PACKAGE datapath_components IS
                 wrd         : IN  STD_LOGIC;
                 addr_a      : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
                 addr_b      : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-                addr_d      : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+                addr_d_1    : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+					 addr_d_2    : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+					 chg_mode	 : IN	 STD_LOGIC;
                 immed       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
                 immed_x2    : IN  STD_LOGIC;
+					 d_sys		 : IN  STD_LOGIC;
+					 reti			 : IN STD_LOGIC;
+					 sel_reg_out : IN	 STD_LOGIC;
                 datard_m    : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
                 ins_dad     : IN  STD_LOGIC;
 					 Rb_N			 : IN STD_LOGIC;
@@ -38,11 +43,15 @@ PACKAGE datapath_components IS
 
     COMPONENT regfile IS
     PORT (  clk     : IN  STD_LOGIC;
-            wrd     : IN  STD_LOGIC;
-            d       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+            wrd_1   : IN  STD_LOGIC;
+				wrd_2   : IN  STD_LOGIC;
+            d_1     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+				d_2     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+				chg_mode: IN  STD_LOGIC;
             addr_a  : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
             addr_b  : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-            addr_d  : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+            addr_d_1: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+				addr_d_2: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
             a       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
             b       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
     END COMPONENT;

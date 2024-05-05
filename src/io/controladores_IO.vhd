@@ -19,7 +19,8 @@ ENTITY controladores_IO IS
             HEX0: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
             HEX1: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
             HEX2: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-            HEX3: OUT STD_LOGIC_VECTOR(6 DOWNTO 0));
+            HEX3: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+				intr: OUT STD_LOGIC);
 END controladores_IO;
 
 ARCHITECTURE Structure OF controladores_IO IS
@@ -74,5 +75,7 @@ BEGIN
     HEX1 <= hexs(1);
     HEX2 <= hexs(2);
     HEX3 <= hexs(3);
+	 
+	 intr <= '0';
 
 END Structure;
