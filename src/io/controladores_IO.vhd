@@ -23,6 +23,7 @@ ENTITY controladores_IO IS
             HEX1: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
             HEX2: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
             HEX3: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+			intr: OUT STD_LOGIC;
             vga_cursor: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
             vga_cursor_enable: OUT STD_LOGIC;
             ps2_clk : INOUT std_logic;
@@ -113,6 +114,8 @@ BEGIN
     HEX1 <= hexs(1);
     HEX2 <= hexs(2);
     HEX3 <= hexs(3);
+	 
+	intr <= '0';
 
     keyboard: keyboard_controller
     PORT MAP (  clk        => CLOCK_50,

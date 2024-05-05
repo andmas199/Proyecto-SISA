@@ -19,6 +19,7 @@ PACKAGE io_components IS
                 HEX1: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
                 HEX2: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
                 HEX3: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+				intr: OUT STD_LOGIC;
                 vga_cursor: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
                 vga_cursor_enable: OUT STD_LOGIC;
                 ps2_clk : INOUT std_logic;
