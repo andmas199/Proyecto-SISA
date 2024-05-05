@@ -48,7 +48,7 @@ ARCHITECTURE Structure OF sisa IS
     SIGNAL wr_io: STD_LOGIC_VECTOR(15 DOWNTO 0);  
     SIGNAL rd_io: STD_LOGIC_VECTOR(15 DOWNTO 0);  
     SIGNAL wr_out: STD_LOGIC; 
-    SIGNAL rd_in: STD_LOGIC;  
+    SIGNAL rd_in: STD_LOGIC;
     SIGNAL vga_addr: STD_LOGIC_VECTOR(12 DOWNTO 0);
     SIGNAL vga_we: STD_LOGIC;
     SIGNAL vga_wr_data: STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -56,6 +56,7 @@ ARCHITECTURE Structure OF sisa IS
     SIGNAL vga_byte_m: STD_LOGIC;
     SIGNAL vga_cursor: STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL vga_cursor_enable: STD_LOGIC;
+	 SIGNAL intr: STD_LOGIC;
 BEGIN
 
     pro0: proc
@@ -70,7 +71,8 @@ BEGIN
                     wr_io       => wr_io,
                     rd_io       => rd_io,
                     wr_out      => wr_out,
-                    rd_in       => rd_in);
+                    rd_in       => rd_in,
+						  intr		  => intr);
 
     mem0: MemoryController
     PORT MAP (  CLOCK_50    => CLOCK_50,
@@ -109,6 +111,7 @@ BEGIN
                     HEX1              => HEX1,
                     HEX2              => HEX2,
                     HEX3              => HEX3,
+						  intr		  => intr,
                     vga_cursor        => vga_cursor,
                     vga_cursor_enable => vga_cursor_enable,
                     ps2_clk           => PS2_CLK,

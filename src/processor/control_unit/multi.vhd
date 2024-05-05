@@ -8,6 +8,8 @@ entity multi is
          wrd_l     : IN  STD_LOGIC;
          wr_m_l    : IN  STD_LOGIC;
          w_b       : IN  STD_LOGIC;
+			intr		 : IN  STD_LOGIC;
+			chg_mode  : OUT STD_LOGIC;
          ldpc      : OUT STD_LOGIC;
          wrd       : OUT STD_LOGIC;
          wr_m      : OUT STD_LOGIC;
@@ -18,7 +20,7 @@ end entity;
 
 architecture Structure of multi is
 
-	type state_t is (F, DEMW);
+	type state_t is (F, DEMW, SYSTEM);
 	
 	signal state: state_t;
 
@@ -33,6 +35,12 @@ begin
 				WHEN F =>
 					state <= DEMW;
 				WHEN DEMW =>
+					IF intr = '1' THEN
+						state <= SYSTEM;
+					ELSE
+						state <= F;
+					END IF;
+				WHEN SYSTEM =>
 					state <= F;
 			END CASE;
 		END IF;
@@ -48,6 +56,7 @@ begin
 				word_byte <= '0';
 				ins_dad <= '0';
 				ldir <= '1';
+				chg_mode <= '0';
 			WHEN DEMW =>
 				ldpc <= ldpc_l;
 				wrd <= wrd_l;
@@ -55,6 +64,16 @@ begin
 				word_byte <= w_b;
 				ins_dad <= '1';
 				ldir <= '0';
+				chg_mode <= '0';
+			WHEN SYSTEM =>
+				ldpc <= '0';
+				wrd <= '1';
+				wr_m <= '0';
+				word_byte <= '0';
+				ins_dad <= '0';
+				ldir <= '0';
+				chg_mode <= '1';
+			
 		END CASE;
 	END PROCESS;
 end Structure;

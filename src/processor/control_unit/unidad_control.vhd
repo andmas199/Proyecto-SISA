@@ -12,18 +12,24 @@ ENTITY unidad_control IS
     PORT (boot      : IN  STD_LOGIC;
           clk       : IN  STD_LOGIC;
           datard_m  : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-		  alu_out   : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-		  z			: IN STD_LOGIC;
+			 alu_out   : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+			 z		     : IN  STD_LOGIC;
+			 intr		  : IN  STD_LOGIC;
 			 op_group  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
           op        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           wrd       : OUT STD_LOGIC;
           addr_a    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_b    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-          addr_d    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+          addr_d_1  : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			 addr_d_2  : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			 chg_mode  : OUT STD_LOGIC;
           immed     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			 d_sys	  : OUT STD_LOGIC;
+			 reti		  : OUT STD_LOGIC;
           pc        : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           ins_dad   : OUT STD_LOGIC;
           regfile_input : OUT regfile_input_t;
+			 sel_reg_out : OUT STD_LOGIC;
 			 Rb_N		  : OUT STD_LOGIC;	
           immed_x2  : OUT STD_LOGIC;
           wr_m      : OUT STD_LOGIC;
@@ -61,12 +67,16 @@ BEGIN
 					 wrd => wrd_l,
 					 addr_a => addr_a,
 					 addr_b => addr_b,
-					 addr_d => addr_d,
+					 addr_d_1 => addr_d_1,
+					 addr_d_2 => addr_d_2,
 					 immed => immediate,
+					 d_sys => d_sys,
+					 reti => reti,
 					 wr_m => wr_m_l,
 					 regfile_input => regfile_input,
 					 Rb_N => Rb_N,
 					 immed_x2 => immed_x2,
+					 sel_reg_out => sel_reg_out,
 					 word_byte => w_b,
 					 sequencing_mode => sequencing_mode,
 					 addr_io => addr_io,
@@ -80,6 +90,8 @@ BEGIN
 					wrd_l => wrd_l,
 					wr_m_l => wr_m_l,
 					w_b => w_b,
+					intr => intr,
+					chg_mode => chg_mode,
 					ldpc => ldpc,
 					wrd  => wrd,
 					wr_m => wr_m,
