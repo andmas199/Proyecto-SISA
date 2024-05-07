@@ -67,7 +67,7 @@ BEGIN
             regs(KEYS_PORT)(3 DOWNTO 0) <= keys;
             regs(SWITCHES_PORT)(7 DOWNTO 0) <= switches;
             regs(KEYBOARD_VALUE_PORT)(7 DOWNTO 0) <= kb_read_char;
-            regs(KEYBOARD_CONTROL_PORT)(0) <= kb_data_ready;
+            regs(KEYBOARD_CONTROL_PORT)(15 DOWNTO 0) <= (0 => kb_data_ready, others => '0');
         
             -- IO-mapped registers Writes
             IF wr_out = '1' and not IsReadOnlyPort(addr_io) THEN
