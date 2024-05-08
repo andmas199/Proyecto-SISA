@@ -2,6 +2,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
+USE work.io_components.cycle_counter;
 USE work.io_components.seg7_driver;
 USE work.keyboard_components.keyboard_controller;
 
@@ -40,6 +41,9 @@ ARCHITECTURE Structure OF controladores_IO IS
     SIGNAL kb_clear_char: STD_LOGIC;
     SIGNAL kb_data_ready: STD_LOGIC;
 
+    SIGNAL cycles: STD_LOGIC_VECTOR(15 DOWNTO 0);
+    SIGNAL milis: STD_LOGIC_VECTOR(15 DOWNTO 0);
+
     CONSTANT LEDG_PORT: integer := 5;
     CONSTANT LEDR_PORT: integer := 6;
     CONSTANT KEYS_PORT: integer := 7;
@@ -50,6 +54,8 @@ ARCHITECTURE Structure OF controladores_IO IS
     CONSTANT CURSOR_ENABLE_PORT: integer := 12;
     CONSTANT KEYBOARD_VALUE_PORT: integer := 15;
     CONSTANT KEYBOARD_CONTROL_PORT: integer := 16;
+    CONSTANT CYCLES_PORT: integer := 20;
+    CONSTANT MILIS_PORT: integer := 21;
 
     FUNCTION IsReadOnlyPort(port_addr: STD_LOGIC_VECTOR(7 DOWNTO 0)) RETURN BOOLEAN IS
         VARIABLE port_addr_int: integer;
@@ -57,7 +63,8 @@ ARCHITECTURE Structure OF controladores_IO IS
         port_addr_int := to_integer(unsigned(port_addr));
         RETURN port_addr_int = KEYS_PORT
             or port_addr_int = SWITCHES_PORT
-            or port_addr_int = KEYBOARD_VALUE_PORT;
+            or port_addr_int = KEYBOARD_VALUE_PORT
+            or port_addr_int = CYCLES_PORT;
     END;
 
 BEGIN
@@ -72,6 +79,8 @@ BEGIN
             regs(SWITCHES_PORT)(7 DOWNTO 0) <= switches;
             regs(KEYBOARD_VALUE_PORT)(7 DOWNTO 0) <= kb_read_char;
             regs(KEYBOARD_CONTROL_PORT)(15 DOWNTO 0) <= (0 => kb_data_ready, others => '0');
+            regs(CYCLES_PORT) <= cycles;
+            regs(MILIS_PORT) <= milis;
         
             -- IO-mapped registers Writes
             IF wr_out = '1' and not IsReadOnlyPort(addr_io) THEN
@@ -113,4 +122,9 @@ BEGIN
                 read_char  => kb_read_char,
                 clear_char => kb_clear_char,
                 data_ready => kb_data_ready);
+    
+    cc: cycle_counter
+    PORT MAP ( clock_50 => CLOCK_50,
+                cycles  => cycles,
+                milis   => milis);
 END Structure;

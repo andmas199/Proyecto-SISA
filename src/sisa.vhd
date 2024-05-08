@@ -28,11 +28,11 @@ ENTITY sisa IS
           PS2_DAT   : INOUT std_logic;
           BLANK_OUT      : OUT STD_LOGIC;
           CSYNC_OUT      : OUT STD_LOGIC;
-          RED_OUT        : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-          GREEN_OUT      : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-          BLUE_OUT       : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-          HORIZ_SYNC_OUT : OUT STD_LOGIC;
-          VERT_SYNC_OUT  : OUT STD_LOGIC);
+          VGA_R        : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+          VGA_G      : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+          VGA_B       : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+          VGA_HS : OUT STD_LOGIC;
+          VGA_VS  : OUT STD_LOGIC);
 END sisa;
 
 ARCHITECTURE Structure OF sisa IS
@@ -119,11 +119,11 @@ BEGIN
               reset          => boot,
               blank_out      => BLANK_OUT,
               csync_out      => CSYNC_OUT,
-              red_out        => RED_OUT,
-              green_out      => GREEN_OUT,
-              blue_out       => BLUE_OUT,
-              horiz_sync_out => HORIZ_SYNC_OUT,
-              vert_sync_out  => VERT_SYNC_OUT,
+              red_out        => VGA_R,
+              green_out      => VGA_G,
+              blue_out       => VGA_B,
+              horiz_sync_out => VGA_HS,
+              vert_sync_out  => VGA_VS,
               addr_vga          => vga_addr,
               we                => vga_we,
               wr_data           => vga_wr_data,

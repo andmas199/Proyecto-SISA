@@ -33,8 +33,8 @@ architecture comportament of MemoryController is
     SIGNAL addr_space: addr_space_t;
 begin
 
-    addr_space <= ADDR_SPACE_SRAM_RW WHEN unsigned(addr) < 16#A000#
-        ELSE      ADDR_SPACE_VGA     WHEN unsigned(addr) < 16#C000#
+    addr_space <= ADDR_SPACE_SRAM_RW WHEN unsigned(addr) < x"A000"
+        ELSE      ADDR_SPACE_VGA     WHEN unsigned(addr) < x"C000"
         ELSE      ADDR_SPACE_SRAM_RO;
 
     WITH addr_space SELECT

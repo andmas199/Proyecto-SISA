@@ -25,6 +25,14 @@ PACKAGE io_components IS
                 ps2_data : INOUT std_logic);
     END COMPONENT;
 
+    COMPONENT cycle_counter IS
+        PORT (
+            clock_50: in std_logic;
+            cycles: out std_logic_vector(15 downto 0);
+            milis: out std_logic_vector(15 downto 0)
+        );
+    END COMPONENT;
+
     COMPONENT seg7_driver IS
       PORT (enable: in  std_logic;
             value:  in  std_logic_vector(3 DOWNTO 0);
