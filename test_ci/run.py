@@ -73,7 +73,7 @@ for test_file in os.listdir("test_files"):
         continue
 
     # TODO: IO tests
-    if "keyboard" in test_name:
+    if "keyboard" in test_name or "display" in test_name:
         continue
     
     tb.add_config(

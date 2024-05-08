@@ -11,6 +11,11 @@ entity MemoryController is
           rd_data   : out std_logic_vector(15 downto 0);
           we        : in  std_logic;
           byte_m    : in  std_logic;
+          vga_addr  : out std_logic_vector(12 downto 0);
+          vga_we    : out std_logic;
+          vga_wr_data : out std_logic_vector(15 downto 0);
+          vga_rd_data : in std_logic_vector(15 downto 0);
+          vga_byte_m : out std_logic;
           -- señales para la placa de desarrollo
           SRAM_ADDR : out   std_logic_vector(17 downto 0);
           SRAM_DQ   : inout std_logic_vector(15 downto 0);
@@ -22,10 +27,22 @@ entity MemoryController is
 end MemoryController;
 
 architecture comportament of MemoryController is
-    SIGNAL we_validated: std_logic;
+    SIGNAL sram_we: std_logic;
+    SIGNAL sram_rd_data: std_logic_vector(15 downto 0);
+    TYPE addr_space_t IS (ADDR_SPACE_SRAM_RW, ADDR_SPACE_VGA, ADDR_SPACE_SRAM_RO);
+    SIGNAL addr_space: addr_space_t;
 begin
 
-    we_validated <= we WHEN unsigned(addr) < 16#C000# ELSE '0';
+    addr_space <= ADDR_SPACE_SRAM_RW WHEN unsigned(addr) < 16#A000#
+        ELSE      ADDR_SPACE_VGA     WHEN unsigned(addr) < 16#C000#
+        ELSE      ADDR_SPACE_SRAM_RO;
+
+    WITH addr_space SELECT
+        rd_data <= sram_rd_data WHEN ADDR_SPACE_SRAM_RW,
+                   vga_rd_data  WHEN ADDR_SPACE_VGA,
+                   sram_rd_data WHEN ADDR_SPACE_SRAM_RO;
+
+    sram_we <= we WHEN addr_space = ADDR_SPACE_SRAM_RW ELSE '0';
 
     sramContr: SRAMController
         PORT MAP(   clk         => CLOCK_50,
@@ -37,9 +54,14 @@ begin
                     SRAM_OE_N   => SRAM_OE_N,
                     SRAM_WE_N   => SRAM_WE_N,
                     address     => addr,
-                    dataReaded  => rd_data,
+                    dataReaded  => sram_rd_data,
                     dataToWrite => wr_data,
-                    WR          => we_validated,
+                    WR          => sram_we,
                     byte_m      => byte_m);
+
+    vga_addr <= addr(12 downto 0);
+    vga_we <= we WHEN addr_space = ADDR_SPACE_VGA ELSE '0';
+    vga_wr_data <= wr_data;
+    vga_byte_m <= byte_m;
 
 end comportament;

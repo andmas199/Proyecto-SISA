@@ -10,6 +10,11 @@ PACKAGE memory_components IS
             rd_data   : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
             we        : IN  STD_LOGIC;
             byte_m    : IN  STD_LOGIC;
+            vga_addr  : out std_logic_vector(12 downto 0);
+            vga_we    : out std_logic;
+            vga_wr_data : out std_logic_vector(15 downto 0);
+            vga_rd_data : in std_logic_vector(15 downto 0);
+            vga_byte_m : out std_logic;
             SRAM_ADDR : OUT   STD_LOGIC_VECTOR(17 DOWNTO 0);
             SRAM_DQ   : INOUT STD_LOGIC_VECTOR(15 DOWNTO 0);
             SRAM_UB_N : OUT   STD_LOGIC;

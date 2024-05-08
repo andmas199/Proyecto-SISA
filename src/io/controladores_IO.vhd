@@ -22,6 +22,8 @@ ENTITY controladores_IO IS
             HEX1: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
             HEX2: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
             HEX3: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+            vga_cursor: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+            vga_cursor_enable: OUT STD_LOGIC;
             ps2_clk : INOUT std_logic;
             ps2_data : INOUT std_logic);
 END controladores_IO;
@@ -44,6 +46,8 @@ ARCHITECTURE Structure OF controladores_IO IS
     CONSTANT SWITCHES_PORT: integer := 8;
     CONSTANT HEX_CONTROL_PORT: integer := 9;
     CONSTANT HEX_VALUE_PORT: integer := 10;
+    CONSTANT CURSOR_POSITION_PORT: integer := 11;
+    CONSTANT CURSOR_ENABLE_PORT: integer := 12;
     CONSTANT KEYBOARD_VALUE_PORT: integer := 15;
     CONSTANT KEYBOARD_CONTROL_PORT: integer := 16;
 
@@ -85,6 +89,9 @@ BEGIN
 
     led_verdes <= regs(LEDG_PORT)(7 DOWNTO 0);
     led_rojos <= regs(LEDR_PORT)(7 DOWNTO 0);
+
+    vga_cursor <= regs(CURSOR_POSITION_PORT);
+    vga_cursor_ENABLE <= regs(CURSOR_ENABLE_PORT)(0);
 
     hex_gen: FOR i IN 0 TO 3 GENERATE
         driver: seg7_driver
