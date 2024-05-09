@@ -54,7 +54,17 @@ architecture comportament of tb_sisa is
         HEX0      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
         HEX1      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
         HEX2      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-        HEX3      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0));
+        HEX3      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+        PS2_CLK   : INOUT std_logic;
+        PS2_DAT   : INOUT std_logic;
+        BLANK_OUT      : OUT STD_LOGIC;
+        CSYNC_OUT      : OUT STD_LOGIC;
+        VGA_R        : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        VGA_G      : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        VGA_B       : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        VGA_HS : OUT STD_LOGIC;
+        VGA_VS  : OUT STD_LOGIC);
+        
    end component;
 
    
