@@ -1,34 +1,55 @@
-# Reading C:/altera/13.0sp1/modelsim_ase/tcl/vsim/pref.tcl 
 # do Proyecto-SISA_run_msim_rtl_vhdl.do 
 # if {[file exists rtl_work]} {
 # 	vdel -lib rtl_work -all
 # }
 # vlib rtl_work
 # vmap work rtl_work
-# Copying C:\altera\13.0sp1\modelsim_ase\win32aloem/../modelsim.ini to modelsim.ini
+# Copying /opt/altera/13.0sp1/modelsim_ase/linux/../modelsim.ini to modelsim.ini
 # Modifying modelsim.ini
-# ** Warning: Copied C:\altera\13.0sp1\modelsim_ase\win32aloem/../modelsim.ini to modelsim.ini.
+# ** Warning: Copied /opt/altera/13.0sp1/modelsim_ase/linux/../modelsim.ini to modelsim.ini.
 #          Updated modelsim.ini.
 # 
-# vcom -93 -work work {C:/Users/pec02/Desktop/Proyecto-SISA/src/sisa.vhd}
+# vcom -93 -work work {/home/andrei/Documents/Proyecto-SISA/src/io/seg7_driver.vhd}
+# Model Technology ModelSim ALTERA vcom 10.1d Compiler 2012.11 Nov  2 2012
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity seg7_driver
+# -- Compiling architecture Structure of seg7_driver
+# vcom -93 -work work {/home/andrei/Documents/Proyecto-SISA/src/io/io_components.vhd}
+# Model Technology ModelSim ALTERA vcom 10.1d Compiler 2012.11 Nov  2 2012
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Compiling package io_components
+# vcom -93 -work work {/home/andrei/Documents/Proyecto-SISA/src/io/controladores_IO.vhd}
+# Model Technology ModelSim ALTERA vcom 10.1d Compiler 2012.11 Nov  2 2012
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Loading package io_components
+# -- Compiling entity controladores_IO
+# -- Compiling architecture Structure of controladores_IO
+# vcom -93 -work work {/home/andrei/Documents/Proyecto-SISA/src/processor/datapath/components.vhd}
+# Model Technology ModelSim ALTERA vcom 10.1d Compiler 2012.11 Nov  2 2012
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Compiling package datapath_components
+# vcom -93 -work work {/home/andrei/Documents/Proyecto-SISA/src/memory/MemoryController.vhd}
 # Model Technology ModelSim ALTERA vcom 10.1d Compiler 2012.11 Nov  2 2012
 # -- Loading package STANDARD
 # -- Loading package TEXTIO
 # -- Loading package std_logic_1164
 # -- Loading package NUMERIC_STD
 # ** Error: (vcom-11) Could not find work.memory_components.
-# 
-# ** Error: C:/Users/pec02/Desktop/Proyecto-SISA/src/sisa.vhd(5): (vcom-1195) Cannot find expanded name "work.memory_components".
-# 
-# ** Error: C:/Users/pec02/Desktop/Proyecto-SISA/src/sisa.vhd(5): Unknown expanded name.
-# ** Error: (vcom-11) Could not find work.processor_components.
-# 
-# ** Error: C:/Users/pec02/Desktop/Proyecto-SISA/src/sisa.vhd(6): (vcom-1195) Cannot find expanded name "work.processor_components".
-# 
-# ** Error: C:/Users/pec02/Desktop/Proyecto-SISA/src/sisa.vhd(6): Unknown expanded name.
-# ** Error: C:/Users/pec02/Desktop/Proyecto-SISA/src/sisa.vhd(8): VHDL Compiler exiting
-# ** Error: C:/altera/13.0sp1/modelsim_ase/win32aloem/vcom failed.
-# Error in macro ./Proyecto-SISA_run_msim_rtl_vhdl.do line 8
-# C:/altera/13.0sp1/modelsim_ase/win32aloem/vcom failed.
+# ** Error: /home/andrei/Documents/Proyecto-SISA/src/memory/MemoryController.vhd(5): (vcom-1195) Cannot find expanded name "work.memory_components".
+# ** Error: /home/andrei/Documents/Proyecto-SISA/src/memory/MemoryController.vhd(5): Unknown expanded name.
+# ** Error: /home/andrei/Documents/Proyecto-SISA/src/memory/MemoryController.vhd(7): VHDL Compiler exiting
+# ** Error: /opt/altera/13.0sp1/modelsim_ase/linux/vcom failed.
+# Error in macro ./Proyecto-SISA_run_msim_rtl_vhdl.do line 12
+# /opt/altera/13.0sp1/modelsim_ase/linux/vcom failed.
 #     while executing
-# "vcom -93 -work work {C:/Users/pec02/Desktop/Proyecto-SISA/src/sisa.vhd}"
+# "vcom -93 -work work {/home/andrei/Documents/Proyecto-SISA/src/memory/MemoryController.vhd}"

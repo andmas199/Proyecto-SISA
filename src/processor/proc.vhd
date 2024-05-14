@@ -42,6 +42,7 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL regfile_input : regfile_input_t;
 	SIGNAL alu_out : STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL z : STD_LOGIC;
+	SIGNAL clear : STD_LOGIC;
 
 BEGIN
 	e0: datapath
@@ -56,6 +57,7 @@ BEGIN
 						 chg_mode => chg_mode,
 						 immed => immed,
 						 immed_x2 => immed_x2,
+						 clear => clear,
 						 d_sys	=> d_sys,
 						 reti => reti,
 						 sel_reg_out => sel_reg_out,
@@ -83,6 +85,7 @@ BEGIN
 						 addr_d_1 => addr_d_1,
 						 addr_d_2 => addr_d_2,
 						 intr => intr,
+						 clear => clear,
 						 chg_mode => chg_mode,
 						 immed => immed,
 						 d_sys => d_sys,

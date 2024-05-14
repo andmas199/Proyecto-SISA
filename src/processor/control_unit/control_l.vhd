@@ -42,6 +42,8 @@ BEGIN
 	op_code <= ir(15 DOWNTO 12);
 	func <= ir(5 DOWNTO 3);
 	
+	--PLEASE INCLUDE WRS and RDS in op_group and op
+	
 	op_group <= "00" WHEN op_code = "0000" or op_code = "0010" or op_code = "0011" or
 								 op_code = "0100" or op_code = "1101" or op_code = "1110" or
 								 (op_code = "1111" and ir(5 DOWNTO 0) = "100001") 			 or
@@ -50,7 +52,8 @@ BEGIN
 					"10" WHEN op_code = "0101" or op_code = "0110" 							 else
 					"10" WHEN op_code = "0110" 													 else
 					"11" WHEN op_code = "1000" or op_code = "1010" or
-								 (op_code = "1111" and ir(5 DOWNTO 0) = "100100")			 else
+								 (op_code = "1111" and (ir(5 DOWNTO 0) = "100100" or
+								 ir(5 DOWNTO 0) = "101100" or ir(5 DOWNTO 0) = "110000")) else
 					"--";
 	op <= func 				WHEN op_code = "0000" or op_code = "0001" or op_code = "1000" else
 			"100" 			WHEN op_code = "0010" or op_code = "0011" or op_code = "0100" or
@@ -58,20 +61,26 @@ BEGIN
 			"00" & ir(8) 	WHEN op_code = "0101" or op_code = "0110"							  else
 			"100" 			WHEN op_code = "1101" or op_code = "1110"							  else
 			"110"				WHEN op_code = "1010" or
-									  (op_code = "1111" and ir(5 DOWNTO 0) = "100100")			  else
+									  (op_code = "1111" and (ir(5 DOWNTO 0) = "100100" or 
+									   ir(5 DOWNTO 0) = "101100" or ir(5 DOWNTO 0) = "110000"))else
 			"000"				WHEN op_code = "1111" and ir(5 DOWNTO 0) = "100001"			  else
 			"001"				WHEN op_code = "1111" and ir(5 DOWNTO 0) = "100000"			  else
 			"---";
 				
 	ldpc <= '0' WHEN ir = x"FFFF" ELSE '1';
 	Rb_N <= '1' WHEN op_code = "0000" or op_code = "0001" or op_code = "1000" or op_code = "0110" or op_code = "1010" ELSE '0';
-	wrd <= '0' WHEN op_code = "0100" or op_code = "0110" or op_code = "1110"  or (op_code = "1010" and ir(2) = '0') or (op_code = "0111" and ir(8) = '1') or op_code = "1111" ELSE '1';
-	addr_a <= ir(11 DOWNTO 9) WHEN op_code = "0101" ELSE ir(8 DOWNTO 6);
-	addr_b <= ir(11 DOWNTO 9) WHEN op_code = "0100" or op_code = "0110" or op_code = "0111" or op_code = "0110" or op_code = "1010" or op_code = "1110" or op_code = "0111" ELSE ir(2 DOWNTO 0);
-	addr_d_1 <= ir(11 DOWNTO 9);
+	wrd <= '0' WHEN op_code = "0100" or op_code = "0110" or op_code = "1110"  or (op_code = "1010" and ir(2) = '0') or (op_code = "0111" and ir(8) = '1') or (op_code = "1111" and ir(5 DOWNTO 0) = "100100")ELSE '1';
+	addr_a <= ir(11 DOWNTO 9) WHEN op_code = "0101" ELSE
+				 "111" WHEN op_code = "1111" and (ir(5 DOWNTO 0) = "100000" or ir(5 DOWNTO 0) = "100001") ELSE
+				 "001" WHEN op_code = "1111" and ir(5 DOWNTO 0) = "100100" ELSE
+				 ir(8 DOWNTO 6);
+	addr_b <= ir(11 DOWNTO 9) WHEN op_code = "0100" or op_code = "0110" or op_code = "0111" or op_code = "0110" or op_code = "1010" or op_code = "1110" or op_code = "0111" ELSE
+				 "000" WHEN op_code = "1111" and ir(5 DOWNTO 0) = "100100" ELSE
+				 ir(2 DOWNTO 0);
+	addr_d_1 <= "111" WHEN op_code = "1111" and (ir(5 DOWNTO 0) = "100000" or ir(5 DOWNTO 0) = "100001") ELSE ir(11 DOWNTO 9);
 	addr_d_2 <= "111";
 	d_sys <= '1' WHEN op_code = "1111" and (ir(5 DOWNTO 0) = "110000" or ir(5 DOWNTO 0) = "100000" or ir(5 DOWNTO 0) = "100001" or ir(5 DOWNTO 0) = "100100") ELSE '0';
-	sel_reg_out <= '1' WHEN op_code = "1111" and ir(5 DOWNTO 0) = "101100" ELSE '0';
+	sel_reg_out <= '1' WHEN op_code = "1111" and (ir(5 DOWNTO 0) = "101100" or ir(5 DOWNTO 0) = "100000" or ir(5 DOWNTO 0) = "100001" or ir(5 DOWNTO 0) = "100100") ELSE '0';
 	reti <= '1' WHEN op_code = "1111" and ir(5 DOWNTO 0) = "100100" ELSE '0';
 	
 	immed <= std_logic_vector(resize(signed(ir(7 DOWNTO 0)), immed'length)) WHEN op_code = "0101" else

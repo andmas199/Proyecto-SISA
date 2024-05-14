@@ -22,6 +22,7 @@ ENTITY unidad_control IS
           addr_b    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_d_1  : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			 addr_d_2  : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+			 clear	  : OUT STD_LOGIC;
 			 chg_mode  : OUT STD_LOGIC;
           immed     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 d_sys	  : OUT STD_LOGIC;
@@ -102,6 +103,7 @@ BEGIN
 	PROCESS(clk, pc_reg)
 	BEGIN
 		IF rising_edge(clk) THEN
+			clear <= boot;
 			IF booted = '1' and ldpc = '1' THEN
 				CASE sequencing_mode IS
 					WHEN IMPLICIT => pc_reg <= pc_reg + 2;
