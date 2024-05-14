@@ -22,6 +22,7 @@ PACKAGE datapath_components IS
                 addr_b      : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
                 addr_d_1    : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 					 addr_d_2    : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
+					 clear		 : IN  STD_LOGIC;
 					 chg_mode	 : IN	 STD_LOGIC;
                 immed       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
                 immed_x2    : IN  STD_LOGIC;
@@ -47,6 +48,7 @@ PACKAGE datapath_components IS
 				wrd_2   : IN  STD_LOGIC;
             d_1     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 				d_2     : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+				clear	  : IN STD_LOGIC;
 				chg_mode: IN  STD_LOGIC;
             addr_a  : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
             addr_b  : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
