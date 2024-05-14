@@ -14,6 +14,7 @@ ENTITY datapath IS
 			 addr_b 	: IN STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_d_1: IN STD_LOGIC_VECTOR(2 DOWNTO 0);
 			 addr_d_2: IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+			 clear	: IN STD_LOGIC;
 			 chg_mode: IN STD_LOGIC;
           immed  	: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 d_sys	: IN STD_LOGIC;
@@ -67,6 +68,7 @@ BEGIN
 						addr_b	=> addr_b,
 						addr_d_1 => addr_d_1,
 						addr_d_2 => "000",
+						clear		=> clear,
 						chg_mode => '0',
 						a 			=> a,
 						b			=> b);
@@ -81,6 +83,7 @@ BEGIN
 						addr_b	=> addr_b,
 						addr_d_1	=> addr_d_1,
 						addr_d_2 => addr_d_2,
+						clear		=> clear,
 						chg_mode => chg_mode,
 						a			=> a_esp,
 						b			=> b_esp);
