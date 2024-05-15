@@ -28,7 +28,8 @@ ENTITY control_l IS
 			 rd_in: OUT STD_LOGIC;
 			 wr_out: OUT STD_LOGIC;
 			 d_sys:	OUT STD_LOGIC;
-			 reti : OUT STD_LOGIC);
+			 reti : OUT STD_LOGIC;
+			 inta : OUT STD_LOGIC);
 END control_l;
 
 
@@ -69,14 +70,26 @@ BEGIN
 				
 	ldpc <= '0' WHEN ir = x"FFFF" ELSE '1';
 	Rb_N <= '1' WHEN op_code = "0000" or op_code = "0001" or op_code = "1000" or op_code = "0110" or op_code = "1010" ELSE '0';
-	wrd <= '0' WHEN op_code = "0100" or op_code = "0110" or op_code = "1110"  or (op_code = "1010" and ir(2) = '0') or (op_code = "0111" and ir(8) = '1') or (op_code = "1111" and ir(5 DOWNTO 0) = "100100")ELSE '1';
+	wrd <= '0' WHEN op_code = "0100"
+						 or op_code = "0110"
+						 or op_code = "1110"
+						 or (op_code = "1010" and ir(2) = '0')
+						 or (op_code = "0111" and ir(8) = '1')
+						 or (op_code = "1111" and ir(5 DOWNTO 0) = "100100")
+						 ELSE '1';
 	addr_a <= ir(11 DOWNTO 9) WHEN op_code = "0101" ELSE
 				 "111" WHEN op_code = "1111" and (ir(5 DOWNTO 0) = "100000" or ir(5 DOWNTO 0) = "100001") ELSE
 				 "001" WHEN op_code = "1111" and ir(5 DOWNTO 0) = "100100" ELSE
 				 ir(8 DOWNTO 6);
-	addr_b <= ir(11 DOWNTO 9) WHEN op_code = "0100" or op_code = "0110" or op_code = "0111" or op_code = "0110" or op_code = "1010" or op_code = "1110" or op_code = "0111" ELSE
-				 "000" WHEN op_code = "1111" and ir(5 DOWNTO 0) = "100100" ELSE
-				 ir(2 DOWNTO 0);
+	addr_b <= ir(11 DOWNTO 9) WHEN op_code = "0100"
+											 or op_code = "0110"
+											 or op_code = "0111"
+											 or op_code = "0110"
+											 or op_code = "1010"
+											 or op_code = "1110"
+											 or op_code = "0111" ELSE
+											 "000" WHEN op_code = "1111" and ir(5 DOWNTO 0) = "100100" ELSE
+											 ir(2 DOWNTO 0);
 	addr_d_1 <= "111" WHEN op_code = "1111" and (ir(5 DOWNTO 0) = "100000" or ir(5 DOWNTO 0) = "100001") ELSE ir(11 DOWNTO 9);
 	addr_d_2 <= "111";
 	d_sys <= '1' WHEN op_code = "1111" and (ir(5 DOWNTO 0) = "110000" or ir(5 DOWNTO 0) = "100000" or ir(5 DOWNTO 0) = "100001" or ir(5 DOWNTO 0) = "100100") ELSE '0';
@@ -89,7 +102,10 @@ BEGIN
 				std_logic_vector(resize(signed(ir(5 DOWNTO 0)), immed'length));
 					
 	wr_m <= '1' WHEN op_code = "0100" or op_code = "1110" ELSE '0';
-	regfile_input <= MEM WHEN op_code = "0011" or op_code = "1101" ELSE PC_UPD WHEN op_code = "1010" ELSE IO_RD WHEN op_code = "0111" ELSE ALU_OUTPUT;
+	regfile_input <= MEM WHEN op_code = "0011" or op_code = "1101" ELSE
+						  PC_UPD WHEN op_code = "1010" ELSE
+						  IO_RD WHEN op_code = "0111" or (op_code = "1111" and ir(5 DOWNTO 0) = "101000") ELSE 
+						  ALU_OUTPUT;
 	immed_x2 <= '1' WHEN op_code = "0011" or op_code = "0100" ELSE '0';
 	word_byte <= '1' WHEN op_code = "1101" or op_code = "1110" ELSE '0';
 
@@ -101,6 +117,8 @@ BEGIN
 	sequencing_mode <= 	RELATIVE WHEN op_code = "0110" AND take_branch ELSE
 								ABSOLUTE WHEN (op_code = "1010" AND take_branch) or (op_code = "1111" and ir(5 DOWNTO 0) = "100100") ELSE
 								IMPLICIT;
+	
+	inta <= '1' WHEN op_code = "1111" and ir(5 DOWNTO 0) = "101000" ELSE '0';
 	
 	addr_io <= ir(7 DOWNTO 0);
 	rd_in <= not ir(8) WHEN op_code = "0111" ELSE '0';
