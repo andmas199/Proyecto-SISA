@@ -253,6 +253,8 @@ BEGIN
 								ABSOLUTE WHEN (op_code = "1010" AND take_branch) or (op_code = "1111" and ir(5 DOWNTO 0) = "100100") ELSE
 								IMPLICIT;
 	
+	inta <= '1' WHEN op_code = "1111" and ir(5 DOWNTO 0) = "101000" ELSE '0';
+	
 	addr_io <= ir(7 DOWNTO 0);
 
 END Structure;
