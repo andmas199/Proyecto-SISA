@@ -15,7 +15,9 @@ entity multi is
          wr_m      : OUT STD_LOGIC;
          ldir      : OUT STD_LOGIC;
          ins_dad   : OUT STD_LOGIC;
-         word_byte : OUT STD_LOGIC);
+         word_byte : OUT STD_LOGIC;
+			intr_enabl: IN STD_LOGIC);
+			
 end entity;
 
 architecture Structure of multi is
@@ -35,7 +37,7 @@ begin
 				WHEN F =>
 					state <= DEMW;
 				WHEN DEMW =>
-					IF intr = '1' THEN
+					IF intr = '1' and intr_enabl = '1' THEN
 						state <= SYSTEM;
 					ELSE
 						state <= F;

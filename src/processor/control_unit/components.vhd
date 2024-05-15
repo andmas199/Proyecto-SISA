@@ -29,7 +29,8 @@ PACKAGE control_unit_components IS
                 sequencing_mode: OUT sequencing_mode_t;
                 addr_io: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
                 rd_in: OUT STD_LOGIC;
-                wr_out: OUT STD_LOGIC);
+                wr_out: OUT STD_LOGIC;
+					 inta: OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT multi is
@@ -46,7 +47,8 @@ PACKAGE control_unit_components IS
                 wr_m        : OUT STD_LOGIC;
                 ldir        : OUT STD_LOGIC;
                 ins_dad     : OUT STD_LOGIC;
-                word_byte   : OUT STD_LOGIC);
+                word_byte   : OUT STD_LOGIC;
+					 intr_enabl	 : IN STD_LOGIC);
     END COMPONENT;
 
     COMPONENT regfile IS
@@ -89,6 +91,8 @@ PACKAGE control_unit_components IS
                 word_byte : OUT STD_LOGIC;
                 addr_io: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
                 rd_in: OUT STD_LOGIC;
-                wr_out: OUT STD_LOGIC);
+                wr_out: OUT STD_LOGIC;
+					 intr_enabl: IN STD_LOGIC;
+					 inta : OUT STD_LOGIC);
     END COMPONENT;
 END PACKAGE;

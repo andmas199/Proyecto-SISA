@@ -39,7 +39,8 @@ PACKAGE datapath_components IS
                 alu_out     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
                 z : OUT STD_LOGIC;
                 rd_io : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-                wr_io : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+                wr_io : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+					 intr_enabl: OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT regfile IS
@@ -55,7 +56,8 @@ PACKAGE datapath_components IS
             addr_d_1: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 				addr_d_2: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
             a       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-            b       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+            b       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+				intr_enabl: OUT STD_LOGIC);
     END COMPONENT;
 
 END PACKAGE;

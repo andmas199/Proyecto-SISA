@@ -15,7 +15,8 @@ ENTITY regfile IS
 	      addr_d_1 : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 			addr_d_2 : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 	      a      	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			b      	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+			b      	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			intr_enabl:OUT STD_LOGIC);
 END regfile;
 
 
@@ -26,6 +27,8 @@ BEGIN
 	PROCESS(clk, wrd_1, wrd_2, addr_a, addr_b)
 	BEGIN
 		IF rising_edge(clk) THEN
+			intr_enabl <= regs(7)(1);
+			
 			IF clear = '1' THEN
 				regs(0) <= (OTHERS => '0');
 				regs(1) <= (OTHERS => '0');
@@ -36,7 +39,7 @@ BEGIN
 				regs(6) <= (OTHERS => '0');
 				regs(7) <= (OTHERS => '0');
 			ELSE
-				IF chg_mode = '1' and regs(7)(1) = '1' THEN
+				IF chg_mode = '1' THEN
 					regs(0) <= regs(7);
 					regs(1) <= d_1;
 					regs(2) <= X"000F";
