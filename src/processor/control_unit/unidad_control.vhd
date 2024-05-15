@@ -37,7 +37,9 @@ ENTITY unidad_control IS
           word_byte : OUT STD_LOGIC;
 		  addr_io: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
 		  rd_in: OUT STD_LOGIC;
-		  wr_out: OUT STD_LOGIC);
+		  wr_out: OUT STD_LOGIC;
+		  intr_enabl: IN STD_LOGIC;
+		  inta: OUT STD_LOGIC);
 END unidad_control;
 
 ARCHITECTURE Structure OF unidad_control IS
@@ -82,7 +84,8 @@ BEGIN
 					 sequencing_mode => sequencing_mode,
 					 addr_io => addr_io,
 					 rd_in => rd_in,
-					 wr_out => wr_out);
+					 wr_out => wr_out,
+					 inta => inta);
 	
 	m0: multi
 		PORT MAP(clk => clk,
@@ -98,7 +101,8 @@ BEGIN
 					wr_m => wr_m,
 					ldir => ldir,
 					ins_dad => ins_dad,
-					word_byte => word_byte);
+					word_byte => word_byte,
+					intr_enabl => intr_enabl);
 	
 	PROCESS(clk, pc_reg)
 	BEGIN

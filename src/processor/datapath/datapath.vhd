@@ -31,7 +31,8 @@ ENTITY datapath IS
 			 alu_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 z 		: OUT STD_LOGIC;
 			 rd_io 	: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 wr_io 	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0));
+			 wr_io 	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+			 intr_enabl: OUT STD_LOGIC);
 END datapath;
 
 
@@ -86,7 +87,8 @@ BEGIN
 						clear		=> clear,
 						chg_mode => chg_mode,
 						a			=> a_esp,
-						b			=> b_esp);
+						b			=> b_esp,
+						intr_enabl => intr_enabl);
 
 	data_wr <= b;
 	reg_out <= a WHEN sel_reg_out = '0' ELSE a_esp; -- 0 is normal register bank, 1 is special bank

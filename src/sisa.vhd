@@ -40,6 +40,7 @@ ARCHITECTURE Structure OF sisa IS
     SIGNAL wr_out: STD_LOGIC; 
     SIGNAL rd_in: STD_LOGIC;
 	 SIGNAL intr: STD_LOGIC;
+	 SIGNAL inta: STD_LOGIC;
 BEGIN
 
     pro0: proc
@@ -55,7 +56,8 @@ BEGIN
                     rd_io       => rd_io,
                     wr_out      => wr_out,
                     rd_in       => rd_in,
-						  intr		  => intr);
+						  intr		  => intr,
+						  inta		  => inta);
 
     mem0: MemoryController
     PORT MAP (  CLOCK_50  => CLOCK_50,
@@ -88,7 +90,8 @@ BEGIN
                     HEX1        => HEX1,
                     HEX2        => HEX2,
                     HEX3        => HEX3,
-						  intr		  => intr);
+						  intr		  => intr,
+						  inta		  => inta);
 
     boot <= SW(9);
 

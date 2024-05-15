@@ -17,7 +17,8 @@ ENTITY proc IS
 		  rd_io		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 		  wr_io		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 		  rd_in		: OUT STD_LOGIC;
-		  wr_out	: OUT STD_LOGIC);
+		  wr_out	: OUT STD_LOGIC;
+		  inta : OUT STD_LOGIC);
 END proc;
 
 
@@ -43,6 +44,7 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL alu_out : STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL z : STD_LOGIC;
 	SIGNAL clear : STD_LOGIC;
+	SIGNAL intr_enabl: STD_LOGIC;
 
 BEGIN
 	e0: datapath
@@ -71,7 +73,8 @@ BEGIN
 						 alu_out => alu_out,
 						 z => z,
 						 rd_io => rd_io,
-						 wr_io => wr_io);
+						 wr_io => wr_io,
+						 intr_enabl => intr_enabl);
 	
 	co: unidad_control
 		PORT MAP	(	 boot => boot,
@@ -102,5 +105,7 @@ BEGIN
 						 z => z,
 						 addr_io => addr_io,
 						 rd_in => rd_in,
-						 wr_out => wr_out);
+						 wr_out => wr_out,
+						 intr_enabl => intr_enabl,
+						 inta => inta);
 END Structure;
