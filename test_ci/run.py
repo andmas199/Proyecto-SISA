@@ -31,8 +31,8 @@ def make_post_check(test_name):
 
             code_start = 24576
             for i in range(len(code)):
-                expected = code[i]
-                got = memory_dump[code_start + i]
+                expected = code[i].upper()
+                got = memory_dump[code_start + i].upper()
                 if expected != got:
                     print(f"Code corruption @ {hex((code_start + i) * 2)} ({i}th instruction). Expected {expected}, got {got}.")
                     return False
