@@ -86,15 +86,15 @@ BEGIN
 			output := STD_LOGIC_VECTOR(unsigned(x) - unsigned(y));
 		WHEN "00110" =>
 			IF y(4) = '0' THEN
-				output := STD_LOGIC_VECTOR(shift_left(signed(x), natural(to_integer(unsigned(y(3 DOWNTO 0))))));
+				output := STD_LOGIC_VECTOR(shift_left(signed(x), natural(to_integer(unsigned(y(4 DOWNTO 0))))));
 			ELSE
-				output := STD_LOGIC_VECTOR(shift_right(signed(x), natural(to_integer(unsigned(y(3 DOWNTO 0))))));
+				output := STD_LOGIC_VECTOR(shift_right(signed(x), natural(to_integer(abs(signed(y(4 DOWNTO 0)))))));
 			END IF;
 		WHEN "00111" =>
 			IF y(4) = '0' THEN
-				output := STD_LOGIC_VECTOR(shift_left(unsigned(x), natural(to_integer(unsigned(y(3 DOWNTO 0))))));
+				output := STD_LOGIC_VECTOR(shift_left(unsigned(x), natural(to_integer(unsigned(y(4 DOWNTO 0))))));
 			ELSE
-				output := STD_LOGIC_VECTOR(shift_right(unsigned(x), natural(to_integer(unsigned(y(3 DOWNTO 0))))));
+				output := STD_LOGIC_VECTOR(shift_right(unsigned(x), natural(to_integer(abs(signed(y(4 DOWNTO 0)))))));
 			END IF;
 
 -- Comparison instructions
