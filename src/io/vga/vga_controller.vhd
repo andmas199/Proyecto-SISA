@@ -20,7 +20,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
-USE ieee.numeric_std.all;
+USE ieee.std_logic_arith.all;
 
 
 entity vga_controller is
@@ -91,6 +91,7 @@ architecture vga_controller_rtl of vga_controller is
 
     signal aux1_ram_addr2 : STD_LOGIC_VECTOR (11 downto 0);
     signal aux2_ram_addr2 : STD_LOGIC_VECTOR (11 downto 0);
+    signal aux2_ram_addr2_fix : STD_LOGIC_VECTOR (16 downto 0);
 
     -- counter signal
     signal counter_dec : STD_LOGIC;
@@ -160,7 +161,8 @@ architecture vga_controller_rtl of vga_controller is
     -- get char that must be displayed on this region
     -- calcula la @ de memoria de la pantalla multiplicanco la fila por 80 (80=5*16) y sumandole la columna
     aux1_ram_addr2 <= "00000"&pixel_column(9  downto 3) when (pixel_column(9  downto 3)<= 79) else (others=>'0'); -- calcula la columna
-    aux2_ram_addr2 <="00"&std_logic_vector(unsigned(pixel_row(8  downto 4)) * 5);        -- calcula @ parcial de la fila actual multiplicandola por 5
+    aux2_ram_addr2_fix <= unsigned(pixel_row(8  downto 4)) * conv_unsigned(5, aux2_ram_addr2'length);
+    aux2_ram_addr2 <="00"&std_logic_vector(aux2_ram_addr2_fix(9 downto 0));        -- calcula @ parcial de la fila actual multiplicandola por 5
     ram_addr2 <= (aux2_ram_addr2(7  downto 0)&"0000") + aux1_ram_addr2;                 -- calcula @ final multiplicando de @parcial de la fila actual por 16 y sumandole la columna
 
     -- decode the ram char to displayed it on the screen
