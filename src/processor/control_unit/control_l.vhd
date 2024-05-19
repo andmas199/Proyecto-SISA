@@ -13,7 +13,7 @@ ENTITY control_l IS
 			 op_group	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
           op     		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           ldpc   		: OUT STD_LOGIC;
-          wrd    		: OUT STD_LOGIC;
+          wrd_1  		: OUT STD_LOGIC;
           addr_a 		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
 			 addr_b 		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_d_1 	: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -30,8 +30,11 @@ ENTITY control_l IS
 			 rd_in: OUT STD_LOGIC;
 			 wr_out: OUT STD_LOGIC;
 			 d_sys:	OUT STD_LOGIC;
-			 reti : OUT STD_LOGIC;
-			 inta : OUT STD_LOGIC);
+			 wrd_2 : OUT STD_LOGIC;
+			 inta : OUT STD_LOGIC;
+			 div_zero : IN STD_LOGIC;
+			 mux_regS : OUT STD_LOGIC;
+			 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0));
 END control_l;
 
 
@@ -208,8 +211,8 @@ BEGIN
 	addr_d_1 <= reg_src(control_output.addr_d1, ir);
 	addr_d_2 <= reg_src(control_output.addr_d2, ir);
 
-	wrd <= control_output.wrd_1;
-	reti <= control_output.wrd_2;
+	wrd_1 <= control_output.wrd_1;
+	wrd_2 <= control_output.wrd_2;
 
 	regfile_input <= control_output.regfile_input_1;
 	--regfile_input_2 <= control_output.regfile_input_2;
@@ -253,6 +256,8 @@ BEGIN
 								ABSOLUTE WHEN (op_code = "1010" AND take_branch) or (op_code = "1111" and ir(5 DOWNTO 0) = "100100") ELSE
 								IMPLICIT;
 	
+	mux_regS <= '1' WHEN tipo_int = "0001" ELSE '0';
+
 	addr_io <= ir(7 DOWNTO 0);
 
 END Structure;

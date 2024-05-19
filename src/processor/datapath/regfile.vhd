@@ -16,7 +16,9 @@ ENTITY regfile IS
 			addr_d_2 : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
 	      a      	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			b      	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			intr_enabl:OUT STD_LOGIC);
+			intr_enabl:OUT STD_LOGIC;
+			bad_alignment : IN STD_LOGIC;
+			m_addr : IN STD_LOGIC_VECTOR(15 DOWNTO 0));
 END regfile;
 
 
@@ -41,8 +43,11 @@ BEGIN
 			ELSE
 				IF chg_mode = '1' THEN
 					regs(0) <= regs(7);
+					IF(bad_alignment = '1') THEN
+						regs(3) <= m_addr;
+					END IF;
 					regs(1) <= d_1;
-					regs(2) <= X"000F";
+					regs(2) <= d_2;
 					regs(7)(1) <= '0';
 				END IF;
 				IF wrd_1 = '1' THEN

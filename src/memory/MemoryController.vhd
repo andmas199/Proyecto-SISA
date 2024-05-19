@@ -23,7 +23,8 @@ entity MemoryController is
           SRAM_LB_N : out   std_logic;
           SRAM_CE_N : out   std_logic := '1';
           SRAM_OE_N : out   std_logic := '1';
-          SRAM_WE_N : out   std_logic := '1');
+          SRAM_WE_N : out   std_logic := '1';
+			 bad_alignment: OUT STD_logic);
 end MemoryController;
 
 architecture comportament of MemoryController is
@@ -57,7 +58,8 @@ begin
                     dataReaded  => sram_rd_data,
                     dataToWrite => wr_data,
                     WR          => sram_we,
-                    byte_m      => byte_m);
+                    byte_m      => byte_m,
+						  bad_alignment => bad_alignment);
 
     vga_addr <= addr(12 downto 0);
     vga_we <= we WHEN addr_space = ADDR_SPACE_VGA ELSE '0';
