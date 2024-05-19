@@ -31,9 +31,9 @@ PACKAGE control_unit_components IS
                 rd_in: OUT STD_LOGIC;
                 wr_out: OUT STD_LOGIC;
 					 inta: OUT STD_LOGIC;
-					 div_zero : IN STD_LOGIC;
 					 mux_regS : OUT STD_LOGIC;
-					 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0));
+					 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+					 invalid_inst : OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT multi is
@@ -51,7 +51,8 @@ PACKAGE control_unit_components IS
                 ldir        : OUT STD_LOGIC;
                 ins_dad     : OUT STD_LOGIC;
                 word_byte   : OUT STD_LOGIC;
-					 intr_enabl	 : IN STD_LOGIC);
+					 intr_enabl	 : IN STD_LOGIC;
+					 excp: IN STD_LOGIC);
     END COMPONENT;
 
     COMPONENT regfile IS
@@ -97,8 +98,9 @@ PACKAGE control_unit_components IS
                 wr_out: OUT STD_LOGIC;
 					 intr_enabl: IN STD_LOGIC;
 					 inta : OUT STD_LOGIC;
-					 div_zero : IN STD_LOGIC;
 					 mux_regS : OUT STD_LOGIC;
-					 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0));
+					 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+					 invalid_inst : OUT STD_LOGIC;
+					 excp : IN STD_LOGIC);
     END COMPONENT;
 END PACKAGE;

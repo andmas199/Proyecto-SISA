@@ -9,7 +9,7 @@ USE work.datapath_components.all;
 
 ENTITY control_l IS
     PORT (ir     		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			z			: IN STD_LOGIC;
+			 z			: IN STD_LOGIC;
 			 op_group	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
           op     		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           ldpc   		: OUT STD_LOGIC;
@@ -32,9 +32,9 @@ ENTITY control_l IS
 			 d_sys:	OUT STD_LOGIC;
 			 wrd_2 : OUT STD_LOGIC;
 			 inta : OUT STD_LOGIC;
-			 div_zero : IN STD_LOGIC;
 			 mux_regS : OUT STD_LOGIC;
-			 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0));
+			 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+			 invalid_inst : OUT STD_LOGIC);
 END control_l;
 
 
@@ -76,7 +76,7 @@ BEGIN
 
 	op_code <= ir(15 DOWNTO 12);
 
-	-- Determinación de la instrucción actual
+	-- Determinaciï¿½n de la instrucciï¿½n actual
 	PROCESS (ir)
 	BEGIN
 		CASE ir(15 downto 12) IS
@@ -215,7 +215,6 @@ BEGIN
 	wrd_2 <= control_output.wrd_2;
 
 	regfile_input <= control_output.regfile_input_1;
-	--regfile_input_2 <= control_output.regfile_input_2;
 
 	sel_reg_out <= control_output.sel_reg_rd;
 	d_sys <= control_output.sel_reg_wr;
@@ -246,6 +245,7 @@ BEGIN
 	rd_in <= control_output.rd_in;
 	wr_out <= control_output.wr_out;
 	inta <= control_output.int_ack;
+	invalid_inst <= control_output.invalid_inst;
 
 	WITH op_code SELECT
 		take_branch <= 	ir(8) /= z								 WHEN "0110",

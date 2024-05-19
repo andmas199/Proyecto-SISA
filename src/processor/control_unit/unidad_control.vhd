@@ -39,9 +39,10 @@ ENTITY unidad_control IS
 			 wr_out: OUT STD_LOGIC;
 			 intr_enabl: IN STD_LOGIC;
 			 inta: OUT STD_LOGIC;
-			 div_zero : IN STD_LOGIC;
 			 mux_regS : OUT STD_LOGIC;
-			 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0));
+			 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+			 invalid_inst : OUT STD_LOGIC;
+			 excp : IN STD_LOGIC);
 END unidad_control;
 
 ARCHITECTURE Structure OF unidad_control IS
@@ -98,9 +99,9 @@ BEGIN
 					 rd_in => rd_in,
 					 wr_out => wr_out,
 					 inta => inta,
-					 div_zero => div_zero,
 					 mux_regS => mux_regS,
-					 tipo_int => tipo_int);
+					 tipo_int => tipo_int,
+					 invalid_inst => invalid_inst);
 	
 	m0: multi
 		PORT MAP(clk => clk,
@@ -117,7 +118,8 @@ BEGIN
 					ldir => ldir,
 					ins_dad => ins_dad,
 					word_byte => word_byte,
-					intr_enabl => intr_enabl);
+					intr_enabl => intr_enabl,
+					excp => excp);
 	
 	PROCESS(clk, pc_reg)
 	BEGIN

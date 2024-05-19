@@ -4,11 +4,12 @@ USE ieee.std_logic_1164.all;
 PACKAGE exception_unit_components IS
 
     COMPONENT exception_controller IS
-        PORT (  instruction 	: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+        PORT (  invalid_inst 	: IN  STD_LOGIC;
 					 bad_alignment : IN  STD_LOGIC;
 					 div_zero	   : IN  STD_LOGIC;
 					 inta				: IN	STD_LOGIC;
-					 exc_code 		: OUT STD_LOGIC_VECTOR(3 DOWNTO 0));
+					 exc_code 		: OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+					 excp				: OUT STD_LOGIC);
     END COMPONENT;
 
 

@@ -52,6 +52,8 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL div_zero : STD_LOGIC;
 	SIGNAL mux_regS : STD_LOGIC;
 	SIGNAL exc_code : STD_LOGIC_VECTOR(3 DOWNTO 0);
+	SIGNAL invalid_inst : STD_LOGIC;
+	SIGNAL excp : STD_LOGIC;
 
 BEGIN
 	e0: datapath
@@ -118,17 +120,19 @@ BEGIN
 						 wr_out => wr_out,
 						 intr_enabl => intr_enabl,
 						 inta => inta_s,
-						 div_zero => div_zero,
 						 mux_regS => mux_regS,
-						 tipo_int => exc_code);
+						 tipo_int => exc_code,
+						 invalid_inst => invalid_inst,
+						 excp => excp);
 	
 	exc0: exception_controller
 		PORT MAP (
-			instruction => pc,
+			invalid_inst => invalid_inst,
 			bad_alignment => bad_alignment,
 			div_zero => div_zero,
 			inta => inta_s,
-			exc_code => exc_code);
+			exc_code => exc_code,
+			excp => excp);
 	
 	inta <= inta_s;
 END Structure;

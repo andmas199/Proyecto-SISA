@@ -9,7 +9,6 @@ PACKAGE control_l_defs IS
     TYPE op_t IS (OP_IR_5_3, OP_00_IR_8, OP_MOVI, OP_AND, OP_OR, OP_ADD, OP_X, OP_DONTCARE);
     TYPE immed_t IS (IMMED_IR_7_0, IMMED_IR_5_0, IMMED_EI, IMMED_DI, IMMED_DONTCARE);      
     TYPE regfile_input_1_t IS (REG_IN_1_MEM, REG_IN_1_ALU, REG_IN_1_PC_UPD, REG_IN_1_IO, REG_IN_1_DONTCARE);
-    TYPE regfile_input_2_t IS (REG_IN_2_SB, REG_IN_2_INT, REG_IN_2_DONTCARE);
     TYPE sequencing_mode_t IS (IMPLICIT, RELATIVE, ABSOLUTE);
 
     CONSTANT SEL_REG_GENERAL: STD_LOGIC := '0';
@@ -35,7 +34,6 @@ PACKAGE control_l_defs IS
         wrd_1: STD_LOGIC;
         wrd_2: STD_LOGIC;
         regfile_input_1: regfile_input_1_t;
-        regfile_input_2: regfile_input_2_t;
         sel_reg_rd: STD_LOGIC;
         sel_reg_wr: STD_LOGIC;
         immed: immed_t;
@@ -48,6 +46,7 @@ PACKAGE control_l_defs IS
         rd_in: STD_LOGIC;
         wr_out: STD_LOGIC;
         int_ack: STD_LOGIC;
+		  invalid_inst: STD_LOGIC;
     END RECORD;
 
     CONSTANT CONTROL_OUT_ARITH: control_output_t := (
@@ -59,7 +58,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_ALU,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_DONTCARE,
@@ -71,7 +69,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_CMP: control_output_t := (
@@ -83,7 +82,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_ALU,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_DONTCARE,
@@ -95,7 +93,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_ADDI: control_output_t := (
@@ -107,7 +106,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_ALU,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_IR_5_0,
@@ -119,7 +117,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_LD: control_output_t := (
@@ -131,7 +130,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_MEM,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_IR_5_0,
@@ -143,7 +141,8 @@ PACKAGE control_l_defs IS
         word_byte => WORD_BYTE_WORD,
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_ST: control_output_t := (
@@ -155,7 +154,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '0',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_DONTCARE,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_IR_5_0,
@@ -167,7 +165,8 @@ PACKAGE control_l_defs IS
         word_byte => WORD_BYTE_WORD,
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_MOVI: control_output_t := (
@@ -179,7 +178,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_ALU,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_IR_7_0,
@@ -191,7 +189,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_BRANCH: control_output_t := (
@@ -203,7 +202,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '0',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_DONTCARE,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_IR_7_0,
@@ -215,7 +213,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_IN: control_output_t := (
@@ -227,7 +226,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_IO,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_DONTCARE,
@@ -239,7 +237,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '1',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_OUT: control_output_t := (
@@ -251,7 +250,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '0',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_DONTCARE,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_DONTCARE,
@@ -263,7 +261,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '1',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_ARITH_EXT: control_output_t := (
@@ -275,7 +274,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_ALU,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_DONTCARE,
@@ -287,7 +285,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_JZ_JNZ: control_output_t := (
@@ -299,7 +298,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '0',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_DONTCARE,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_DONTCARE,
@@ -311,7 +309,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
     
     CONSTANT CONTROL_OUT_JMP: control_output_t := (
@@ -323,7 +322,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '0',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_DONTCARE,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_DONTCARE,
@@ -335,7 +333,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_JAL: control_output_t := (
@@ -347,7 +346,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_PC_UPD,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_DONTCARE,
@@ -359,7 +357,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_LDB: control_output_t := (
@@ -371,7 +370,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_MEM,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_IR_5_0,
@@ -383,7 +381,8 @@ PACKAGE control_l_defs IS
         word_byte => WORD_BYTE_BYTE,
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_STB: control_output_t := (
@@ -395,7 +394,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '0',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_DONTCARE,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_IR_5_0,
@@ -407,7 +405,8 @@ PACKAGE control_l_defs IS
         word_byte => WORD_BYTE_BYTE,
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_EI: control_output_t := (
@@ -419,7 +418,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_ALU,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_SPECIAL,
         sel_reg_wr => SEL_REG_SPECIAL,
         immed => IMMED_EI,
@@ -431,7 +429,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_DI: control_output_t := (
@@ -443,7 +442,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_ALU,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_SPECIAL,
         sel_reg_wr => SEL_REG_SPECIAL,
         immed => IMMED_DI,
@@ -455,7 +453,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_RETI: control_output_t := (
@@ -467,7 +466,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '0',
         wrd_2 => '1',
         regfile_input_1 => REG_IN_1_DONTCARE,
-        regfile_input_2 => REG_IN_2_SB,
         sel_reg_rd => SEL_REG_SPECIAL,
         sel_reg_wr => SEL_REG_SPECIAL,
         immed => IMMED_DONTCARE,
@@ -479,7 +477,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_GETIID: control_output_t := (
@@ -491,7 +490,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_IO,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_DONTCARE,
@@ -503,7 +501,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '1'
+        int_ack => '1',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_RDS: control_output_t := (
@@ -515,7 +514,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_ALU,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_SPECIAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_DONTCARE,
@@ -527,7 +525,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_WRS: control_output_t := (
@@ -539,7 +538,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '1',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_ALU,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_SPECIAL,
         immed => IMMED_DONTCARE,
@@ -551,7 +549,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_HALT: control_output_t := (
@@ -563,7 +562,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '0',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_DONTCARE,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_DONTCARE,
@@ -575,7 +573,8 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '0'
     );
 
     CONSTANT CONTROL_OUT_INVALID: control_output_t := (
@@ -587,7 +586,6 @@ PACKAGE control_l_defs IS
         wrd_1 => '0',
         wrd_2 => '0',
         regfile_input_1 => REG_IN_1_DONTCARE,
-        regfile_input_2 => REG_IN_2_DONTCARE,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
         immed => IMMED_DONTCARE,
@@ -599,6 +597,7 @@ PACKAGE control_l_defs IS
         word_byte => '-',
         rd_in => '0',
         wr_out => '0',
-        int_ack => '0'
+        int_ack => '0',
+		  invalid_inst => '1'
     );
 END PACKAGE;
