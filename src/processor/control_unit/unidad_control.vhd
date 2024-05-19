@@ -3,8 +3,7 @@ USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 USE ieee.std_logic_unsigned.all;
 
-USE work.control_unit_components.all;
-USE work.datapath_components.regfile_input_t;
+USE work.control_l_defs.all;
 USE work.control_unit_components.control_l;
 USE work.control_unit_components.multi;
 
@@ -29,7 +28,7 @@ ENTITY unidad_control IS
 			 reti		  : OUT STD_LOGIC;
           pc        : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           ins_dad   : OUT STD_LOGIC;
-          regfile_input : OUT regfile_input_t;
+          regfile_input : OUT regfile_input_1_t;
 			 sel_reg_out : OUT STD_LOGIC;
 			 Rb_N		  : OUT STD_LOGIC;	
           immed_x2  : OUT STD_LOGIC;

@@ -30,6 +30,8 @@ PACKAGE io_components IS
     COMPONENT cycle_counter IS
         PORT (
             clock_50: in std_logic;
+            milis_in: in std_logic_vector(15 downto 0);
+            wre: in std_logic;
             cycles: out std_logic_vector(15 downto 0);
             milis: out std_logic_vector(15 downto 0)
         );

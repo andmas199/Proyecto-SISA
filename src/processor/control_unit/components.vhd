@@ -1,10 +1,10 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 
-USE work.datapath_components.regfile_input_t;
+USE work.control_l_defs.sequencing_mode_t;
+USE work.control_l_defs.regfile_input_1_t;
 
 PACKAGE control_unit_components IS
-    TYPE sequencing_mode_t IS (IMPLICIT, RELATIVE, ABSOLUTE);
 
     COMPONENT control_l IS
         PORT (  ir     		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -21,7 +21,7 @@ PACKAGE control_unit_components IS
 					 d_sys	: OUT STD_LOGIC;
 					 reti		: OUT STD_LOGIC;
                 wr_m	  	: OUT STD_LOGIC;
-                regfile_input: OUT regfile_input_t;
+                regfile_input: OUT regfile_input_1_t;
 					 Rb_N			: OUT STD_LOGIC;
                 immed_x2	: OUT STD_LOGIC;
 					 sel_reg_out: OUT STD_LOGIC;
@@ -83,7 +83,7 @@ PACKAGE control_unit_components IS
 					 reti 		 : OUT STD_LOGIC;
                 pc          : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
                 ins_dad     : OUT STD_LOGIC;
-                regfile_input : OUT regfile_input_t;
+                regfile_input : OUT regfile_input_1_t;
 					 Rb_N			 : OUT STD_LOGIC;
                 immed_x2    : OUT STD_LOGIC;
 					 sel_reg_out : OUT STD_LOGIC;

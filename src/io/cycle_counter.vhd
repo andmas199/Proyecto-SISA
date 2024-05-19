@@ -5,6 +5,8 @@ use ieee.numeric_std.all;
 ENTITY cycle_counter IS
     PORT (
         clock_50: in std_logic;
+        milis_in: in std_logic_vector(15 downto 0);
+        wre: in std_logic;
         cycles: out std_logic_vector(15 downto 0);
         milis: out std_logic_vector(15 downto 0)
     );
@@ -17,13 +19,17 @@ BEGIN
     PROCESS (clock_50)
     BEGIN
         IF rising_edge(clock_50) THEN
+            IF wre = '1' THEN
+                milis_internal <= unsigned(milis_in);
+            END IF;
+
             IF cycles_internal = 0 THEN
                 cycles_internal <= x"C350";
                 IF milis_internal > 0 THEN
                     milis_internal <= milis_internal - 1;
                 END IF;
             ELSE
-                cycles_internal <= cycles_internal + 1;
+                cycles_internal <= cycles_internal - 1;
             END IF;
         END IF;
     END PROCESS;

@@ -123,9 +123,17 @@ BEGIN
 			MUL := STD_LOGIC_VECTOR(unsigned(x) * unsigned(y));
 			output := MUL(31 DOWNTO 16);
 		WHEN "11100" =>
-			output := STD_LOGIC_VECTOR(signed(x) / signed(y));
+			IF y /= x"0000" THEN
+				output := STD_LOGIC_VECTOR(signed(x) / signed(y));
+			ELSE
+				output := x"0000"; -- TODO: Exception!
+			END IF;
 		WHEN "11101" =>
-			output := STD_LOGIC_VECTOR(unsigned(x) / unsigned(y));
+			IF y /= x"0000" THEN
+				output := STD_LOGIC_VECTOR(unsigned(x) / unsigned(y));
+			ELSE
+				output := x"0000"; -- TODO: Exception!
+			END IF;
 	
 	-- Special
 		WHEN "11110" =>

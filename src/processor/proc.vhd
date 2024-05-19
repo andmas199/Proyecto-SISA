@@ -1,6 +1,7 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 
+USE work.control_l_defs.regfile_input_1_t;
 USE work.datapath_components.all;
 USE work.control_unit_components.unidad_control;
 
@@ -40,7 +41,7 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL ins_dad:	STD_LOGIC;
 	SIGNAL Rb_N :		STD_LOGIC;
 	SIGNAL pc:			STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL regfile_input : regfile_input_t;
+	SIGNAL regfile_input : regfile_input_1_t;
 	SIGNAL alu_out : STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL z : STD_LOGIC;
 	SIGNAL clear : STD_LOGIC;

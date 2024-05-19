@@ -2,6 +2,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
+USE work.control_l_defs.all;
 USE work.datapath_components.all;
 USE work.io_components.all;
 
@@ -19,7 +20,7 @@ ENTITY datapath IS
           immed  	: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 d_sys	: IN STD_LOGIC;
 			 reti		: IN STD_LOGIC;
-			 regfile_input: IN regfile_input_t;
+			 regfile_input: IN regfile_input_1_t;
 			 sel_reg_out : IN STD_LOGIC;
 			 immed_x2: IN STD_LOGIC;
 			 datard_m: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -99,10 +100,11 @@ BEGIN
 
 	--Input 1 of both register banks
 	WITH regfile_input SELECT
-		d <= w 									WHEN ALU_OUTPUT,
-			  datard_m							WHEN MEM,
-		     STD_LOGIC_VECTOR(unsigned(pc) + 2) WHEN PC_UPD,
-			  rd_io								WHEN IO_RD;				  
+		d <= w 									WHEN REG_IN_1_ALU,
+			  datard_m							WHEN REG_IN_1_MEM,
+		     STD_LOGIC_VECTOR(unsigned(pc) + 2) WHEN REG_IN_1_PC_UPD,
+			  rd_io								WHEN REG_IN_1_IO,
+			  (others => '-')					WHEN REG_IN_1_DONTCARE;				  
 				
 
 	addr_m <= pc WHEN ins_dad = '0' ELSE w;

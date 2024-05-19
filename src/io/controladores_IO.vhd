@@ -45,6 +45,8 @@ ARCHITECTURE Structure OF controladores_IO IS
 
     SIGNAL cycles: STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL milis: STD_LOGIC_VECTOR(15 DOWNTO 0);
+    SIGNAL milis_in: STD_LOGIC_VECTOR(15 DOWNTO 0);
+    SIGNAL milis_wre: STD_LOGIC;
 
     CONSTANT LEDG_PORT: integer := 5;
     CONSTANT LEDR_PORT: integer := 6;
@@ -75,6 +77,7 @@ BEGIN
     BEGIN
         IF rising_edge(clk) THEN
             kb_clear_char <= '0';
+            milis_wre <= '0';
 
             -- IO Inputs
             regs(KEYS_PORT)(3 DOWNTO 0) <= keys;
@@ -90,8 +93,15 @@ BEGIN
             END IF;
 
             -- IO-mapped registers Writes side-effects
-            IF wr_out = '1' and to_integer(unsigned(addr_io)) = KEYBOARD_CONTROL_PORT THEN
-                kb_clear_char <= '1';
+            IF wr_out = '1' THEN
+                CASE to_integer(unsigned(addr_io)) IS
+                    WHEN KEYBOARD_CONTROL_PORT =>
+                        kb_clear_char <= '1';
+                    WHEN MILIS_PORT =>
+                        milis_in <= wr_io;
+                        milis_wre <= '1';
+                    WHEN OTHERS =>
+                END CASE;
             END IF;
         END IF;
     END PROCESS;
@@ -129,6 +139,8 @@ BEGIN
     
     cc: cycle_counter
     PORT MAP ( clock_50 => CLOCK_50,
+                milis_in => milis_in,
+                wre => milis_wre,
                 cycles  => cycles,
                 milis   => milis);
 END Structure;
