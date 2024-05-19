@@ -41,6 +41,7 @@ ARCHITECTURE Structure OF sisa IS
     SIGNAL rd_in: STD_LOGIC;
 	 SIGNAL intr: STD_LOGIC;
 	 SIGNAL inta: STD_LOGIC;
+	 SIGNAL bad_alignment: STD_LOGIC;
 BEGIN
 
     pro0: proc
@@ -57,7 +58,8 @@ BEGIN
                     wr_out      => wr_out,
                     rd_in       => rd_in,
 						  intr		  => intr,
-						  inta		  => inta);
+						  inta		  => inta,
+						  bad_alignment => bad_alignment);
 
     mem0: MemoryController
     PORT MAP (  CLOCK_50  => CLOCK_50,
@@ -72,7 +74,8 @@ BEGIN
                 SRAM_LB_N => SRAM_LB_N,
                 SRAM_CE_N => SRAM_CE_N,
                 SRAM_OE_N => SRAM_OE_N,
-                SRAM_WE_N => SRAM_WE_N);
+                SRAM_WE_N => SRAM_WE_N,
+					 bad_alignment => bad_alignment);
     
     io: controladores_IO
         PORT MAP (  boot        => boot,

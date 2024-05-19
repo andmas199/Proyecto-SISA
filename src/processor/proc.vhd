@@ -3,6 +3,7 @@ USE ieee.std_logic_1164.all;
 
 USE work.datapath_components.all;
 USE work.control_unit_components.unidad_control;
+USE work.exception_unit_components.all;
 
 ENTITY proc IS
     PORT (clk       : IN  STD_LOGIC;
@@ -18,7 +19,8 @@ ENTITY proc IS
 		  wr_io		: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 		  rd_in		: OUT STD_LOGIC;
 		  wr_out	: OUT STD_LOGIC;
-		  inta : OUT STD_LOGIC);
+		  inta : OUT STD_LOGIC;
+		  bad_alignment : IN STD_LOGIC);
 END proc;
 
 
@@ -26,7 +28,7 @@ ARCHITECTURE Structure OF proc IS
 	
 	SIGNAL op_groupS : STD_LOGIC_VECTOR(1 DOWNTO 0);
 	SIGNAL op :			STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL wrd	:		STD_LOGIC;
+	SIGNAL wrd_1	:	STD_LOGIC;
 	SIGNAL addr_a :	STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL addr_b :	STD_LOGIC_VECTOR(2 DOWNTO 0);
 	SIGNAL addr_d_1 :	STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -34,7 +36,7 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL chg_mode : STD_LOGIC;
 	SIGNAL immed :		STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL d_sys :		STD_LOGIC;
-	SIGNAL reti :		STD_LOGIC;
+	SIGNAL wrd_2 :		STD_LOGIC;
 	SIGNAL immed_x2: 	STD_LOGIC;
 	SIGNAL sel_reg_out:STD_LOGIC;
 	SIGNAL ins_dad:	STD_LOGIC;
@@ -45,13 +47,17 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL z : STD_LOGIC;
 	SIGNAL clear : STD_LOGIC;
 	SIGNAL intr_enabl: STD_LOGIC;
+	SIGNAL inta_s: STD_LOGIC;
+	SIGNAL div_zero : STD_LOGIC;
+	SIGNAL mux_regS : STD_LOGIC;
+	SIGNAL exc_code : STD_LOGIC_VECTOR(3 DOWNTO 0);
 
 BEGIN
 	e0: datapath
 		PORT MAP	(	 clk => clk,
 						 op_group => op_groupS,
 						 op => op,
-						 wrd => wrd,
+						 wrd_1 => wrd_1,
 						 addr_a => addr_a,
 						 addr_b => addr_b,
 						 addr_d_1 => addr_d_1,
@@ -61,7 +67,7 @@ BEGIN
 						 immed_x2 => immed_x2,
 						 clear => clear,
 						 d_sys	=> d_sys,
-						 reti => reti,
+						 wrd_2 => wrd_2,
 						 sel_reg_out => sel_reg_out,
 						 datard_m => datard_m,
 						 ins_dad => ins_dad,
@@ -74,7 +80,10 @@ BEGIN
 						 z => z,
 						 rd_io => rd_io,
 						 wr_io => wr_io,
-						 intr_enabl => intr_enabl);
+						 intr_enabl => intr_enabl,
+						 div_zero => div_zero,
+						 mux_regS => mux_regS,
+						 exc_code => exc_code);
 	
 	co: unidad_control
 		PORT MAP	(	 boot => boot,
@@ -82,7 +91,7 @@ BEGIN
 						 datard_m => datard_m,
 						 op_group => op_groupS,
 						 op => op,
-						 wrd => wrd,
+						 wrd_1 => wrd_1,
 						 addr_a => addr_a,
 						 addr_b => addr_b,
 						 addr_d_1 => addr_d_1,
@@ -92,7 +101,7 @@ BEGIN
 						 chg_mode => chg_mode,
 						 immed => immed,
 						 d_sys => d_sys,
-						 reti => reti,
+						 wrd_2 => wrd_2,
 						 Rb_N => Rb_N,
 						 pc => pc,
 						 ins_dad => ins_dad,
@@ -107,5 +116,18 @@ BEGIN
 						 rd_in => rd_in,
 						 wr_out => wr_out,
 						 intr_enabl => intr_enabl,
-						 inta => inta);
+						 inta => inta_s,
+						 div_zero => div_zero,
+						 mux_regS => mux_regS,
+						 tipo_int => exc_code);
+	
+	exc0: exception_controller
+		PORT MAP (
+			instruction => pc,
+			bad_alignment => bad_alignment,
+			div_zero => div_zero,
+			inta => inta_s,
+			exc_code => exc_code);
+	
+	inta <= inta_s;
 END Structure;

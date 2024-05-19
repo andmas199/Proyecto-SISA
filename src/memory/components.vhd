@@ -16,7 +16,8 @@ PACKAGE memory_components IS
             SRAM_LB_N : OUT   STD_LOGIC;
             SRAM_CE_N : OUT   STD_LOGIC := '1';
             SRAM_OE_N : OUT   STD_LOGIC := '1';
-            SRAM_WE_N : OUT   STD_LOGIC := '1');
+            SRAM_WE_N : OUT   STD_LOGIC := '1';
+				bad_alignment : OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT SRAMController is
@@ -32,7 +33,8 @@ PACKAGE memory_components IS
               dataReaded  : OUT   STD_LOGIC_VECTOR(15 DOWNTO 0);
               dataToWrite : IN    STD_LOGIC_VECTOR(15 DOWNTO 0);
               WR          : IN    STD_LOGIC;
-              byte_m      : IN    STD_LOGIC := '0');
+              byte_m      : IN    STD_LOGIC := '0';
+				  bad_alignment : OUT STD_LOGIC);
     END COMPONENT;
 
 END PACKAGE;

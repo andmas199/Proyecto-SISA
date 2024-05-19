@@ -17,7 +17,7 @@ ENTITY unidad_control IS
 			 intr		  : IN  STD_LOGIC;
 			 op_group  : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
           op        : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-          wrd       : OUT STD_LOGIC;
+          wrd_1     : OUT STD_LOGIC;
           addr_a    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_b    : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           addr_d_1  : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -26,7 +26,7 @@ ENTITY unidad_control IS
 			 chg_mode  : OUT STD_LOGIC;
           immed     : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 d_sys	  : OUT STD_LOGIC;
-			 reti		  : OUT STD_LOGIC;
+			 wrd_2		  : OUT STD_LOGIC;
           pc        : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
           ins_dad   : OUT STD_LOGIC;
           regfile_input : OUT regfile_input_t;
@@ -35,11 +35,14 @@ ENTITY unidad_control IS
           immed_x2  : OUT STD_LOGIC;
           wr_m      : OUT STD_LOGIC;
           word_byte : OUT STD_LOGIC;
-		  addr_io: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-		  rd_in: OUT STD_LOGIC;
-		  wr_out: OUT STD_LOGIC;
-		  intr_enabl: IN STD_LOGIC;
-		  inta: OUT STD_LOGIC);
+			 addr_io: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+			 rd_in: OUT STD_LOGIC;
+			 wr_out: OUT STD_LOGIC;
+			 intr_enabl: IN STD_LOGIC;
+			 inta: OUT STD_LOGIC;
+			 div_zero : IN STD_LOGIC;
+			 mux_regS : OUT STD_LOGIC;
+			 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0));
 END unidad_control;
 
 ARCHITECTURE Structure OF unidad_control IS
@@ -59,6 +62,16 @@ ARCHITECTURE Structure OF unidad_control IS
 	SIGNAL sequencing_mode: sequencing_mode_t;
 BEGIN
 
+--------------------------------------
+--              AVISO               --
+--          MUY IMPORTANTE          --
+--------------------------------------
+-- No confundir el signal wrd_l con --
+-- la salida wrd_l de la unidad de  --
+-- control. La salida es el numero  --
+-- uno y el signal la letra "ele"   --
+--------------------------------------
+
 	immed <= immediate;
 
 	c0: control_l
@@ -67,14 +80,14 @@ BEGIN
 					 op_group => op_group,
 					 op => op,
 					 ldpc => ldpc_l,
-					 wrd => wrd_l,
+					 wrd_1 => wrd_l,
 					 addr_a => addr_a,
 					 addr_b => addr_b,
 					 addr_d_1 => addr_d_1,
 					 addr_d_2 => addr_d_2,
 					 immed => immediate,
 					 d_sys => d_sys,
-					 reti => reti,
+					 wrd_2 => wrd_2,
 					 wr_m => wr_m_l,
 					 regfile_input => regfile_input,
 					 Rb_N => Rb_N,
@@ -85,7 +98,10 @@ BEGIN
 					 addr_io => addr_io,
 					 rd_in => rd_in,
 					 wr_out => wr_out,
-					 inta => inta);
+					 inta => inta,
+					 div_zero => div_zero,
+					 mux_regS => mux_regS,
+					 tipo_int => tipo_int);
 	
 	m0: multi
 		PORT MAP(clk => clk,
@@ -97,7 +113,7 @@ BEGIN
 					intr => intr,
 					chg_mode => chg_mode,
 					ldpc => ldpc,
-					wrd  => wrd,
+					wrd  => wrd_1,
 					wr_m => wr_m,
 					ldir => ldir,
 					ins_dad => ins_dad,

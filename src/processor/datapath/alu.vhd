@@ -35,7 +35,8 @@ ENTITY alu IS
           op_group : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 			 op 		 : IN	 STD_LOGIC_VECTOR(2 DOWNTO 0);
           w  		 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 z	 		 :	OUT STD_LOGIC);
+			 z	 		 :	OUT STD_LOGIC;
+			 div_zero : OUT STD_LOGIC);
 END alu;
 
 
@@ -140,6 +141,12 @@ BEGIN
 		z <= '1';
 	 ELSE
 		z <= '0';
+	END IF;
+	
+	IF op_group = "11" and (op = "111" or op = "110") and y = "0000000000000000" THEN
+		div_zero <= '1';
+	ELSE
+		div_zero <= '0';
 	END IF;
 	
 	w <= output;

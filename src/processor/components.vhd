@@ -16,6 +16,7 @@ PACKAGE processor_components IS
         wr_io	  : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
         rd_in	  : OUT STD_LOGIC;
         wr_out	  : OUT STD_LOGIC;
-		  inta	  : OUT STD_LOGIC);
+		  inta	  : OUT STD_LOGIC;
+		  bad_alignment : IN STD_LOGIC);
     END COMPONENT;
 END PACKAGE;

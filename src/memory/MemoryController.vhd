@@ -11,14 +11,15 @@ entity MemoryController is
           rd_data   : out std_logic_vector(15 downto 0);
           we        : in  std_logic;
           byte_m    : in  std_logic;
-          -- señales para la placa de desarrollo
+          -- seï¿½ales para la placa de desarrollo
           SRAM_ADDR : out   std_logic_vector(17 downto 0);
           SRAM_DQ   : inout std_logic_vector(15 downto 0);
           SRAM_UB_N : out   std_logic;
           SRAM_LB_N : out   std_logic;
           SRAM_CE_N : out   std_logic := '1';
           SRAM_OE_N : out   std_logic := '1';
-          SRAM_WE_N : out   std_logic := '1');
+          SRAM_WE_N : out   std_logic := '1';
+			 bad_alignment: OUT STD_logic);
 end MemoryController;
 
 architecture comportament of MemoryController is
@@ -40,6 +41,7 @@ begin
                     dataReaded  => rd_data,
                     dataToWrite => wr_data,
                     WR          => we_validated,
-                    byte_m      => byte_m);
+                    byte_m      => byte_m,
+						  bad_alignment => bad_alignment);
 
 end comportament;
