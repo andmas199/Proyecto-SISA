@@ -11,14 +11,15 @@ PACKAGE datapath_components IS
 					 op_group : IN  STD_LOGIC_VECTOR(1 DOWNTO 0);
 					 op 		 : IN	 STD_LOGIC_VECTOR(2 DOWNTO 0);
 					 w  		 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-					 z	 		 :	OUT STD_LOGIC);
+					 z	 		 :	OUT STD_LOGIC;
+					 div_zero : OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT datapath IS
         PORT (  clk         : IN  STD_LOGIC;
 					 op_group	 : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
                 op          : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
-                wrd         : IN  STD_LOGIC;
+                wrd_1         : IN  STD_LOGIC;
                 addr_a      : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
                 addr_b      : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
                 addr_d_1    : IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -28,7 +29,7 @@ PACKAGE datapath_components IS
                 immed       : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
                 immed_x2    : IN  STD_LOGIC;
 					 d_sys		 : IN  STD_LOGIC;
-					 reti			 : IN STD_LOGIC;
+					 wrd_2			 : IN STD_LOGIC;
 					 sel_reg_out : IN	 STD_LOGIC;
                 datard_m    : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
                 ins_dad     : IN  STD_LOGIC;
@@ -41,7 +42,10 @@ PACKAGE datapath_components IS
                 z : OUT STD_LOGIC;
                 rd_io : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
                 wr_io : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-					 intr_enabl: OUT STD_LOGIC);
+					 intr_enabl: OUT STD_LOGIC;
+					 div_zero : OUT STD_LOGIC;
+					 mux_regS : IN STD_LOGIC;
+					 exc_code : IN STD_LOGIC_VECTOR(3 DOWNTO 0));
     END COMPONENT;
 
     COMPONENT regfile IS
@@ -58,7 +62,9 @@ PACKAGE datapath_components IS
 				addr_d_2: IN  STD_LOGIC_VECTOR(2 DOWNTO 0);
             a       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
             b       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-				intr_enabl: OUT STD_LOGIC);
+				intr_enabl: OUT STD_LOGIC;
+				bad_alignment : IN STD_LOGIC;
+				m_addr : IN STD_LOGIC_VECTOR(15 DOWNTO 0));
     END COMPONENT;
 
 END PACKAGE;
