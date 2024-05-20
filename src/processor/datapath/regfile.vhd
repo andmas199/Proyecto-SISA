@@ -26,11 +26,9 @@ ARCHITECTURE Structure OF regfile IS
   TYPE regs_t IS ARRAY(7 DOWNTO 0) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL regs: regs_t;
 BEGIN
-	PROCESS(clk, wrd_1, wrd_2, addr_a, addr_b)
+	PROCESS(clk, wrd_1, wrd_2, addr_a, addr_b, regs)
 	BEGIN
 		IF rising_edge(clk) THEN
-			intr_enabl <= regs(7)(1);
-			
 			IF clear = '1' THEN
 				regs(0) <= (OTHERS => '0');
 				regs(1) <= (OTHERS => '0');
@@ -58,6 +56,8 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
+
+		intr_enabl <= regs(7)(1);
 		
 	END PROCESS;
 

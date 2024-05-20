@@ -11,7 +11,9 @@ entity keyboard_controller is
           ps2_data   : inout STD_LOGIC;
           read_char  : out   STD_LOGIC_VECTOR (7 downto 0);
           clear_char : in    STD_LOGIC;
-          data_ready : out   STD_LOGIC);
+          data_ready : out   STD_LOGIC;
+          intr       : out   STD_LOGIC;
+          inta       : in    STD_LOGIC);
 end keyboard_controller;
 
 architecture Behavioral of keyboard_controller is
@@ -80,7 +82,7 @@ begin
             else
                 case state is
                     when idle =>
-                        if (clear_char = '1') then
+                        if (clear_char = '1' or inta = '1') then
                             state <= clearing;
                         end if;
                     when clearing =>
@@ -114,8 +116,10 @@ begin
     process (clk) begin
         if (clk'event and clk = '1') then
             data_ready <= '0';
+            intr <= '0';
             if (data_ready_we = '1') then
                 data_ready <= data_available;
+                intr <= data_available;
                 if (data_available = '1') then
                     read_char <= rx_ascii;
                 end if;

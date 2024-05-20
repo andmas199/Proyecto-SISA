@@ -112,6 +112,7 @@ BEGIN
 	WITH regfile_input SELECT
 		d <= w 									WHEN REG_IN_1_ALU,
 			  datard_m							WHEN REG_IN_1_MEM,
+			  pc								WHEN REG_IN_1_PC,
 		     STD_LOGIC_VECTOR(unsigned(pc) + 2) WHEN REG_IN_1_PC_UPD,
 			  rd_io								WHEN REG_IN_1_IO,
 			  (others => '-')					WHEN REG_IN_1_DONTCARE;				  

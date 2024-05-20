@@ -4,6 +4,9 @@ USE ieee.numeric_std.all;
 
 USE work.io_components.cycle_counter;
 USE work.io_components.seg7_driver;
+USE work.io_components.interrupting_driver;
+USE work.io_components.interruption_controller;
+USE work.io_components.timer;
 USE work.keyboard_components.keyboard_controller;
 
 ENTITY controladores_IO IS
@@ -35,6 +38,14 @@ ARCHITECTURE Structure OF controladores_IO IS
 
     TYPE regs_t IS ARRAY(255 DOWNTO 0) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL regs: regs_t;
+
+    CONSTANT interruption_sources: natural := 4;
+    SIGNAL devices_intr: std_logic_vector(interruption_sources - 1 downto 0) := (others => '0');
+    SIGNAL devices_inta: std_logic_vector(interruption_sources - 1 downto 0);
+    SIGNAL iid: std_logic_vector(7 downto 0);
+
+    SIGNAL keys_avail: std_logic_vector(3 downto 0);
+    SIGNAL switches_avail: std_logic_vector(7 downto 0);
 
     TYPE hexs_t IS ARRAY(3 DOWNTO 0) OF STD_LOGIC_VECTOR(6 DOWNTO 0);
     SIGNAL hexs: hexs_t;
@@ -80,8 +91,8 @@ BEGIN
             milis_wre <= '0';
 
             -- IO Inputs
-            regs(KEYS_PORT)(3 DOWNTO 0) <= keys;
-            regs(SWITCHES_PORT)(7 DOWNTO 0) <= switches;
+            regs(KEYS_PORT)(3 DOWNTO 0) <= keys_avail;
+            regs(SWITCHES_PORT)(7 DOWNTO 0) <= switches_avail;
             regs(KEYBOARD_VALUE_PORT)(7 DOWNTO 0) <= kb_read_char;
             regs(KEYBOARD_CONTROL_PORT)(15 DOWNTO 0) <= (0 => kb_data_ready, others => '0');
             regs(CYCLES_PORT) <= cycles;
@@ -106,10 +117,44 @@ BEGIN
         END IF;
     END PROCESS;
 
-    rd_io <= regs(to_integer(unsigned(addr_io)));
+    rd_io <= regs(to_integer(unsigned(addr_io))) WHEN inta = '0' ELSE x"00" & iid;
 
     led_verdes <= regs(LEDG_PORT)(7 DOWNTO 0);
     led_rojos <= regs(LEDR_PORT)(7 DOWNTO 0);
+
+    int_ctl: interruption_controller
+        GENERIC MAP (interruption_sources => interruption_sources)
+        PORT MAP (
+            boot => boot,
+            clk => clk,
+            global_inta => inta,
+            devices_intr => devices_intr,
+            global_intr => intr,
+            devices_inta => devices_inta,
+            iid => iid
+        );
+
+    keys0: interrupting_driver
+        GENERIC MAP (width => 4)
+        PORT MAP (
+            boot => boot,
+            clk => clk,
+            device_in => keys,
+            inta => devices_inta(1),
+            device_out => keys_avail,
+            intr => devices_intr(1)
+        );
+    
+    switches0: interrupting_driver
+        GENERIC MAP (width => 8)
+        PORT MAP (
+            boot => boot,
+            clk => clk,
+            device_in => switches,
+            inta => devices_inta(2),
+            device_out => switches_avail,
+            intr => devices_intr(2)
+        );
 
     vga_cursor <= regs(CURSOR_POSITION_PORT);
     vga_cursor_ENABLE <= regs(CURSOR_ENABLE_PORT)(0);
@@ -125,8 +170,6 @@ BEGIN
     HEX1 <= hexs(1);
     HEX2 <= hexs(2);
     HEX3 <= hexs(3);
-	 
-	intr <= '0';
 
     keyboard: keyboard_controller
     PORT MAP (  clk        => CLOCK_50,
@@ -135,7 +178,9 @@ BEGIN
                 ps2_data   => ps2_data,
                 read_char  => kb_read_char,
                 clear_char => kb_clear_char,
-                data_ready => kb_data_ready);
+                data_ready => kb_data_ready,
+                intr       => devices_intr(3),
+                inta       => devices_inta(3));
     
     cc: cycle_counter
     PORT MAP ( clock_50 => CLOCK_50,
@@ -143,4 +188,12 @@ BEGIN
                 wre => milis_wre,
                 cycles  => cycles,
                 milis   => milis);
+
+    timer0: timer
+    PORT MAP (
+        CLOCK_50 => CLOCK_50,
+        boot => boot,
+        inta => devices_inta(0),
+        intr => devices_intr(0)
+    );
 END Structure;

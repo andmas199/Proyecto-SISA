@@ -48,11 +48,11 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL z : STD_LOGIC;
 	SIGNAL clear : STD_LOGIC;
 	SIGNAL intr_enabl: STD_LOGIC;
-	SIGNAL inta_s: STD_LOGIC;
 	SIGNAL div_zero : STD_LOGIC;
 	SIGNAL mux_regS : STD_LOGIC;
 	SIGNAL exc_code : STD_LOGIC_VECTOR(3 DOWNTO 0);
 	SIGNAL invalid_inst : STD_LOGIC;
+	SIGNAL memory_access : STD_LOGIC;
 	SIGNAL excp : STD_LOGIC;
 
 BEGIN
@@ -99,7 +99,6 @@ BEGIN
 						 addr_b => addr_b,
 						 addr_d_1 => addr_d_1,
 						 addr_d_2 => addr_d_2,
-						 intr => intr,
 						 clear => clear,
 						 chg_mode => chg_mode,
 						 immed => immed,
@@ -118,21 +117,20 @@ BEGIN
 						 addr_io => addr_io,
 						 rd_in => rd_in,
 						 wr_out => wr_out,
-						 intr_enabl => intr_enabl,
-						 inta => inta_s,
+						 inta => inta,
 						 mux_regS => mux_regS,
 						 tipo_int => exc_code,
 						 invalid_inst => invalid_inst,
+						 memory_access => memory_access,
 						 excp => excp);
 	
 	exc0: exception_controller
 		PORT MAP (
 			invalid_inst => invalid_inst,
-			bad_alignment => bad_alignment,
+			bad_alignment => bad_alignment and memory_access,
 			div_zero => div_zero,
-			inta => inta_s,
+			intr => intr,
+			intr_enabl => intr_enabl,
 			exc_code => exc_code,
 			excp => excp);
-	
-	inta <= inta_s;
 END Structure;

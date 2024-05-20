@@ -10,6 +10,7 @@ USE work.datapath_components.all;
 ENTITY control_l IS
     PORT (ir     		: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
 			 z			: IN STD_LOGIC;
+			 system     : IN STD_LOGIC;
 			 op_group	: OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
           op     		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
           ldpc   		: OUT STD_LOGIC;
@@ -34,7 +35,8 @@ ENTITY control_l IS
 			 inta : OUT STD_LOGIC;
 			 mux_regS : OUT STD_LOGIC;
 			 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-			 invalid_inst : OUT STD_LOGIC);
+			 invalid_inst : OUT STD_LOGIC;
+			 memory_access : OUT STD_LOGIC);
 END control_l;
 
 
@@ -49,21 +51,12 @@ ARCHITECTURE Structure OF control_l IS
 	FUNCTION reg_src (addr_src: addr_source_t; ir_in: STD_LOGIC_VECTOR(15 downto 0)) RETURN STD_LOGIC_VECTOR IS
 		VARIABLE result: STD_LOGIC_VECTOR(2 downto 0);
 	BEGIN
-		-- WITH addr_src SELECT
-		-- 	result := 	ir_in(11 downto 9) WHEN ADDR_SRC_IR_11_9,
-		-- 				ir_in(8 downto 6) WHEN ADDR_SRC_IR_8_6,
-		-- 				ir_in(2 downto 0) WHEN ADDR_SRC_IR_2_0,
-		-- 				"111" WHEN ADDR_SRC_7,
-		-- 				"011" WHEN ADDR_SRC_3,
-		-- 				"001" WHEN ADDR_SRC_1,
-		-- 				"000" WHEN ADDR_SRC_0,
-		-- 				(others => '-') WHEN ADDR_SRC_DONTCARE;
-
 		CASE addr_src IS
 			WHEN ADDR_SRC_IR_11_9 => result := ir_in(11 downto 9);
 						WHEN ADDR_SRC_IR_8_6 => result := ir_in(8 downto 6);
 						WHEN ADDR_SRC_IR_2_0 => result := ir_in(2 downto 0);
 						WHEN ADDR_SRC_7 => result := "111";
+						WHEN ADDR_SRC_5 => result := "101";
 						WHEN ADDR_SRC_3 => result := "011";
 						WHEN ADDR_SRC_1 => result := "001";
 						WHEN ADDR_SRC_0 => result := "000";
@@ -77,106 +70,110 @@ BEGIN
 	op_code <= ir(15 DOWNTO 12);
 
 	-- Determinaci�n de la instrucci�n actual
-	PROCESS (ir)
+	PROCESS (ir, system)
 	BEGIN
-		CASE ir(15 downto 12) IS
-			WHEN "0000" =>
-				instruction <= INST_ARITH;
-			WHEN "0001" =>
-				IF ir(5 downto 3) = "010" or ir(5 downto 4) = "11" THEN
-					instruction <= INST_INVALID;
-				ELSE
-					instruction <= INST_CMP;
-				END IF;
-			WHEN "0010" =>
-				instruction <= INST_ADDI;
-			WHEN "0011" =>
-				instruction <= INST_LD;
-			WHEN "0100" =>
-				instruction <= INST_ST;
-			WHEN "0101" =>
-				instruction <= INST_MOVI;
-			WHEN "0110" =>
-				instruction <= INST_BRANCH;
-			WHEN "0111" =>
-				IF ir(8) = '0' THEN
-					instruction <= INST_IN;
-				ELSE
-					instruction <= INST_OUT;
-				END IF;
-			WHEN "1000" =>
-				IF ir(5 downto 3) = "011" or ir(5 downto 4) = "11" THEN
-					instruction <= INST_INVALID;
-				ELSE
-					instruction <= INST_ARITH_EXT;
-				END IF;
-			WHEN "1010" =>
-				IF ir(5 downto 3) = "000" THEN
-					CASE ir(2 downto 0) IS
-						WHEN "000" =>
-							instruction <= INST_JZ_JNZ;
-						WHEN "001" =>
-							instruction <= INST_JZ_JNZ;
-						WHEN "011" =>
-							IF ir(11 downto 9) = "000" THEN
-								instruction <= INST_JMP;
+		IF system = '1' THEN
+			instruction <= INST_SYSTEM;
+		ELSE
+			CASE ir(15 downto 12) IS
+				WHEN "0000" =>
+					instruction <= INST_ARITH;
+				WHEN "0001" =>
+					IF ir(5 downto 3) = "010" or ir(5 downto 4) = "11" THEN
+						instruction <= INST_INVALID;
+					ELSE
+						instruction <= INST_CMP;
+					END IF;
+				WHEN "0010" =>
+					instruction <= INST_ADDI;
+				WHEN "0011" =>
+					instruction <= INST_LD;
+				WHEN "0100" =>
+					instruction <= INST_ST;
+				WHEN "0101" =>
+					instruction <= INST_MOVI;
+				WHEN "0110" =>
+					instruction <= INST_BRANCH;
+				WHEN "0111" =>
+					IF ir(8) = '0' THEN
+						instruction <= INST_IN;
+					ELSE
+						instruction <= INST_OUT;
+					END IF;
+				WHEN "1000" =>
+					IF ir(5 downto 3) = "011" or ir(5 downto 4) = "11" THEN
+						instruction <= INST_INVALID;
+					ELSE
+						instruction <= INST_ARITH_EXT;
+					END IF;
+				WHEN "1010" =>
+					IF ir(5 downto 3) = "000" THEN
+						CASE ir(2 downto 0) IS
+							WHEN "000" =>
+								instruction <= INST_JZ_JNZ;
+							WHEN "001" =>
+								instruction <= INST_JZ_JNZ;
+							WHEN "011" =>
+								IF ir(11 downto 9) = "000" THEN
+									instruction <= INST_JMP;
+								ELSE
+									instruction <= INST_INVALID;
+								END IF;
+							WHEN "100" =>
+								instruction <= INST_JAL;
+							WHEN OTHERS =>
+								instruction <= INST_INVALID;
+						END CASE;
+					ELSE
+						instruction <= INST_INVALID;
+					END IF;
+				WHEN "1101" =>
+					instruction <= INST_LDB;
+				WHEN "1110" =>
+					instruction <= INST_STB;
+				WHEN "1111" =>
+					CASE ir(5 downto 0) IS
+						WHEN "100000" =>
+							IF ir(11 downto 6) = "000000" THEN
+								instruction <= INST_EI;
 							ELSE
 								instruction <= INST_INVALID;
 							END IF;
-						WHEN "100" =>
-							instruction <= INST_JAL;
+						WHEN "100001" =>
+							IF ir(11 downto 6) = "000000" THEN
+								instruction <= INST_DI;
+							ELSE
+								instruction <= INST_INVALID;
+							END IF;
+						WHEN "100100" =>
+							IF ir(11 downto 6) = "000000" THEN
+								instruction <= INST_RETI;
+							ELSE
+								instruction <= INST_INVALID;
+							END IF;
+						WHEN "101000" =>
+							IF ir(8 downto 6) = "000" THEN
+								instruction <= INST_GETIID;
+							ELSE
+								instruction <= INST_INVALID;
+							END IF;
+						WHEN "101100" =>
+							instruction <= INST_RDS;
+						WHEN "110000" =>
+							instruction <= INST_WRS;
+						WHEN "111111" =>
+							IF ir(11 downto 6) = "111111" THEN
+								instruction <= INST_HALT;
+							ELSE
+								instruction <= INST_INVALID;
+							END IF;
 						WHEN OTHERS =>
 							instruction <= INST_INVALID;
 					END CASE;
-				ELSE
+				WHEN OTHERS =>
 					instruction <= INST_INVALID;
-				END IF;
-			WHEN "1101" =>
-				instruction <= INST_LDB;
-			WHEN "1110" =>
-				instruction <= INST_STB;
-			WHEN "1111" =>
-				CASE ir(5 downto 0) IS
-					WHEN "100000" =>
-						IF ir(11 downto 6) = "000000" THEN
-							instruction <= INST_EI;
-						ELSE
-							instruction <= INST_INVALID;
-						END IF;
-					WHEN "100001" =>
-						IF ir(11 downto 6) = "000000" THEN
-							instruction <= INST_DI;
-						ELSE
-							instruction <= INST_INVALID;
-						END IF;
-					WHEN "100100" =>
-						IF ir(11 downto 6) = "000000" THEN
-							instruction <= INST_RETI;
-						ELSE
-							instruction <= INST_INVALID;
-						END IF;
-					WHEN "101000" =>
-						IF ir(8 downto 6) = "000" THEN
-							instruction <= INST_GETIID;
-						ELSE
-							instruction <= INST_INVALID;
-						END IF;
-					WHEN "101100" =>
-						instruction <= INST_RDS;
-					WHEN "110000" =>
-						instruction <= INST_WRS;
-					WHEN "111111" =>
-						IF ir(11 downto 6) = "111111" THEN
-							instruction <= INST_HALT;
-						ELSE
-							instruction <= INST_INVALID;
-						END IF;
-					WHEN OTHERS =>
-						instruction <= INST_INVALID;
-				END CASE;
-			WHEN OTHERS =>
-				instruction <= INST_INVALID;
-		END CASE;
+			END CASE;
+		END IF;
 	END PROCESS;
 	
 	WITH instruction SELECT
@@ -202,7 +199,8 @@ BEGIN
 							CONTROL_OUT_RDS WHEN INST_RDS,
 							CONTROL_OUT_WRS WHEN INST_WRS,
 							CONTROL_OUT_HALT WHEN INST_HALT,
-							CONTROL_OUT_INVALID WHEN INST_INVALID;
+							CONTROL_OUT_INVALID WHEN INST_INVALID,
+							CONTROL_OUT_SYSTEM WHEN INST_SYSTEM;
 	
 	ldpc <= control_output.ldpc;
 
@@ -246,13 +244,15 @@ BEGIN
 	wr_out <= control_output.wr_out;
 	inta <= control_output.int_ack;
 	invalid_inst <= control_output.invalid_inst;
+	memory_access <= control_output.memory_access;
 
 	WITH op_code SELECT
 		take_branch <= 	ir(8) /= z								 WHEN "0110",
 						ir(0) /= z or ir(2) = '1' or ir(1) = '1' WHEN "1010",
 						false WHEN OTHERS;
 	
-	sequencing_mode <= 	RELATIVE WHEN op_code = "0110" AND take_branch ELSE
+	sequencing_mode <= 			ABSOLUTE WHEN system = '1' ELSE
+								RELATIVE WHEN op_code = "0110" AND take_branch ELSE
 								ABSOLUTE WHEN (op_code = "1010" AND take_branch) or (op_code = "1111" and ir(5 DOWNTO 0) = "100100") ELSE
 								IMPLICIT;
 	

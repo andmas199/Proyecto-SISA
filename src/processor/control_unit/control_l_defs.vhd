@@ -3,12 +3,12 @@ USE ieee.std_logic_1164.all;
 
 PACKAGE control_l_defs IS
     
-    TYPE instruction_t IS (INST_ARITH, INST_CMP, INST_ADDI, INST_LD, INST_ST, INST_MOVI, INST_BRANCH, INST_IN, INST_OUT, INST_ARITH_EXT, INST_JZ_JNZ, INST_JMP, INST_JAL, INST_LDB, INST_STB, INST_EI, INST_DI, INST_RETI, INST_GETIID, INST_RDS, INST_WRS, INST_HALT, INST_INVALID);
+    TYPE instruction_t IS (INST_ARITH, INST_CMP, INST_ADDI, INST_LD, INST_ST, INST_MOVI, INST_BRANCH, INST_IN, INST_OUT, INST_ARITH_EXT, INST_JZ_JNZ, INST_JMP, INST_JAL, INST_LDB, INST_STB, INST_EI, INST_DI, INST_RETI, INST_GETIID, INST_RDS, INST_WRS, INST_HALT, INST_INVALID, INST_SYSTEM);
 
-    TYPE addr_source_t IS (ADDR_SRC_IR_11_9, ADDR_SRC_IR_8_6, ADDR_SRC_IR_2_0, ADDR_SRC_7, ADDR_SRC_3, ADDR_SRC_1, ADDR_SRC_0, ADDR_SRC_DONTCARE);
+    TYPE addr_source_t IS (ADDR_SRC_IR_11_9, ADDR_SRC_IR_8_6, ADDR_SRC_IR_2_0, ADDR_SRC_7, ADDR_SRC_5, ADDR_SRC_3, ADDR_SRC_1, ADDR_SRC_0, ADDR_SRC_DONTCARE);
     TYPE op_t IS (OP_IR_5_3, OP_00_IR_8, OP_MOVI, OP_AND, OP_OR, OP_ADD, OP_X, OP_DONTCARE);
     TYPE immed_t IS (IMMED_IR_7_0, IMMED_IR_5_0, IMMED_EI, IMMED_DI, IMMED_DONTCARE);      
-    TYPE regfile_input_1_t IS (REG_IN_1_MEM, REG_IN_1_ALU, REG_IN_1_PC_UPD, REG_IN_1_IO, REG_IN_1_DONTCARE);
+    TYPE regfile_input_1_t IS (REG_IN_1_MEM, REG_IN_1_ALU, REG_IN_1_PC, REG_IN_1_PC_UPD, REG_IN_1_IO, REG_IN_1_DONTCARE);
     TYPE sequencing_mode_t IS (IMPLICIT, RELATIVE, ABSOLUTE);
 
     CONSTANT SEL_REG_GENERAL: STD_LOGIC := '0';
@@ -47,6 +47,7 @@ PACKAGE control_l_defs IS
         wr_out: STD_LOGIC;
         int_ack: STD_LOGIC;
 		  invalid_inst: STD_LOGIC;
+        memory_access: STD_LOGIC;
     END RECORD;
 
     CONSTANT CONTROL_OUT_ARITH: control_output_t := (
@@ -70,7 +71,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_CMP: control_output_t := (
@@ -94,7 +96,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_ADDI: control_output_t := (
@@ -118,7 +121,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_LD: control_output_t := (
@@ -142,7 +146,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '1'
     );
 
     CONSTANT CONTROL_OUT_ST: control_output_t := (
@@ -166,7 +171,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '1'
     );
 
     CONSTANT CONTROL_OUT_MOVI: control_output_t := (
@@ -190,7 +196,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_BRANCH: control_output_t := (
@@ -214,7 +221,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_IN: control_output_t := (
@@ -238,7 +246,8 @@ PACKAGE control_l_defs IS
         rd_in => '1',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_OUT: control_output_t := (
@@ -262,7 +271,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '1',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_ARITH_EXT: control_output_t := (
@@ -286,7 +296,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_JZ_JNZ: control_output_t := (
@@ -310,7 +321,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
     
     CONSTANT CONTROL_OUT_JMP: control_output_t := (
@@ -334,7 +346,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_JAL: control_output_t := (
@@ -358,7 +371,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_LDB: control_output_t := (
@@ -382,7 +396,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '1'
     );
 
     CONSTANT CONTROL_OUT_STB: control_output_t := (
@@ -406,7 +421,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '1'
     );
 
     CONSTANT CONTROL_OUT_EI: control_output_t := (
@@ -430,7 +446,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_DI: control_output_t := (
@@ -454,7 +471,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_RETI: control_output_t := (
@@ -478,7 +496,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_GETIID: control_output_t := (
@@ -502,7 +521,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '1',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_RDS: control_output_t := (
@@ -526,7 +546,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_WRS: control_output_t := (
@@ -550,7 +571,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_HALT: control_output_t := (
@@ -574,7 +596,8 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '0'
+        invalid_inst => '0',
+        memory_access => '0'
     );
 
     CONSTANT CONTROL_OUT_INVALID: control_output_t := (
@@ -598,6 +621,32 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
-		  invalid_inst => '1'
+        invalid_inst => '1',
+        memory_access => '0'
+    );
+
+    CONSTANT CONTROL_OUT_SYSTEM: control_output_t := (
+        ldpc => '1',
+        addr_a => ADDR_SRC_5,
+        addr_b => ADDR_SRC_DONTCARE,
+        addr_d1 => ADDR_SRC_DONTCARE,
+        addr_d2 => ADDR_SRC_DONTCARE,
+        wrd_1 => '0',
+        wrd_2 => '0',
+        regfile_input_1 => REG_IN_1_PC,
+        sel_reg_rd => SEL_REG_SPECIAL,
+        sel_reg_wr => SEL_REG_SPECIAL,
+        immed => IMMED_DONTCARE,
+        immed_x2 => '-',
+        rb_N => RB_N_REGFILE,
+        op_group => OP_GROUP_MISC,
+        op => OP_X,
+        wr_m => '0',
+        word_byte => '-',
+        rd_in => '0',
+        wr_out => '0',
+        int_ack => '0',
+        invalid_inst => '0',
+        memory_access => '0'
     );
 END PACKAGE;

@@ -10,7 +10,9 @@ PACKAGE keyboard_components IS
             ps2_data   : INOUT STD_LOGIC;
             read_char  : OUT   STD_LOGIC_VECTOR (7 DOWNTO 0);
             clear_char : IN    STD_LOGIC;
-            data_ready : OUT   STD_LOGIC);
+            data_ready : OUT   STD_LOGIC;
+            intr       : out   STD_LOGIC;
+            inta       : in    STD_LOGIC);
   END COMPONENT;
 
 END PACKAGE;

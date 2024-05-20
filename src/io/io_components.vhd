@@ -37,9 +37,47 @@ PACKAGE io_components IS
         );
     END COMPONENT;
 
+    COMPONENT interrupting_driver IS
+        GENERIC (
+            width: natural
+        );
+        PORT (
+            boot: in std_logic;
+            clk: in std_logic;
+            device_in: in std_logic_vector(width - 1 downto 0);
+            inta: in std_logic;
+            device_out: out std_logic_vector(width - 1 downto 0);
+            intr: out std_logic
+        );
+    END COMPONENT;
+
+    COMPONENT interruption_controller IS
+        GENERIC (
+            interruption_sources: natural
+        );
+        PORT (
+            boot: in std_logic;
+            clk: in std_logic;
+            global_inta: in std_logic;
+            devices_intr: in std_logic_vector(interruption_sources - 1 downto 0);
+            global_intr: out std_logic;
+            devices_inta: out std_logic_vector(interruption_sources - 1 downto 0);
+            iid: out std_logic_vector(7 downto 0)
+        );
+    END COMPONENT;
+
     COMPONENT seg7_driver IS
       PORT (enable: in  std_logic;
             value:  in  std_logic_vector(3 DOWNTO 0);
             hex:    out std_logic_vector(6 DOWNTO 0));
+    END COMPONENT;
+
+    COMPONENT timer IS
+        PORT (
+            CLOCK_50: in std_logic;
+            boot: in std_logic;
+            inta: in std_logic;
+            intr: out std_logic
+        );
     END COMPONENT;
 END PACKAGE;
