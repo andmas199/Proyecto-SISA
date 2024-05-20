@@ -28,17 +28,31 @@ architecture comportament of test_sisa is
    end component;
    
    component sisa IS 
-	PORT (	CLOCK_50		: IN	STD_LOGIC;
-				SRAM_ADDR 	: out std_logic_vector(17 downto 0);
-				SRAM_DQ 		: inout std_logic_vector(15 downto 0);
-				SRAM_UB_N 	: out std_logic;
-				SRAM_LB_N 	: out std_logic;
-				SRAM_CE_N 	: out std_logic := '1';
-				SRAM_OE_N 	: out std_logic := '1';
-				SRAM_WE_N 	: out std_logic := '1';
-								
-				SW : in std_logic_vector(9 downto 9)
-				);
+	PORT (CLOCK_50  : IN    STD_LOGIC;
+          SRAM_ADDR : out   std_logic_vector(17 downto 0);
+          SRAM_DQ   : inout std_logic_vector(15 downto 0);
+          SRAM_UB_N : out   std_logic;
+          SRAM_LB_N : out   std_logic;
+          SRAM_CE_N : out   std_logic := '1';
+          SRAM_OE_N : out   std_logic := '1';
+          SRAM_WE_N : out   std_logic := '1';
+          LEDG      : out   std_logic_vector(7 downto 0);
+          LEDR      : out   std_logic_vector(7 downto 0);
+          KEY       : in std_logic_vector(3 downto 0);
+          SW        : in std_logic_vector(9 downto 0);
+          HEX0      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+          HEX1      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+          HEX2      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+          HEX3      : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
+          PS2_CLK   : INOUT std_logic;
+          PS2_DAT   : INOUT std_logic;
+          BLANK_OUT      : OUT STD_LOGIC;
+          CSYNC_OUT      : OUT STD_LOGIC;
+          VGA_R        : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+          VGA_G      : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+          VGA_B       : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+          VGA_HS : OUT STD_LOGIC;
+          VGA_VS  : OUT STD_LOGIC);
    end component;
 
    
@@ -58,7 +72,7 @@ architecture comportament of test_sisa is
    signal we_m           : std_logic;
    signal ce_m2           : std_logic;
 
-   signal botones      : std_logic_vector(9 downto 9);
+   signal botones      : std_logic_vector(9 downto 0);
 
 	
 begin
@@ -69,7 +83,7 @@ begin
       port map (
          CLOCK_50   => clk,
          SW        => botones,
-
+	 KEY => "0000",
          SRAM_ADDR  => addr_SoC,
          SRAM_DQ    => data_mem,
 			SRAM_UB_N 	=> ub_m,

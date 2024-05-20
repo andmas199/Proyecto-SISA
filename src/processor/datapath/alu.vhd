@@ -151,7 +151,7 @@ BEGIN
 		z <= '0';
 	END IF;
 	
-	IF op_group = "11" and (op = "111" or op = "110") and y = "0000000000000000" THEN
+	IF op_group = "11" and (op = "100" or op = "101") and y = "0000000000000000" THEN
 		div_zero <= '1';
 	ELSE
 		div_zero <= '0';
