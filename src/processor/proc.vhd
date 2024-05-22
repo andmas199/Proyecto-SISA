@@ -60,6 +60,7 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL inst_privilege_level: STD_LOGIC;
 	SIGNAL protected_inst: STD_LOGIC;
 	SIGNAL mmu_accessible: STD_LOGIC;
+	SIGNAL calls: STD_LOGIC;
 BEGIN
 	e0: datapath
 		PORT MAP	(	 clk => clk,
@@ -130,15 +131,17 @@ BEGIN
 						 invalid_inst => invalid_inst,
 						 memory_access => memory_access,
 						 excp => excp,
-						 inst_privilege_level => inst_privilege_level);
+						 inst_privilege_level => inst_privilege_level,
+						 calls => calls);
 	
 	exc0: exception_controller
 		PORT MAP (
-			invalid_inst => invalid_inst,
+			invalid_inst => invalid_inst or (calls and inst_privilege_level),
 			bad_alignment => bad_alignment and memory_access,
 			div_zero => div_zero,
 			protected_mem => not mmu_accessible and memory_access,
 			protected_inst => protected_inst,
+			calls => calls, -- We ignore validity here as invalid instruction takes higher preference
 			intr => intr,
 			intr_enabl => intr_enabl,
 			exc_code => exc_code,

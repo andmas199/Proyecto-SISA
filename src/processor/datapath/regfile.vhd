@@ -51,7 +51,8 @@ BEGIN
 					END IF;
 					regs(1) <= d_1;
 					regs(2) <= d_2;
-					regs(7)(1) <= '0';
+					regs(7)(0) <= '1'; -- Enter system mode
+					regs(7)(1) <= '0'; -- Disable interrupts
 				END IF;
 				IF wrd_1 = '1' THEN
 					regs(to_integer(unsigned(addr_d_1))) <= d_1;

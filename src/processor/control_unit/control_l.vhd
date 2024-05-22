@@ -37,7 +37,8 @@ ENTITY control_l IS
 			 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 			 invalid_inst : OUT STD_LOGIC;
 			 memory_access : OUT STD_LOGIC;
-			 inst_privilege_level: OUT STD_LOGIC);
+			 inst_privilege_level: OUT STD_LOGIC;
+			 calls: OUT STD_LOGIC);
 END control_l;
 
 
@@ -122,6 +123,12 @@ BEGIN
 								END IF;
 							WHEN "100" =>
 								instruction <= INST_JAL;
+							WHEN "111" =>
+								IF ir(11 downto 9) = "000" THEN
+									instruction <= INST_CALLS;
+								ELSE
+									instruction <= INST_INVALID;
+								END IF;
 							WHEN OTHERS =>
 								instruction <= INST_INVALID;
 						END CASE;
@@ -191,6 +198,7 @@ BEGIN
 							CONTROL_OUT_JZ_JNZ WHEN INST_JZ_JNZ,
 							CONTROL_OUT_JMP WHEN INST_JMP,
 							CONTROL_OUT_JAL WHEN INST_JAL,
+							CONTROL_OUT_CALLS WHEN INST_CALLS,
 							CONTROL_OUT_LDB WHEN INST_LDB,
 							CONTROL_OUT_STB WHEN INST_STB,
 							CONTROL_OUT_EI WHEN INST_EI,
@@ -247,6 +255,8 @@ BEGIN
 	invalid_inst <= control_output.invalid_inst;
 	memory_access <= control_output.memory_access;
 	inst_privilege_level <= control_output.privilege_level;
+
+	calls <= '1' WHEN instruction = INST_CALLS ELSE '0';
 
 	WITH op_code SELECT
 		take_branch <= 	ir(8) /= z								 WHEN "0110",

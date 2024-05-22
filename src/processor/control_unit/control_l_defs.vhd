@@ -3,7 +3,7 @@ USE ieee.std_logic_1164.all;
 
 PACKAGE control_l_defs IS
     
-    TYPE instruction_t IS (INST_ARITH, INST_CMP, INST_ADDI, INST_LD, INST_ST, INST_MOVI, INST_BRANCH, INST_IN, INST_OUT, INST_ARITH_EXT, INST_JZ_JNZ, INST_JMP, INST_JAL, INST_LDB, INST_STB, INST_EI, INST_DI, INST_RETI, INST_GETIID, INST_RDS, INST_WRS, INST_HALT, INST_INVALID, INST_SYSTEM);
+    TYPE instruction_t IS (INST_ARITH, INST_CMP, INST_ADDI, INST_LD, INST_ST, INST_MOVI, INST_BRANCH, INST_IN, INST_OUT, INST_ARITH_EXT, INST_JZ_JNZ, INST_JMP, INST_JAL, INST_CALLS, INST_LDB, INST_STB, INST_EI, INST_DI, INST_RETI, INST_GETIID, INST_RDS, INST_WRS, INST_HALT, INST_INVALID, INST_SYSTEM);
 
     TYPE addr_source_t IS (ADDR_SRC_IR_11_9, ADDR_SRC_IR_8_6, ADDR_SRC_IR_2_0, ADDR_SRC_7, ADDR_SRC_5, ADDR_SRC_3, ADDR_SRC_1, ADDR_SRC_0, ADDR_SRC_DONTCARE);
     TYPE op_t IS (OP_IR_5_3, OP_00_IR_8, OP_MOVI, OP_AND, OP_OR, OP_ADD, OP_X, OP_DONTCARE);
@@ -374,6 +374,32 @@ PACKAGE control_l_defs IS
         regfile_input_1 => REG_IN_1_PC_UPD,
         sel_reg_rd => SEL_REG_GENERAL,
         sel_reg_wr => SEL_REG_GENERAL,
+        immed => IMMED_DONTCARE,
+        immed_x2 => '-',
+        rb_N => RB_N_REGFILE,
+        op_group => OP_GROUP_MISC,
+        op => OP_X,
+        wr_m => '0',
+        word_byte => '-',
+        rd_in => '0',
+        wr_out => '0',
+        int_ack => '0',
+        invalid_inst => '0',
+        memory_access => '0',
+        privilege_level => '0'
+    );
+
+    CONSTANT CONTROL_OUT_CALLS: control_output_t := (
+        ldpc => '1',
+        addr_a => ADDR_SRC_IR_8_6,
+        addr_b => ADDR_SRC_DONTCARE,
+        addr_d1 => ADDR_SRC_3,
+        addr_d2 => ADDR_SRC_DONTCARE,
+        wrd_1 => '1',
+        wrd_2 => '0',
+        regfile_input_1 => REG_IN_1_ALU,
+        sel_reg_rd => SEL_REG_GENERAL,
+        sel_reg_wr => SEL_REG_SPECIAL,
         immed => IMMED_DONTCARE,
         immed_x2 => '-',
         rb_N => RB_N_REGFILE,

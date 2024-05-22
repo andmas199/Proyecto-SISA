@@ -10,6 +10,7 @@ ENTITY exception_controller IS
 			  div_zero	   : IN  STD_LOGIC;
 			  protected_mem : IN STD_LOGIC;
 			  protected_inst : IN STD_LOGIC;
+			  calls: IN STD_LOGIC;
 			  intr				: IN	STD_LOGIC;
 			  intr_enabl: IN STD_LOGIC;
 			  exc_code 		: OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
@@ -31,6 +32,7 @@ BEGIN
 		(present => true, code => 4) WHEN div_zero = '1' ELSE
 		(present => true, code => 11) WHEN protected_mem = '1' ELSE
 		(present => true, code => 13) WHEN protected_inst = '1' ELSE
+		(present => true, code => 14) WHEN calls = '1' ELSE
 		(present => true, code => 15) WHEN intr = '1' and intr_enabl = '1' else
 		(present => false, code => 0);
 
