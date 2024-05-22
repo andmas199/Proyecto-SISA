@@ -137,7 +137,7 @@ BEGIN
 			invalid_inst => invalid_inst,
 			bad_alignment => bad_alignment and memory_access,
 			div_zero => div_zero,
-			protected_mem => not mmu_accessible,
+			protected_mem => not mmu_accessible and memory_access,
 			protected_inst => protected_inst,
 			intr => intr,
 			intr_enabl => intr_enabl,

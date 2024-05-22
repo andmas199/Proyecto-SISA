@@ -31,18 +31,18 @@ BEGIN
 	BEGIN
 		IF rising_edge(clk) THEN
 			IF clear = '1' THEN
-				regs(0) <= (
-					0 => '1', -- System mode
-					1 => '0', -- Interrupts disabled
-					OTHERS => '0'
-				);
+				regs(0) <= (OTHERS => '0');
 				regs(1) <= (OTHERS => '0');
 				regs(2) <= (OTHERS => '0');
 				regs(3) <= (OTHERS => '0');
 				regs(4) <= (OTHERS => '0');
 				regs(5) <= (OTHERS => '0');
 				regs(6) <= (OTHERS => '0');
-				regs(7) <= (OTHERS => '0');
+				regs(7) <= (
+					0 => '1', -- System mode
+					1 => '0', -- Interrupts disabled
+					OTHERS => '0'
+				);
 			ELSE
 				IF chg_mode = '1' THEN
 					regs(0) <= regs(7);
