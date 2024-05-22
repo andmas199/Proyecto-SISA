@@ -58,12 +58,13 @@ begin
                     dataReaded  => sram_rd_data,
                     dataToWrite => wr_data,
                     WR          => sram_we,
-                    byte_m      => byte_m,
-						  bad_alignment => bad_alignment);
+                    byte_m      => byte_m);
 
     vga_addr <= addr(12 downto 0);
     vga_we <= we WHEN addr_space = ADDR_SPACE_VGA ELSE '0';
     vga_wr_data <= wr_data;
     vga_byte_m <= byte_m;
+
+    bad_alignment <= '1' WHEN byte_m = '0' and addr(0) = '1' ELSE '0';
 
 end comportament;

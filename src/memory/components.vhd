@@ -38,8 +38,7 @@ PACKAGE memory_components IS
               dataReaded  : OUT   STD_LOGIC_VECTOR(15 DOWNTO 0);
               dataToWrite : IN    STD_LOGIC_VECTOR(15 DOWNTO 0);
               WR          : IN    STD_LOGIC;
-              byte_m      : IN    STD_LOGIC := '0';
-				  bad_alignment : OUT STD_LOGIC);
+              byte_m      : IN    STD_LOGIC := '0');
     END COMPONENT;
 
 END PACKAGE;
