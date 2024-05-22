@@ -45,7 +45,8 @@ PACKAGE datapath_components IS
 					 intr_enabl: OUT STD_LOGIC;
 					 div_zero : OUT STD_LOGIC;
 					 mux_regS : IN STD_LOGIC;
-					 exc_code : IN STD_LOGIC_VECTOR(3 DOWNTO 0));
+					 exc_code : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+                proc_privilege_level : OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT regfile IS
@@ -64,7 +65,8 @@ PACKAGE datapath_components IS
             b       : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 				intr_enabl: OUT STD_LOGIC;
 				bad_alignment : IN STD_LOGIC;
-				m_addr : IN STD_LOGIC_VECTOR(15 DOWNTO 0));
+				m_addr : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+            privilege_level : OUT STD_LOGIC);
     END COMPONENT;
 
 END PACKAGE;

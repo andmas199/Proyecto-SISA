@@ -5,6 +5,7 @@ USE work.control_l_defs.regfile_input_1_t;
 USE work.datapath_components.all;
 USE work.control_unit_components.unidad_control;
 USE work.exception_unit_components.all;
+USE work.memory_management_unit_components.all;
 
 ENTITY proc IS
     PORT (clk       : IN  STD_LOGIC;
@@ -54,7 +55,11 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL invalid_inst : STD_LOGIC;
 	SIGNAL memory_access : STD_LOGIC;
 	SIGNAL excp : STD_LOGIC;
-
+	SIGNAL virt_addr: STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL proc_privilege_level: STD_LOGIC;
+	SIGNAL inst_privilege_level: STD_LOGIC;
+	SIGNAL protected_inst: STD_LOGIC;
+	SIGNAL mmu_accessible: STD_LOGIC;
 BEGIN
 	e0: datapath
 		PORT MAP	(	 clk => clk,
@@ -77,7 +82,7 @@ BEGIN
 						 Rb_N => Rb_N,
 						 pc => pc,
 						 regfile_input => regfile_input,
-						 addr_m => addr_m,
+						 addr_m => virt_addr,
 						 data_wr => data_wr,
 						 alu_out => alu_out,
 						 z => z,
@@ -86,7 +91,9 @@ BEGIN
 						 intr_enabl => intr_enabl,
 						 div_zero => div_zero,
 						 mux_regS => mux_regS,
-						 exc_code => exc_code);
+						 exc_code => exc_code,
+						 proc_privilege_level => proc_privilege_level
+		);
 	
 	co: unidad_control
 		PORT MAP	(	 boot => boot,
@@ -122,15 +129,30 @@ BEGIN
 						 tipo_int => exc_code,
 						 invalid_inst => invalid_inst,
 						 memory_access => memory_access,
-						 excp => excp);
+						 excp => excp,
+						 inst_privilege_level => inst_privilege_level);
 	
 	exc0: exception_controller
 		PORT MAP (
 			invalid_inst => invalid_inst,
 			bad_alignment => bad_alignment and memory_access,
 			div_zero => div_zero,
+			protected_mem => not mmu_accessible,
+			protected_inst => protected_inst,
 			intr => intr,
 			intr_enabl => intr_enabl,
 			exc_code => exc_code,
 			excp => excp);
+	
+	mmu0: mmu
+		PORT MAP (
+			virt_addr => virt_addr,
+			proc_privilege_level => proc_privilege_level,
+			phys_addr => addr_m,
+			-- present => ignored,
+			accessible => mmu_accessible
+			-- writable => ignored
+		);
+	
+	protected_inst <= '1' WHEN inst_privilege_level > proc_privilege_level ELSE '0';
 END Structure;

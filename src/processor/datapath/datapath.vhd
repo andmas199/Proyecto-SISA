@@ -36,7 +36,8 @@ ENTITY datapath IS
 			 intr_enabl: OUT STD_LOGIC;
 			 div_zero: OUT STD_LOGIC;
 			 mux_regS: IN STD_LOGIC;
-			 exc_code: IN STD_LOGIC_VECTOR(3 DOWNTO 0));
+			 exc_code: IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+			 proc_privilege_level: OUT STD_LOGIC);
 END datapath;
 
 
@@ -98,7 +99,8 @@ BEGIN
 						b			=> b_esp,
 						intr_enabl => intr_enabl,
 						bad_alignment => mux_regS,
-						m_addr => w);
+						m_addr => w,
+						privilege_level => proc_privilege_level);
 						
 	d_2 <= "000000000000" & exc_code WHEN mux_regS = '1' ELSE b_esp;
 	data_wr <= b;

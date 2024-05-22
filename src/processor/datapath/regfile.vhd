@@ -18,7 +18,8 @@ ENTITY regfile IS
 			b      	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
 			intr_enabl:OUT STD_LOGIC;
 			bad_alignment : IN STD_LOGIC;
-			m_addr : IN STD_LOGIC_VECTOR(15 DOWNTO 0));
+			m_addr : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+			privilege_level : OUT STD_LOGIC);
 END regfile;
 
 
@@ -30,7 +31,11 @@ BEGIN
 	BEGIN
 		IF rising_edge(clk) THEN
 			IF clear = '1' THEN
-				regs(0) <= (OTHERS => '0');
+				regs(0) <= (
+					0 => '1', -- System mode
+					1 => '0', -- Interrupts disabled
+					OTHERS => '0'
+				);
 				regs(1) <= (OTHERS => '0');
 				regs(2) <= (OTHERS => '0');
 				regs(3) <= (OTHERS => '0');
@@ -57,6 +62,7 @@ BEGIN
 			END IF;
 		END IF;
 
+		privilege_level <= regs(7)(0);
 		intr_enabl <= regs(7)(1);
 		
 	END PROCESS;

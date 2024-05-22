@@ -7,6 +7,8 @@ PACKAGE exception_unit_components IS
         PORT (  invalid_inst 	: IN  STD_LOGIC;
 					 bad_alignment : IN  STD_LOGIC;
 					 div_zero	   : IN  STD_LOGIC;
+					 protected_mem : IN STD_LOGIC;
+					 protected_inst : IN STD_LOGIC;
 					 intr				: IN	STD_LOGIC;
 					 intr_enabl: IN STD_LOGIC;
 					 exc_code 		: OUT STD_LOGIC_VECTOR(3 DOWNTO 0);

@@ -512,6 +512,10 @@ set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name RTLV_REMOVE_FANOUT_FREE_REGISTERS OFF
+set_global_assignment -name SLD_FILE "C:/Users/pec02/Desktop/Proyecto-SISA/output_files/stp1_auto_stripped.stp"
+set_global_assignment -name VHDL_FILE src/processor/memory_management_unit/mmu.vhd
+set_global_assignment -name VHDL_FILE src/processor/memory_management_unit/memory_management_unit_components.vhd
 set_global_assignment -name VHDL_FILE src/io/timer.vhd
 set_global_assignment -name VHDL_FILE src/io/interruption_controller.vhd
 set_global_assignment -name VHDL_FILE src/io/interrupting_driver.vhd
@@ -545,5 +549,4 @@ set_global_assignment -name VHDL_FILE src/sisa.vhd
 set_global_assignment -name VHDL_FILE src/processor/exception_unit/components.vhd
 set_global_assignment -name VHDL_FILE src/processor/exception_unit/exception_controller.vhd
 set_global_assignment -name CDF_FILE output_files/ControlPanel.cdf
-set_global_assignment -name SLD_FILE "C:/Users/pec02/Desktop/Proyecto-SISA/output_files/stp1_auto_stripped.stp"
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

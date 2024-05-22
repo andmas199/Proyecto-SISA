@@ -41,7 +41,8 @@ ENTITY unidad_control IS
 			 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 			 invalid_inst : OUT STD_LOGIC;
 			 memory_access : OUT STD_LOGIC;
-			 excp : IN STD_LOGIC);
+			 excp : IN STD_LOGIC;
+			 inst_privilege_level : OUT STD_LOGIC);
 END unidad_control;
 
 ARCHITECTURE Structure OF unidad_control IS
@@ -108,7 +109,8 @@ BEGIN
 					 mux_regS => mux_regS,
 					 tipo_int => tipo_int,
 					 invalid_inst => invalid_inst,
-					 memory_access => memory_access_l);
+					 memory_access => memory_access_l,
+					 inst_privilege_level => inst_privilege_level);
 	
 	m0: multi
 		PORT MAP(clk => clk,

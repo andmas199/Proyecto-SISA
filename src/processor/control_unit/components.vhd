@@ -35,7 +35,8 @@ PACKAGE control_unit_components IS
             mux_regS : OUT STD_LOGIC;
             tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             invalid_inst : OUT STD_LOGIC;
-            memory_access : OUT STD_LOGIC);
+            memory_access : OUT STD_LOGIC;
+            inst_privilege_level : OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT multi is
@@ -106,6 +107,7 @@ PACKAGE control_unit_components IS
 					 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 					 invalid_inst : OUT STD_LOGIC;
                      memory_access : OUT STD_LOGIC;
-					 excp : IN STD_LOGIC);
+					 excp : IN STD_LOGIC;
+                inst_privilege_level: OUT STD_LOGIC);
     END COMPONENT;
 END PACKAGE;

@@ -36,7 +36,8 @@ ENTITY control_l IS
 			 mux_regS : OUT STD_LOGIC;
 			 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 			 invalid_inst : OUT STD_LOGIC;
-			 memory_access : OUT STD_LOGIC);
+			 memory_access : OUT STD_LOGIC;
+			 inst_privilege_level: OUT STD_LOGIC);
 END control_l;
 
 
@@ -245,6 +246,7 @@ BEGIN
 	inta <= control_output.int_ack;
 	invalid_inst <= control_output.invalid_inst;
 	memory_access <= control_output.memory_access;
+	inst_privilege_level <= control_output.privilege_level;
 
 	WITH op_code SELECT
 		take_branch <= 	ir(8) /= z								 WHEN "0110",

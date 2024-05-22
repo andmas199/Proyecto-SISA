@@ -48,6 +48,7 @@ PACKAGE control_l_defs IS
         int_ack: STD_LOGIC;
 		  invalid_inst: STD_LOGIC;
         memory_access: STD_LOGIC;
+        privilege_level: STD_LOGIC; -- minimum privilege level
     END RECORD;
 
     CONSTANT CONTROL_OUT_ARITH: control_output_t := (
@@ -72,7 +73,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_CMP: control_output_t := (
@@ -97,7 +99,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_ADDI: control_output_t := (
@@ -122,7 +125,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_LD: control_output_t := (
@@ -147,7 +151,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '1'
+        memory_access => '1',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_ST: control_output_t := (
@@ -172,7 +177,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '1'
+        memory_access => '1',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_MOVI: control_output_t := (
@@ -197,7 +203,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_BRANCH: control_output_t := (
@@ -222,7 +229,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_IN: control_output_t := (
@@ -247,7 +255,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_OUT: control_output_t := (
@@ -272,7 +281,8 @@ PACKAGE control_l_defs IS
         wr_out => '1',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_ARITH_EXT: control_output_t := (
@@ -297,7 +307,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_JZ_JNZ: control_output_t := (
@@ -322,7 +333,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
     
     CONSTANT CONTROL_OUT_JMP: control_output_t := (
@@ -347,7 +359,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_JAL: control_output_t := (
@@ -372,7 +385,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_LDB: control_output_t := (
@@ -397,7 +411,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '1'
+        memory_access => '1',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_STB: control_output_t := (
@@ -422,7 +437,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '1'
+        memory_access => '1',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_EI: control_output_t := (
@@ -447,7 +463,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '1'
     );
 
     CONSTANT CONTROL_OUT_DI: control_output_t := (
@@ -472,7 +489,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '1'
     );
 
     CONSTANT CONTROL_OUT_RETI: control_output_t := (
@@ -497,7 +515,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '1'
     );
 
     CONSTANT CONTROL_OUT_GETIID: control_output_t := (
@@ -522,7 +541,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '1',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '1'
     );
 
     CONSTANT CONTROL_OUT_RDS: control_output_t := (
@@ -547,7 +567,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '1'
     );
 
     CONSTANT CONTROL_OUT_WRS: control_output_t := (
@@ -572,7 +593,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '1'
     );
 
     CONSTANT CONTROL_OUT_HALT: control_output_t := (
@@ -597,7 +619,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_INVALID: control_output_t := (
@@ -622,7 +645,8 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '1',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_SYSTEM: control_output_t := (
@@ -647,6 +671,7 @@ PACKAGE control_l_defs IS
         wr_out => '0',
         int_ack => '0',
         invalid_inst => '0',
-        memory_access => '0'
+        memory_access => '0',
+        privilege_level => '0'
     );
 END PACKAGE;
