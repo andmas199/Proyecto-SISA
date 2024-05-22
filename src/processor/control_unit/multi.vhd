@@ -53,7 +53,7 @@ begin
 		END IF;
 	END PROCESS;
 
-	PROCESS (state, ldpc_l, wrd_1_l, wrd_2_l, wr_m_l, w_b)
+	PROCESS (state, ldpc_l, wrd_1_l, wrd_2_l, wr_m_l, w_b, inta_l, memory_access_l)
 	BEGIN
 		CASE state IS
 			WHEN F =>
