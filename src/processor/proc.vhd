@@ -136,6 +136,7 @@ BEGIN
 	
 	exc0: exception_controller
 		PORT MAP (
+			clk => clk,
 			invalid_inst => invalid_inst or (calls and inst_privilege_level),
 			bad_alignment => bad_alignment and memory_access,
 			div_zero => div_zero,

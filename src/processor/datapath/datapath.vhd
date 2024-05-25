@@ -102,7 +102,7 @@ BEGIN
 						m_addr => w,
 						privilege_level => proc_privilege_level);
 						
-	d_2 <= "000000000000" & exc_code WHEN mux_regS = '1' ELSE b_esp;
+	d_2 <= "000000000000" & exc_code WHEN chg_mode = '1' ELSE b_esp;
 	data_wr <= b;
 	reg_out <= a WHEN sel_reg_out = '0' ELSE a_esp; -- 0 is normal register bank, 1 is special bank
 	wrd_esp <= wrd_1 and d_sys;

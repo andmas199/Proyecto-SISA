@@ -5,7 +5,8 @@ USE ieee.numeric_std.all;
 USE work.exception_unit_components.all;
 
 ENTITY exception_controller IS
-	PORT (  invalid_inst	: IN  STD_LOGIC;
+	PORT (  clk : IN STD_LOGIC;
+			invalid_inst	: IN  STD_LOGIC;
 	        bad_alignment : IN  STD_LOGIC;
 			  div_zero	   : IN  STD_LOGIC;
 			  protected_mem : IN STD_LOGIC;
@@ -37,5 +38,15 @@ BEGIN
 		(present => false, code => 0);
 
 	excp <= '1' WHEN exception.present ELSE '0';
-	exc_code <= std_logic_vector(to_unsigned(exception.code, exc_code'length)) WHEN exception.present ELSE (others => '-');
+
+	PROCESS (clk)
+	BEGIN
+		IF rising_edge(clk) THEN
+			IF exception.present THEN
+				exc_code <= std_logic_vector(to_unsigned(exception.code, exc_code'length));
+			ELSE
+				exc_code <= (others => '-');
+			END IF;
+		END IF;
+	END PROCESS;
 END Structure;
