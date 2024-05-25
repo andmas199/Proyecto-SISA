@@ -19,7 +19,7 @@ BEGIN
 
     -- Without a TLB, privileged memory is hardcoded to be the upper half of the
     -- memory space excluding VGA memory
-    privileged <= '0' WHEN virt_addr < x"8000" or (virt_addr >= x"A000" and virt_addr < x"C000") ELSE '0';
+    privileged <= '0' WHEN virt_addr < x"8000" or (virt_addr >= x"A000" and virt_addr < x"C000") ELSE '1';
     
     -- There's no address translation for now, we just verify privileged access
     phys_addr <= virt_addr;
