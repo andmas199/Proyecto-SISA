@@ -39,6 +39,10 @@ ARCHITECTURE Structure OF controladores_IO IS
     TYPE regs_t IS ARRAY(255 DOWNTO 0) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
     SIGNAL regs: regs_t;
 
+    SIGNAL addr_io_delayed: STD_LOGIC_VECTOR(7 DOWNTO 0);
+    SIGNAL wr_io_delayed: STD_LOGIC_VECTOR(15 DOWNTO 0);
+    SIGNAL wr_out_delayed: STD_LOGIC;
+
     CONSTANT interruption_sources: natural := 4;
     SIGNAL devices_intr: std_logic_vector(interruption_sources - 1 downto 0) := (others => '0');
     SIGNAL devices_inta: std_logic_vector(interruption_sources - 1 downto 0);
@@ -90,6 +94,11 @@ BEGIN
             kb_clear_char <= '0';
             milis_wre <= '0';
 
+            -- Delay IO writes to cut combinational loop
+            addr_io_delayed <= addr_io;
+            wr_io_delayed <= wr_io;
+            wr_out_delayed <= wr_out;
+
             -- IO Inputs
             regs(KEYS_PORT)(3 DOWNTO 0) <= keys_avail;
             regs(SWITCHES_PORT)(7 DOWNTO 0) <= switches_avail;
@@ -99,17 +108,17 @@ BEGIN
             regs(MILIS_PORT) <= milis;
         
             -- IO-mapped registers Writes
-            IF wr_out = '1' and not IsReadOnlyPort(addr_io) THEN
-                regs(to_integer(unsigned(addr_io))) <= wr_io;
+            IF wr_out_delayed = '1' and not IsReadOnlyPort(addr_io_delayed) THEN
+                regs(to_integer(unsigned(addr_io_delayed))) <= wr_io_delayed;
             END IF;
 
             -- IO-mapped registers Writes side-effects
-            IF wr_out = '1' THEN
-                CASE to_integer(unsigned(addr_io)) IS
+            IF wr_out_delayed = '1' THEN
+                CASE to_integer(unsigned(addr_io_delayed)) IS
                     WHEN KEYBOARD_CONTROL_PORT =>
                         kb_clear_char <= '1';
                     WHEN MILIS_PORT =>
-                        milis_in <= wr_io;
+                        milis_in <= wr_io_delayed;
                         milis_wre <= '1';
                     WHEN OTHERS =>
                 END CASE;

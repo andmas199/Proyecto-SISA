@@ -61,12 +61,19 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL protected_inst: STD_LOGIC;
 	SIGNAL mmu_accessible: STD_LOGIC;
 	SIGNAL calls: STD_LOGIC;
+	SIGNAL interrupt: STD_LOGIC;
+	SIGNAL in_demw: STD_LOGIC;
+	SIGNAL kill_writes: STD_LOGIC;
+	SIGNAL wr_m_uc: STD_LOGIC;
+	SIGNAL rd_in_uc: STD_LOGIC;
+	SIGNAL wr_out_uc: STD_LOGIC;
+	SIGNAL inta_uc: STD_LOGIC;
 BEGIN
 	e0: datapath
 		PORT MAP	(	 clk => clk,
 						 op_group => op_groupS,
 						 op => op,
-						 wrd_1 => wrd_1,
+						 wrd_1 => wrd_1 and not kill_writes,
 						 addr_a => addr_a,
 						 addr_b => addr_b,
 						 addr_d_1 => addr_d_1,
@@ -76,7 +83,7 @@ BEGIN
 						 immed_x2 => immed_x2,
 						 clear => clear,
 						 d_sys	=> d_sys,
-						 wrd_2 => wrd_2,
+						 wrd_2 => wrd_2 and not kill_writes,
 						 sel_reg_out => sel_reg_out,
 						 datard_m => datard_m,
 						 ins_dad => ins_dad,
@@ -118,21 +125,22 @@ BEGIN
 						 regfile_input => regfile_input,
 						 immed_x2 => immed_x2,
 						 sel_reg_out => sel_reg_out,
-						 wr_m => wr_m,
+						 wr_m => wr_m_uc,
 						 word_byte => word_byte,
 						 alu_out => alu_out,
 						 z => z,
 						 addr_io => addr_io,
-						 rd_in => rd_in,
-						 wr_out => wr_out,
-						 inta => inta,
+						 rd_in => rd_in_uc,
+						 wr_out => wr_out_uc,
+						 inta => inta_uc,
 						 mux_regS => mux_regS,
 						 tipo_int => exc_code,
 						 invalid_inst => invalid_inst,
 						 memory_access => memory_access,
 						 excp => excp,
 						 inst_privilege_level => inst_privilege_level,
-						 calls => calls);
+						 calls => calls,
+						 in_demw => in_demw);
 	
 	exc0: exception_controller
 		PORT MAP (
@@ -146,7 +154,8 @@ BEGIN
 			intr => intr,
 			intr_enabl => intr_enabl,
 			exc_code => exc_code,
-			excp => excp);
+			excp => excp,
+			interrupt => interrupt);
 	
 	mmu0: mmu
 		PORT MAP (
@@ -159,4 +168,10 @@ BEGIN
 		);
 	
 	protected_inst <= '1' WHEN inst_privilege_level > proc_privilege_level ELSE '0';
+	
+	kill_writes <= in_demw and excp and not interrupt and not calls;
+	wr_m <= wr_m_uc and not kill_writes;
+	rd_in <= rd_in_uc and not kill_writes;
+	wr_out <= wr_out_uc and not kill_writes;
+	inta <= inta_uc and not kill_writes;
 END Structure;

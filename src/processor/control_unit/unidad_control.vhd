@@ -43,7 +43,8 @@ ENTITY unidad_control IS
 			 memory_access : OUT STD_LOGIC;
 			 excp : IN STD_LOGIC;
 			 inst_privilege_level : OUT STD_LOGIC;
-			 calls : OUT STD_LOGIC);
+			 calls : OUT STD_LOGIC;
+			 in_demw : OUT STD_LOGIC);
 END unidad_control;
 
 ARCHITECTURE Structure OF unidad_control IS
@@ -134,7 +135,8 @@ BEGIN
 					word_byte => word_byte,
 					excp => excp,
 					inta => inta,
-					memory_access => memory_access);
+					memory_access => memory_access,
+					in_demw => in_demw);
 	
 	PROCESS(clk, pc_reg)
 	BEGIN

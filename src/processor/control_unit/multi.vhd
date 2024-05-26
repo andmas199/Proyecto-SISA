@@ -21,7 +21,8 @@ entity multi is
          word_byte : OUT STD_LOGIC;
 			excp: IN STD_LOGIC;
 		 inta      : OUT STD_LOGIC;
-		 memory_access: OUT STD_LOGIC);
+		 memory_access: OUT STD_LOGIC;
+		 in_demw: OUT STD_LOGIC);
 			
 end entity;
 
@@ -67,6 +68,7 @@ begin
 				inta <= '0';
 				chg_mode <= '0';
 				memory_access <= '1';
+				in_demw <= '0';
 			WHEN DEMW =>
 				ldpc <= ldpc_l;
 				wrd_1 <= wrd_1_l;
@@ -78,6 +80,7 @@ begin
 				inta <= inta_l;
 				chg_mode <= '0';
 				memory_access <= memory_access_l;
+				in_demw <= '1';
 			WHEN SYSTEM =>
 				ldpc <= ldpc_l;
 				wrd_1 <= wrd_1_l;
@@ -89,6 +92,7 @@ begin
 				inta <= '0';
 				chg_mode <= '1';
 				memory_access <= memory_access_l;
+				in_demw <= '0';
 		END CASE;
 	END PROCESS;
 end Structure;

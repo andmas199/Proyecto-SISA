@@ -14,7 +14,8 @@ PACKAGE exception_unit_components IS
 					 intr				: IN	STD_LOGIC;
 					 intr_enabl: IN STD_LOGIC;
 					 exc_code 		: OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-					 excp				: OUT STD_LOGIC);
+					 excp				: OUT STD_LOGIC;
+					 interrupt : OUT STD_LOGIC);
     END COMPONENT;
 
 

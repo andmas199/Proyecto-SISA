@@ -60,7 +60,8 @@ PACKAGE control_unit_components IS
             word_byte : OUT STD_LOGIC;
                excp: IN STD_LOGIC;
             inta      : OUT STD_LOGIC;
-            memory_access: OUT STD_LOGIC);
+            memory_access: OUT STD_LOGIC;
+            in_demw: OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT regfile IS
@@ -110,6 +111,7 @@ PACKAGE control_unit_components IS
                      memory_access : OUT STD_LOGIC;
 					 excp : IN STD_LOGIC;
                 inst_privilege_level: OUT STD_LOGIC;
-                calls: OUT STD_LOGIC);
+                calls: OUT STD_LOGIC;
+                in_demw: OUT STD_LOGIC);
     END COMPONENT;
 END PACKAGE;
