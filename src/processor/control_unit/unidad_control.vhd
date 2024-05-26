@@ -44,7 +44,8 @@ ENTITY unidad_control IS
 			 excp : IN STD_LOGIC;
 			 inst_privilege_level : OUT STD_LOGIC;
 			 calls : OUT STD_LOGIC;
-			 in_demw : OUT STD_LOGIC);
+			 in_demw : OUT STD_LOGIC;
+			 kill_writes : IN STD_LOGIC);
 END unidad_control;
 
 ARCHITECTURE Structure OF unidad_control IS
@@ -143,11 +144,15 @@ BEGIN
 		IF rising_edge(clk) THEN
 			clear <= boot;
 			IF booted = '1' and ldpc = '1' THEN
-				CASE sequencing_mode IS
-					WHEN IMPLICIT => pc_reg <= pc_reg + 2;
-					WHEN RELATIVE => pc_reg <= STD_LOGIC_VECTOR(signed(unsigned(pc_reg)) + 2 + signed(immediate(7 DOWNTO 0) & '0'));
-					WHEN ABSOLUTE => pc_reg <= alu_out;
-				END CASE;
+				IF kill_writes = '1' THEN
+					pc_reg <= pc_reg + 2; -- On exceptions that abort state changes, keep implicit sequencing
+				ELSE
+					CASE sequencing_mode IS
+						WHEN IMPLICIT => pc_reg <= pc_reg + 2;
+						WHEN RELATIVE => pc_reg <= STD_LOGIC_VECTOR(signed(unsigned(pc_reg)) + 2 + signed(immediate(7 DOWNTO 0) & '0'));
+						WHEN ABSOLUTE => pc_reg <= alu_out;
+					END CASE;
+				END IF;
 			ELSIF boot = '1' THEN
 				pc_reg <= x"C000";
 				booted <= '1';

@@ -1,0 +1,7 @@
+Mem[0B:0A] = 0000
+Mem[0F:0E] = 002A
+Mem[13:12] = 000B
+Mem[17:16] = 000B
+Mem[1B:1A] = 000D
+Mem[1F:1E] = 000E
+Mem[21:20] = ABCD

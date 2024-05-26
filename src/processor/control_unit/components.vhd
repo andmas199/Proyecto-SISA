@@ -112,6 +112,7 @@ PACKAGE control_unit_components IS
 					 excp : IN STD_LOGIC;
                 inst_privilege_level: OUT STD_LOGIC;
                 calls: OUT STD_LOGIC;
-                in_demw: OUT STD_LOGIC);
+                in_demw: OUT STD_LOGIC;
+                kill_writes: IN STD_LOGIC);
     END COMPONENT;
 END PACKAGE;

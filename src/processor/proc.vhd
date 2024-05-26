@@ -140,12 +140,13 @@ BEGIN
 						 excp => excp,
 						 inst_privilege_level => inst_privilege_level,
 						 calls => calls,
-						 in_demw => in_demw);
+						 in_demw => in_demw,
+						 kill_writes => kill_writes);
 	
 	exc0: exception_controller
 		PORT MAP (
 			clk => clk,
-			invalid_inst => invalid_inst or (calls and inst_privilege_level),
+			invalid_inst => invalid_inst or (calls and proc_privilege_level),
 			bad_alignment => bad_alignment and memory_access,
 			div_zero => div_zero,
 			protected_mem => not mmu_accessible and memory_access,
