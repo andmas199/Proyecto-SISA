@@ -160,6 +160,8 @@ BEGIN
 	
 	mmu0: mmu
 		PORT MAP (
+			clk => clk,
+			boot => boot,
 			virt_addr => virt_addr,
 			proc_privilege_level => proc_privilege_level,
 			phys_addr => addr_m,
