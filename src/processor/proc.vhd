@@ -59,7 +59,6 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL proc_privilege_level: STD_LOGIC;
 	SIGNAL inst_privilege_level: STD_LOGIC;
 	SIGNAL protected_inst: STD_LOGIC;
-	SIGNAL mmu_accessible: STD_LOGIC;
 	SIGNAL calls: STD_LOGIC;
 	SIGNAL interrupt: STD_LOGIC;
 	SIGNAL in_demw: STD_LOGIC;
@@ -68,6 +67,10 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL rd_in_uc: STD_LOGIC;
 	SIGNAL wr_out_uc: STD_LOGIC;
 	SIGNAL inta_uc: STD_LOGIC;
+	SIGNAL miss_tlb: STD_LOGIC;
+	SIGNAL accessible_tlb: STD_LOGIC;
+	SIGNAL present_tlb: STD_LOGIC;
+	SIGNAL writable_tlb: STD_LOGIC;
 BEGIN
 	e0: datapath
 		PORT MAP	(	 clk => clk,
@@ -149,7 +152,11 @@ BEGIN
 			invalid_inst => invalid_inst or (calls and proc_privilege_level),
 			bad_alignment => bad_alignment and memory_access,
 			div_zero => div_zero,
-			protected_mem => not mmu_accessible and memory_access,
+			ins_dad => ins_dad,
+			miss_tlb => miss_tlb and memory_access,
+			invalid_tlb => not present_tlb and memory_access,
+			protected_tlb => not accessible_tlb and memory_access,
+			readonly_tlb => not writable_tlb and memory_access and wr_m_uc,
 			protected_inst => protected_inst,
 			calls => calls, -- We ignore validity here as invalid instruction takes higher preference
 			intr => intr,
@@ -164,10 +171,17 @@ BEGIN
 			boot => boot,
 			virt_addr => virt_addr,
 			proc_privilege_level => proc_privilege_level,
+			ins_dad => ins_dad,
+			wr_tlb_ins_dad => '-',
+			wr_tlb_virt_phys => '-',
+			wr_tlb_index => alu_out(3 downto 0),
+			wr_tlb_data => alu_out(13 downto 8),
+			wr_tlb_we => '0',
+			miss => miss_tlb,
 			phys_addr => addr_m,
-			-- present => ignored,
-			accessible => mmu_accessible
-			-- writable => ignored
+			present => present_tlb,
+			accessible => accessible_tlb,
+			writable => writable_tlb
 		);
 	
 	protected_inst <= '1' WHEN inst_privilege_level > proc_privilege_level ELSE '0';

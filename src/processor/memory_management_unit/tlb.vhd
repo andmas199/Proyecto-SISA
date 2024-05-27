@@ -18,6 +18,7 @@ ENTITY tlb IS
         we_v: in std_logic;
         we_r: in std_logic;
         
+        miss: out std_logic;
         phys_tag: out std_logic_vector(3 downto 0);
         present: out std_logic;
         writable: out std_logic
@@ -87,6 +88,7 @@ BEGIN
                     entries(7) WHEN hits(7) ELSE
                     (vtag => "----", ptag => "----", v => '0', r => '-');
 
+  miss <= '1' WHEN hits = (7 downto 0 => false) ELSE '0';
   phys_tag <= selected_entry.ptag;
   present <= selected_entry.v;
   writable <= not selected_entry.r;

@@ -268,7 +268,7 @@ BEGIN
 								ABSOLUTE WHEN (op_code = "1010" AND ir(2 DOWNTO 0) /= "111" and take_branch) or (op_code = "1111" and ir(5 DOWNTO 0) = "100100") ELSE
 								IMPLICIT;
 	
-	mux_regS <= '1' WHEN tipo_int = "0001" ELSE '0';
+	mux_regS <= '1' WHEN tipo_int = "0001" or (tipo_int >= "0110" and tipo_int <= "1100")  ELSE '0';
 
 	addr_io <= ir(7 DOWNTO 0);
 

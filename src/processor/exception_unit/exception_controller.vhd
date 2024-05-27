@@ -9,7 +9,11 @@ ENTITY exception_controller IS
 			invalid_inst	: IN  STD_LOGIC;
 	        bad_alignment : IN  STD_LOGIC;
 			  div_zero	   : IN  STD_LOGIC;
-			  protected_mem : IN STD_LOGIC;
+			  ins_dad : IN STD_LOGIC;
+			  miss_tlb : IN STD_LOGIC;
+			  invalid_tlb : IN STD_LOGIC;
+			  protected_tlb : IN STD_LOGIC;
+			  readonly_tlb : IN STD_LOGIC;
 			  protected_inst : IN STD_LOGIC;
 			  calls: IN STD_LOGIC;
 			  intr				: IN	STD_LOGIC;
@@ -29,7 +33,7 @@ ARCHITECTURE Structure OF exception_controller IS
 
 	FUNCTION fetch_exception (exc: exception_t) RETURN boolean IS
 	BEGIN
-		RETURN exc.present and (exc.code = 1 or exc.code = 11);
+		RETURN exc.present and (exc.code = 1 or exc.code = 6 or exc.code = 8 or exc.code = 10);
 	END FUNCTION;
 BEGIN
 
@@ -37,7 +41,13 @@ BEGIN
 		(present => true, code => 0) WHEN invalid_inst = '1' ELSE
 		(present => true, code => 1) WHEN bad_alignment = '1' ELSE
 		(present => true, code => 4) WHEN div_zero = '1' ELSE
-		(present => true, code => 11) WHEN protected_mem = '1' ELSE
+		(present => true, code => 6) WHEN miss_tlb = '1' and ins_dad = '0' ELSE
+		(present => true, code => 7) WHEN miss_tlb = '1' and ins_dad = '1' ELSE
+		(present => true, code => 8) WHEN invalid_tlb = '1' and ins_dad = '0' ELSE
+		(present => true, code => 9) WHEN invalid_tlb = '1' and ins_dad = '1' ELSE
+		(present => true, code => 10) WHEN protected_tlb = '1' and ins_dad = '0' ELSE 
+		(present => true, code => 11) WHEN protected_tlb = '1' and ins_dad = '1' ELSE
+		(present => true, code => 12) WHEN readonly_tlb = '1' ELSE
 		(present => true, code => 13) WHEN protected_inst = '1' ELSE
 		(present => true, code => 14) WHEN calls = '1' ELSE
 		(present => true, code => 15) WHEN intr = '1' and intr_enabl = '1' else
