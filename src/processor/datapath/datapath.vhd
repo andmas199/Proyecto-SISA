@@ -112,7 +112,7 @@ BEGIN
 						m_addr => reg_s_m_addr,
 						privilege_level => proc_privilege_level);
 
-	reg_s_m_addr <= pc_old WHEN exc_code = "0001" ELSE w_old;
+	reg_s_m_addr <= pc_old WHEN exc_code = "0001" or exc_code = "0110" or exc_code = "1000" or exc_code = "1010" ELSE w_old;
 						
 	d_2 <= "000000000000" & exc_code WHEN chg_mode = '1' ELSE b_esp;
 	data_wr <= b;

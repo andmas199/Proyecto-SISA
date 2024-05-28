@@ -48,7 +48,7 @@ BEGIN
         entries(0) <= (vtag => "0000", ptag => "0000", v => '1', r => '0');
         entries(1) <= (vtag => "0001", ptag => "0001", v => '1', r => '0');
         entries(2) <= (vtag => "0010", ptag => "0010", v => '1', r => '0');
-        entries(3) <= (vtag => "1000", ptag => "1000", v => '1', r => '1');
+        entries(3) <= (vtag => "1000", ptag => "1000", v => '1', r => '0');
         entries(4) <= (vtag => "1100", ptag => "1100", v => '1', r => '1');
         entries(5) <= (vtag => "1101", ptag => "1101", v => '1', r => '1');
         entries(6) <= (vtag => "1110", ptag => "1110", v => '1', r => '1');
