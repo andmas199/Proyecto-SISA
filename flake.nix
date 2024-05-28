@@ -17,6 +17,7 @@
             in
             with pkgs; [
               ghdl
+              gtkwave
               pythonWithPackages
             ];
           };

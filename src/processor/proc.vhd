@@ -71,6 +71,9 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL accessible_tlb: STD_LOGIC;
 	SIGNAL present_tlb: STD_LOGIC;
 	SIGNAL writable_tlb: STD_LOGIC;
+	SIGNAL wr_tlb_ins_dad: STD_LOGIC;
+	SIGNAL wr_tlb_virt_phys: STD_LOGIC;
+	SIGNAL wr_tlb_we: STD_LOGIC;
 BEGIN
 	e0: datapath
 		PORT MAP	(	 clk => clk,
@@ -144,7 +147,10 @@ BEGIN
 						 inst_privilege_level => inst_privilege_level,
 						 calls => calls,
 						 in_demw => in_demw,
-						 kill_writes => kill_writes);
+						 kill_writes => kill_writes,
+						 wr_tlb_ins_dad => wr_tlb_ins_dad,
+						 wr_tlb_virt_phys => wr_tlb_virt_phys,
+						 wr_tlb_we => wr_tlb_we);
 	
 	exc0: exception_controller
 		PORT MAP (
@@ -172,11 +178,11 @@ BEGIN
 			virt_addr => virt_addr,
 			proc_privilege_level => proc_privilege_level,
 			ins_dad => ins_dad,
-			wr_tlb_ins_dad => '-',
-			wr_tlb_virt_phys => '-',
+			wr_tlb_ins_dad => wr_tlb_ins_dad,
+			wr_tlb_virt_phys => wr_tlb_virt_phys,
 			wr_tlb_index => alu_out(3 downto 0),
 			wr_tlb_data => alu_out(13 downto 8),
-			wr_tlb_we => '0',
+			wr_tlb_we => wr_tlb_we,
 			miss => miss_tlb,
 			phys_addr => addr_m,
 			present => present_tlb,

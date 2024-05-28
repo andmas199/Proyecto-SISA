@@ -37,7 +37,10 @@ PACKAGE control_unit_components IS
             invalid_inst : OUT STD_LOGIC;
             memory_access : OUT STD_LOGIC;
             inst_privilege_level : OUT STD_LOGIC;
-            calls : OUT STD_LOGIC);
+            calls : OUT STD_LOGIC;
+						wr_tlb_ins_dad : OUT STD_LOGIC;
+						wr_tlb_virt_phys : OUT STD_LOGIC;
+						wr_tlb_we : OUT STD_LOGIC);
     END COMPONENT;
 
     COMPONENT multi is
@@ -113,6 +116,9 @@ PACKAGE control_unit_components IS
                 inst_privilege_level: OUT STD_LOGIC;
                 calls: OUT STD_LOGIC;
                 in_demw: OUT STD_LOGIC;
-                kill_writes: IN STD_LOGIC);
+                kill_writes: IN STD_LOGIC;
+    						wr_tlb_ins_dad : OUT STD_LOGIC;
+    						wr_tlb_virt_phys : OUT STD_LOGIC;
+    						wr_tlb_we : OUT STD_LOGIC);
     END COMPONENT;
 END PACKAGE;

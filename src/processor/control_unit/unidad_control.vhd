@@ -45,7 +45,10 @@ ENTITY unidad_control IS
 			 inst_privilege_level : OUT STD_LOGIC;
 			 calls : OUT STD_LOGIC;
 			 in_demw : OUT STD_LOGIC;
-			 kill_writes : IN STD_LOGIC);
+       kill_writes: IN STD_LOGIC;
+			 wr_tlb_ins_dad : OUT STD_LOGIC;
+			 wr_tlb_virt_phys : OUT STD_LOGIC;
+			 wr_tlb_we : OUT STD_LOGIC);
 END unidad_control;
 
 ARCHITECTURE Structure OF unidad_control IS
@@ -114,7 +117,10 @@ BEGIN
 					 invalid_inst => invalid_inst,
 					 memory_access => memory_access_l,
 					 inst_privilege_level => inst_privilege_level,
-					 calls => calls);
+					 calls => calls,
+					 wr_tlb_ins_dad => wr_tlb_ins_dad,
+					 wr_tlb_virt_phys => wr_tlb_virt_phys,
+					 wr_tlb_we => wr_tlb_we);
 	
 	m0: multi
 		PORT MAP(clk => clk,

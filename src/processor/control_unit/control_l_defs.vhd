@@ -3,10 +3,10 @@ USE ieee.std_logic_1164.all;
 
 PACKAGE control_l_defs IS
     
-    TYPE instruction_t IS (INST_ARITH, INST_CMP, INST_ADDI, INST_LD, INST_ST, INST_MOVI, INST_BRANCH, INST_IN, INST_OUT, INST_ARITH_EXT, INST_JZ_JNZ, INST_JMP, INST_JAL, INST_CALLS, INST_LDB, INST_STB, INST_EI, INST_DI, INST_RETI, INST_GETIID, INST_RDS, INST_WRS, INST_HALT, INST_INVALID, INST_SYSTEM);
+    TYPE instruction_t IS (INST_ARITH, INST_CMP, INST_ADDI, INST_LD, INST_ST, INST_MOVI, INST_BRANCH, INST_IN, INST_OUT, INST_ARITH_EXT, INST_JZ_JNZ, INST_JMP, INST_JAL, INST_CALLS, INST_LDB, INST_STB, INST_EI, INST_DI, INST_RETI, INST_GETIID, INST_RDS, INST_WRS, INST_WRPI, INST_WRVI, INST_WRPD, INST_WRVD, INST_HALT, INST_INVALID, INST_SYSTEM);
 
     TYPE addr_source_t IS (ADDR_SRC_IR_11_9, ADDR_SRC_IR_8_6, ADDR_SRC_IR_2_0, ADDR_SRC_7, ADDR_SRC_5, ADDR_SRC_3, ADDR_SRC_1, ADDR_SRC_0, ADDR_SRC_DONTCARE);
-    TYPE op_t IS (OP_IR_5_3, OP_00_IR_8, OP_MOVI, OP_AND, OP_OR, OP_ADD, OP_X, OP_DONTCARE);
+    TYPE op_t IS (OP_IR_5_3, OP_00_IR_8, OP_MOVI, OP_MOVHI, OP_AND, OP_OR, OP_ADD, OP_X, OP_DONTCARE);
     TYPE immed_t IS (IMMED_IR_7_0, IMMED_IR_5_0, IMMED_EI, IMMED_DI, IMMED_DONTCARE);      
     TYPE regfile_input_1_t IS (REG_IN_1_MEM, REG_IN_1_ALU, REG_IN_1_PC, REG_IN_1_PC_UPD, REG_IN_1_IO, REG_IN_1_DONTCARE);
     TYPE sequencing_mode_t IS (IMPLICIT, RELATIVE, ABSOLUTE);
@@ -46,7 +46,10 @@ PACKAGE control_l_defs IS
         rd_in: STD_LOGIC;
         wr_out: STD_LOGIC;
         int_ack: STD_LOGIC;
-		  invalid_inst: STD_LOGIC;
+        wr_tlb_ins_dad : STD_LOGIC;
+        wr_tlb_virt_phys : STD_LOGIC;
+        wr_tlb_we : STD_LOGIC;
+        invalid_inst: STD_LOGIC;
         memory_access: STD_LOGIC;
         privilege_level: STD_LOGIC; -- minimum privilege level
     END RECORD;
@@ -72,6 +75,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -98,6 +104,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -124,6 +133,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -150,6 +162,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '1',
         privilege_level => '0'
@@ -176,6 +191,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '1',
         privilege_level => '0'
@@ -202,6 +220,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -228,6 +249,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -254,6 +278,9 @@ PACKAGE control_l_defs IS
         rd_in => '1',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -280,6 +307,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '1',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -306,6 +336,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -332,6 +365,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -358,6 +394,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -384,6 +423,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -410,6 +452,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -436,6 +481,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '1',
         privilege_level => '0'
@@ -462,6 +510,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '1',
         privilege_level => '0'
@@ -488,6 +539,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '1'
@@ -514,6 +568,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '1'
@@ -540,6 +597,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '1'
@@ -566,6 +626,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '1',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '1'
@@ -592,6 +655,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '1'
@@ -618,9 +684,128 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '1'
+    );
+
+    CONSTANT CONTROL_OUT_WRPI: control_output_t := (
+        ldpc => '1',
+        addr_a => ADDR_SRC_IR_8_6,
+        addr_b => ADDR_SRC_IR_11_9,
+        addr_d1 => ADDR_SRC_DONTCARE,
+        addr_d2 => ADDR_SRC_DONTCARE,
+        wrd_1 => '0',
+        wrd_2 => '0',
+        regfile_input_1 => REG_IN_1_DONTCARE,
+        sel_reg_rd => SEL_REG_GENERAL,
+        sel_reg_wr => SEL_REG_GENERAL,
+        immed => IMMED_DONTCARE,
+        immed_x2 => '-',
+        rb_N => RB_N_REGFILE,
+        op_group => OP_GROUP_MOVI,
+        op => OP_MOVHI,
+        wr_m => '0',
+        word_byte => '-',
+        rd_in => '0',
+        wr_out => '0',
+        int_ack => '0',
+        wr_tlb_ins_dad => '0',
+        wr_tlb_virt_phys => '1',
+        wr_tlb_we => '1',
+        invalid_inst => '0',
+        memory_access => '0',
+        privilege_level => '0'
+    );
+
+    CONSTANT CONTROL_OUT_WRVI: control_output_t := (
+        ldpc => '1',
+        addr_a => ADDR_SRC_IR_8_6,
+        addr_b => ADDR_SRC_IR_11_9,
+        addr_d1 => ADDR_SRC_DONTCARE,
+        addr_d2 => ADDR_SRC_DONTCARE,
+        wrd_1 => '0',
+        wrd_2 => '0',
+        regfile_input_1 => REG_IN_1_DONTCARE,
+        sel_reg_rd => SEL_REG_GENERAL,
+        sel_reg_wr => SEL_REG_GENERAL,
+        immed => IMMED_DONTCARE,
+        immed_x2 => '-',
+        rb_N => RB_N_REGFILE,
+        op_group => OP_GROUP_MOVI,
+        op => OP_MOVHI,
+        wr_m => '0',
+        word_byte => '-',
+        rd_in => '0',
+        wr_out => '0',
+        int_ack => '0',
+        wr_tlb_ins_dad => '0',
+        wr_tlb_virt_phys => '0',
+        wr_tlb_we => '1',
+        invalid_inst => '0',
+        memory_access => '0',
+        privilege_level => '0'
+    );
+
+    CONSTANT CONTROL_OUT_WRPD: control_output_t := (
+        ldpc => '1',
+        addr_a => ADDR_SRC_IR_8_6,
+        addr_b => ADDR_SRC_IR_11_9,
+        addr_d1 => ADDR_SRC_DONTCARE,
+        addr_d2 => ADDR_SRC_DONTCARE,
+        wrd_1 => '0',
+        wrd_2 => '0',
+        regfile_input_1 => REG_IN_1_DONTCARE,
+        sel_reg_rd => SEL_REG_GENERAL,
+        sel_reg_wr => SEL_REG_GENERAL,
+        immed => IMMED_DONTCARE,
+        immed_x2 => '-',
+        rb_N => RB_N_REGFILE,
+        op_group => OP_GROUP_MOVI,
+        op => OP_MOVHI,
+        wr_m => '0',
+        word_byte => '-',
+        rd_in => '0',
+        wr_out => '0',
+        int_ack => '0',
+        wr_tlb_ins_dad => '1',
+        wr_tlb_virt_phys => '1',
+        wr_tlb_we => '1',
+        invalid_inst => '0',
+        memory_access => '0',
+        privilege_level => '0'
+    );
+
+    CONSTANT CONTROL_OUT_WRVD: control_output_t := (
+        ldpc => '1',
+        addr_a => ADDR_SRC_IR_8_6,
+        addr_b => ADDR_SRC_IR_11_9,
+        addr_d1 => ADDR_SRC_DONTCARE,
+        addr_d2 => ADDR_SRC_DONTCARE,
+        wrd_1 => '0',
+        wrd_2 => '0',
+        regfile_input_1 => REG_IN_1_DONTCARE,
+        sel_reg_rd => SEL_REG_GENERAL,
+        sel_reg_wr => SEL_REG_GENERAL,
+        immed => IMMED_DONTCARE,
+        immed_x2 => '-',
+        rb_N => RB_N_REGFILE,
+        op_group => OP_GROUP_MOVI,
+        op => OP_MOVHI,
+        wr_m => '0',
+        word_byte => '-',
+        rd_in => '0',
+        wr_out => '0',
+        int_ack => '0',
+        wr_tlb_ins_dad => '1',
+        wr_tlb_virt_phys => '0',
+        wr_tlb_we => '1',
+        invalid_inst => '0',
+        memory_access => '0',
+        privilege_level => '0'
     );
 
     CONSTANT CONTROL_OUT_HALT: control_output_t := (
@@ -644,6 +829,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'
@@ -670,6 +858,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '1',
         memory_access => '0',
         privilege_level => '0'
@@ -696,6 +887,9 @@ PACKAGE control_l_defs IS
         rd_in => '0',
         wr_out => '0',
         int_ack => '0',
+        wr_tlb_ins_dad => '-',
+        wr_tlb_virt_phys => '-',
+        wr_tlb_we => '0',
         invalid_inst => '0',
         memory_access => '0',
         privilege_level => '0'

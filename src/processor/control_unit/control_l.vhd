@@ -38,7 +38,10 @@ ENTITY control_l IS
 			 invalid_inst : OUT STD_LOGIC;
 			 memory_access : OUT STD_LOGIC;
 			 inst_privilege_level: OUT STD_LOGIC;
-			 calls: OUT STD_LOGIC);
+			 calls: OUT STD_LOGIC;
+			 wr_tlb_ins_dad : OUT STD_LOGIC;
+			 wr_tlb_virt_phys : OUT STD_LOGIC;
+			 wr_tlb_we : OUT STD_LOGIC);
 END control_l;
 
 
@@ -169,6 +172,14 @@ BEGIN
 							instruction <= INST_RDS;
 						WHEN "110000" =>
 							instruction <= INST_WRS;
+						WHEN "110100" =>
+							instruction <= INST_WRPI;
+						WHEN "110101" =>
+							instruction <= INST_WRVI;
+						WHEN "110110" =>
+							instruction <= INST_WRPD;
+						WHEN "110111" =>
+							instruction <= INST_WRVD;
 						WHEN "111111" =>
 							IF ir(11 downto 6) = "111111" THEN
 								instruction <= INST_HALT;
@@ -207,6 +218,10 @@ BEGIN
 							CONTROL_OUT_GETIID WHEN INST_GETIID,
 							CONTROL_OUT_RDS WHEN INST_RDS,
 							CONTROL_OUT_WRS WHEN INST_WRS,
+							CONTROL_OUT_WRPI WHEN INST_WRPI,
+							CONTROL_OUT_WRVI WHEN INST_WRVI,
+							CONTROL_OUT_WRPD WHEN INST_WRPD,
+							CONTROL_OUT_WRVD WHEN INST_WRVD,
 							CONTROL_OUT_HALT WHEN INST_HALT,
 							CONTROL_OUT_INVALID WHEN INST_INVALID,
 							CONTROL_OUT_SYSTEM WHEN INST_SYSTEM;
@@ -240,6 +255,7 @@ BEGIN
 		op <=	ir(5 downto 3) WHEN OP_IR_5_3,
 				"00" & ir(8) WHEN OP_00_IR_8,
 				"000" WHEN OP_MOVI,
+				"001" WHEN OP_MOVHI,
 				"000" WHEN OP_AND,
 				"001" WHEN OP_OR,
 				"100" WHEN OP_ADD,
@@ -255,6 +271,10 @@ BEGIN
 	invalid_inst <= control_output.invalid_inst;
 	memory_access <= control_output.memory_access;
 	inst_privilege_level <= control_output.privilege_level;
+
+  wr_tlb_ins_dad <= control_output.wr_tlb_ins_dad;
+  wr_tlb_virt_phys <= control_output.wr_tlb_virt_phys;
+  wr_tlb_we <= control_output.wr_tlb_we;
 
 	calls <= '1' WHEN instruction = INST_CALLS ELSE '0';
 
