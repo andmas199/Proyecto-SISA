@@ -12,23 +12,28 @@
 
     ; Invalid instruction test
     st 0(r5), r6
+    st 2(r5), r6
     .word 0xf000
 
     ; Unaligned store test
-    addi r5, r5, 2
+    addi r5, r5, 4
     st 0(r5), r6
+    st 2(r5), r6
     movi r0, 69
     movi r1, 3
     st 0(r1), r0
 
     ; Unaligned load test
-    addi r5, r5, 2
+    addi r5, r5, 4
     st 0(r5), r6
+    st 2(r5), r6
+    movi r1, 7
     ld r0, 0(r1)
 
     ; Unaligned fetch test
-    addi r5, r5, 2
+    addi r5, r5, 4
     st 0(r5), r6
+    st 2(r5), r6
     movi r0, lo(cont)
     movhi r0, hi(cont)
     addi r0, r0, 1
@@ -37,8 +42,9 @@ cont:
     and r0, r0, r0 ; This nop will "run" unaligned
 
     ; Division by zero test
-    addi r5, r5, 2
+    addi r5, r5, 4
     st 0(r5), r6
+    st 2(r5), r6
     movi r0, 0
     movi r1, 2
     div r3, r1, r0
@@ -50,6 +56,9 @@ rgs:
     ; Save the exception code
     rds r4, s2
     st 0(r5), r4
+    ; Save the culprit address
+    rds r4, s3
+    st 2(r5), r4
 
     ; Realign the program counter if needed
     movi r7, 1

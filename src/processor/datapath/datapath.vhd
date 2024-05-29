@@ -37,6 +37,7 @@ ENTITY datapath IS
 			 div_zero: OUT STD_LOGIC;
 			 mux_regS: IN STD_LOGIC;
 			 exc_code: IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+			 fetch_excp : IN STD_LOGIC;
 			 proc_privilege_level: OUT STD_LOGIC);
 END datapath;
 
@@ -55,8 +56,21 @@ ARCHITECTURE Structure OF datapath IS
 	SIGNAL d_2: STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL wrd_gen: STD_LOGIC;
 	SIGNAL wrd_esp: STD_LOGIC;
+	SIGNAL pc_old: STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL w_old: STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL reg_s_m_addr: STD_LOGIC_VECTOR(15 DOWNTO 0);
+	SIGNAL fetch_excp_old: STD_LOGIC;
 	
 BEGIN
+
+	PROCESS (clk)
+	BEGIN
+		IF rising_edge(clk) THEN
+			pc_old <= pc;
+			w_old <= w;
+			fetch_excp_old <= fetch_excp;
+		END IF;
+	END PROCESS;
 	
 	alu0: alu
 		PORT MAP (	x 	=> reg_out,
@@ -99,8 +113,10 @@ BEGIN
 						b			=> b_esp,
 						intr_enabl => intr_enabl,
 						bad_alignment => mux_regS,
-						m_addr => w,
+						m_addr => reg_s_m_addr,
 						privilege_level => proc_privilege_level);
+
+	reg_s_m_addr <= pc_old WHEN fetch_excp_old = '1' ELSE w_old;
 						
 	d_2 <= "000000000000" & exc_code WHEN chg_mode = '1' ELSE b_esp;
 	data_wr <= b;

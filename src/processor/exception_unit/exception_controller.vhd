@@ -16,6 +16,7 @@ ENTITY exception_controller IS
 			  intr_enabl: IN STD_LOGIC;
 			  exc_code 		: OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
 			  excp : OUT STD_LOGIC;
+			  fetch_excp : OUT STD_LOGIC;
 			  interrupt : OUT STD_LOGIC);
 END exception_controller;
 
@@ -44,6 +45,7 @@ BEGIN
 		(present => false, code => 0);
 
 	excp <= '1' WHEN exception.present or fetch_exception(prev_exception) ELSE '0';
+	fetch_excp <= '1' WHEN fetch_exception(prev_exception) ELSE '0';
 	interrupt <= '1' WHEN (exception.present and exception.code = 15) or (fetch_exception(prev_exception) and prev_exception.code = 15) ELSE '0';
 
 	PROCESS (clk)

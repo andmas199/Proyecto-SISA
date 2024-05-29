@@ -15,6 +15,7 @@ PACKAGE exception_unit_components IS
 					 intr_enabl: IN STD_LOGIC;
 					 exc_code 		: OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
 					 excp				: OUT STD_LOGIC;
+					 fetch_excp : OUT STD_LOGIC;
 					 interrupt : OUT STD_LOGIC);
     END COMPONENT;
 
