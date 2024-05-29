@@ -52,6 +52,7 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL div_zero : STD_LOGIC;
 	SIGNAL mux_regS : STD_LOGIC;
 	SIGNAL exc_code : STD_LOGIC_VECTOR(3 DOWNTO 0);
+	SIGNAL fetch_excp : STD_LOGIC;
 	SIGNAL invalid_inst : STD_LOGIC;
 	SIGNAL memory_access : STD_LOGIC;
 	SIGNAL excp : STD_LOGIC;
@@ -106,6 +107,7 @@ BEGIN
 						 div_zero => div_zero,
 						 mux_regS => mux_regS,
 						 exc_code => exc_code,
+						 fetch_excp => fetch_excp,
 						 proc_privilege_level => proc_privilege_level
 		);
 	
@@ -169,6 +171,7 @@ BEGIN
 			intr_enabl => intr_enabl,
 			exc_code => exc_code,
 			excp => excp,
+			fetch_excp => fetch_excp,
 			interrupt => interrupt);
 	
 	mmu0: mmu

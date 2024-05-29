@@ -46,6 +46,7 @@ PACKAGE datapath_components IS
 					 div_zero : OUT STD_LOGIC;
 					 mux_regS : IN STD_LOGIC;
 					 exc_code : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+    			 fetch_excp : IN STD_LOGIC;
                 proc_privilege_level : OUT STD_LOGIC);
     END COMPONENT;
 
