@@ -40,6 +40,7 @@ ENTITY unidad_control IS
 			 mux_regS : OUT STD_LOGIC;
 			 tipo_int : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 			 invalid_inst : OUT STD_LOGIC;
+			 may_divide: OUT STD_LOGIC;
 			 memory_access : OUT STD_LOGIC;
 			 excp : IN STD_LOGIC;
 			 inst_privilege_level : OUT STD_LOGIC;
@@ -115,6 +116,7 @@ BEGIN
 					 mux_regS => mux_regS,
 					 tipo_int => tipo_int,
 					 invalid_inst => invalid_inst,
+					 may_divide => may_divide,
 					 memory_access => memory_access_l,
 					 inst_privilege_level => inst_privilege_level,
 					 calls => calls,

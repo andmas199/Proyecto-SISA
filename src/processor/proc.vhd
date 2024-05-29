@@ -54,6 +54,7 @@ ARCHITECTURE Structure OF proc IS
 	SIGNAL exc_code : STD_LOGIC_VECTOR(3 DOWNTO 0);
 	SIGNAL fetch_excp : STD_LOGIC;
 	SIGNAL invalid_inst : STD_LOGIC;
+	SIGNAL may_divide : STD_LOGIC;
 	SIGNAL memory_access : STD_LOGIC;
 	SIGNAL excp : STD_LOGIC;
 	SIGNAL virt_addr: STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -144,6 +145,7 @@ BEGIN
 						 mux_regS => mux_regS,
 						 tipo_int => exc_code,
 						 invalid_inst => invalid_inst,
+						 may_divide => may_divide,
 						 memory_access => memory_access,
 						 excp => excp,
 						 inst_privilege_level => inst_privilege_level,
@@ -159,7 +161,7 @@ BEGIN
 			clk => clk,
 			invalid_inst => invalid_inst or (calls and proc_privilege_level),
 			bad_alignment => bad_alignment and memory_access,
-			div_zero => div_zero,
+			div_zero => div_zero and may_divide and in_demw,
 			ins_dad => ins_dad,
 			miss_tlb => miss_tlb and memory_access,
 			invalid_tlb => not present_tlb and memory_access,
