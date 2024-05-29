@@ -1,18 +1,20 @@
-LIBRARY ieee;
-USE ieee.std_logic_1164.all;
+library ieee;
+  use ieee.std_logic_1164.all;
 
-PACKAGE keyboard_components IS
+package keyboard_components is
 
-  COMPONENT keyboard_controller IS
-      PORT (clk        : IN    STD_LOGIC;
-            reset      : IN    STD_LOGIC;
-            ps2_clk    : INOUT STD_LOGIC;
-            ps2_data   : INOUT STD_LOGIC;
-            read_char  : OUT   STD_LOGIC_VECTOR (7 DOWNTO 0);
-            clear_char : IN    STD_LOGIC;
-            data_ready : OUT   STD_LOGIC;
-            intr       : out   STD_LOGIC;
-            inta       : in    STD_LOGIC);
-  END COMPONENT;
+  component keyboard_controller is
+    port (
+      clk        : in    std_logic;
+      reset      : in    std_logic;
+      ps2_clk    : inout std_logic;
+      ps2_data   : inout std_logic;
+      read_char  : out   std_logic_vector(7 downto 0);
+      clear_char : in    std_logic;
+      data_ready : out   std_logic;
+      intr       : out   std_logic;
+      inta       : in    std_logic
+    );
+  end component;
 
-END PACKAGE;
+end package keyboard_components;

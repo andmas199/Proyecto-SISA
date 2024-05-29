@@ -4,12 +4,26 @@
 { pkgs, fetchurl, fetchgit, fetchhg }:
 
 self: super: {
+  "PyYAML" = super.buildPythonPackage rec {
+    pname = "PyYAML";
+    version = "6.0.1";
+    src = fetchurl {
+      url = "https://files.pythonhosted.org/packages/cd/e5/af35f7ea75cf72f2cd079c95ee16797de7cd71f29ea7c68ae5ce7be1eda0/PyYAML-6.0.1.tar.gz";
+      sha256 = "0hsa7g6ddynifrwdgadqcx80khhblfy94slzpbr7birn2w5ldpxz";
+    };
+    format = "setuptools";
+    doCheck = false;
+    buildInputs = [];
+    checkInputs = [];
+    nativeBuildInputs = [];
+    propagatedBuildInputs = [];
+  };
   "colorama" = super.buildPythonPackage rec {
     pname = "colorama";
-    version = "0.4.6";
+    version = "0.4.5";
     src = fetchurl {
-      url = "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl";
-      sha256 = "1ijz53xpmxds2qf02l9yf0rnp7bznwh3ci4xkw8wmh5cyn8rj7ag";
+      url = "https://files.pythonhosted.org/packages/77/8b/7550e87b2d308a1b711725dfaddc19c695f8c5fa413c640b2be01662f4e6/colorama-0.4.5-py2.py3-none-any.whl";
+      sha256 = "1nlriqsqjsilvxg6pm3086z2xkjviplw3gz79a1gadryjd2g8jw5";
     };
     format = "wheel";
     doCheck = false;
@@ -31,6 +45,22 @@ self: super: {
     checkInputs = [];
     nativeBuildInputs = [];
     propagatedBuildInputs = [];
+  };
+  "vsg" = super.buildPythonPackage rec {
+    pname = "vsg";
+    version = "3.22.0";
+    src = fetchurl {
+      url = "https://files.pythonhosted.org/packages/4c/ee/fc7d0198fc4a3f41d78d2606a85bea0c54a51c53f75c827eb5aac9ca42e3/vsg-3.22.0.tar.gz";
+      sha256 = "0y1xn5b8zr9hydpnplzb96v5jnxkaw61dygasi508rbcfhdni6jq";
+    };
+    format = "setuptools";
+    doCheck = false;
+    buildInputs = [];
+    checkInputs = [];
+    nativeBuildInputs = [];
+    propagatedBuildInputs = [
+      self."PyYAML"
+    ];
   };
   "vunit-hdl" = super.buildPythonPackage rec {
     pname = "vunit-hdl";

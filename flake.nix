@@ -13,7 +13,7 @@
             let
               packageOverrides = pkgs.callPackage ./python-packages.nix {};
               python = pkgs.python3.override { inherit packageOverrides; };
-              pythonWithPackages = python.withPackages(ps: [ ps.vunit-hdl ]);
+              pythonWithPackages = python.withPackages(ps: [ ps.vunit-hdl ps.vsg ]);
             in
             with pkgs; [
               ghdl

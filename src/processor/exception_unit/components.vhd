@@ -1,27 +1,28 @@
-LIBRARY ieee;
-USE ieee.std_logic_1164.all;
+library ieee;
+  use ieee.std_logic_1164.all;
 
-PACKAGE exception_unit_components IS
+package exception_unit_components is
 
-    COMPONENT exception_controller IS
-		PORT (  clk : IN STD_LOGIC;
-			invalid_inst	: IN  STD_LOGIC;
-	        bad_alignment : IN  STD_LOGIC;
-			  div_zero	   : IN  STD_LOGIC;
-			  ins_dad : IN STD_LOGIC;
-			  miss_tlb : IN STD_LOGIC;
-			  invalid_tlb : IN STD_LOGIC;
-			  protected_tlb : IN STD_LOGIC;
-			  readonly_tlb : IN STD_LOGIC;
-			  protected_inst : IN STD_LOGIC;
-			  calls: IN STD_LOGIC;
-			  intr				: IN	STD_LOGIC;
-			  intr_enabl: IN STD_LOGIC;
-			  exc_code 		: OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-			  excp : OUT STD_LOGIC;
-				fetch_excp : OUT STD_LOGIC;
-			  interrupt : OUT STD_LOGIC);
-    END COMPONENT;
+  component exception_controller is
+    port (
+      clk            : in    std_logic;
+      invalid_inst   : in    std_logic;
+      bad_alignment  : in    std_logic;
+      div_zero       : in    std_logic;
+      ins_dad        : in    std_logic;
+      miss_tlb       : in    std_logic;
+      invalid_tlb    : in    std_logic;
+      protected_tlb  : in    std_logic;
+      readonly_tlb   : in    std_logic;
+      protected_inst : in    std_logic;
+      calls          : in    std_logic;
+      intr           : in    std_logic;
+      intr_enabl     : in    std_logic;
+      exc_code       : out   std_logic_vector(3 downto 0);
+      excp           : out   std_logic;
+      fetch_excp     : out   std_logic;
+      interrupt      : out   std_logic
+    );
+  end component;
 
-
-END PACKAGE;
+end package exception_unit_components;

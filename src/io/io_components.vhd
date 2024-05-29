@@ -1,83 +1,89 @@
-LIBRARY ieee;
-USE ieee.std_logic_1164.all;
+library ieee;
+  use ieee.std_logic_1164.all;
 
-PACKAGE io_components IS
-    COMPONENT controladores_IO IS
-        PORT (  boot: IN STD_LOGIC;
-                CLOCK_50: IN STD_LOGIC;
-                clk: IN STD_LOGIC;
-                addr_io: IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-                wr_io: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-                rd_io: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-                wr_out: IN STD_LOGIC;
-                rd_in: IN STD_LOGIC;
-                led_verdes: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-                led_rojos: OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-                keys: IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-                switches: IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-                HEX0: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-                HEX1: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-                HEX2: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-                HEX3: OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-				intr: OUT STD_LOGIC;
-				inta: IN STD_LOGIC;
-                vga_cursor: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-                vga_cursor_enable: OUT STD_LOGIC;
-                ps2_clk : INOUT std_logic;
-                ps2_data : INOUT std_logic);
-    END COMPONENT;
+package io_components is
 
-    COMPONENT cycle_counter IS
-        PORT (
-            clock_50: in std_logic;
-            milis_in: in std_logic_vector(15 downto 0);
-            wre: in std_logic;
-            cycles: out std_logic_vector(15 downto 0);
-            milis: out std_logic_vector(15 downto 0)
-        );
-    END COMPONENT;
+  component controladores_io is
+    port (
+      boot              : in    std_logic;
+      clock_50          : in    std_logic;
+      clk               : in    std_logic;
+      addr_io           : in    std_logic_vector(7 downto 0);
+      wr_io             : in    std_logic_vector(15 downto 0);
+      rd_io             : out   std_logic_vector(15 downto 0);
+      wr_out            : in    std_logic;
+      rd_in             : in    std_logic;
+      led_verdes        : out   std_logic_vector(7 downto 0);
+      led_rojos         : out   std_logic_vector(7 downto 0);
+      keys              : in    std_logic_vector(3 downto 0);
+      switches          : in    std_logic_vector(7 downto 0);
+      hex0              : out   std_logic_vector(6 downto 0);
+      hex1              : out   std_logic_vector(6 downto 0);
+      hex2              : out   std_logic_vector(6 downto 0);
+      hex3              : out   std_logic_vector(6 downto 0);
+      intr              : out   std_logic;
+      inta              : in    std_logic;
+      vga_cursor        : out   std_logic_vector(15 downto 0);
+      vga_cursor_enable : out   std_logic;
+      ps2_clk           : inout std_logic;
+      ps2_data          : inout std_logic
+    );
+  end component;
 
-    COMPONENT interrupting_driver IS
-        GENERIC (
-            width: natural
-        );
-        PORT (
-            boot: in std_logic;
-            clk: in std_logic;
-            device_in: in std_logic_vector(width - 1 downto 0);
-            inta: in std_logic;
-            device_out: out std_logic_vector(width - 1 downto 0);
-            intr: out std_logic
-        );
-    END COMPONENT;
+  component cycle_counter is
+    port (
+      clock_50 : in    std_logic;
+      milis_in : in    std_logic_vector(15 downto 0);
+      wre      : in    std_logic;
+      cycles   : out   std_logic_vector(15 downto 0);
+      milis    : out   std_logic_vector(15 downto 0)
+    );
+  end component;
 
-    COMPONENT interruption_controller IS
-        GENERIC (
-            interruption_sources: natural
-        );
-        PORT (
-            boot: in std_logic;
-            clk: in std_logic;
-            global_inta: in std_logic;
-            devices_intr: in std_logic_vector(interruption_sources - 1 downto 0);
-            global_intr: out std_logic;
-            devices_inta: out std_logic_vector(interruption_sources - 1 downto 0);
-            iid: out std_logic_vector(7 downto 0)
-        );
-    END COMPONENT;
+  component interrupting_driver is
+    generic (
+      width : natural
+    );
+    port (
+      boot       : in    std_logic;
+      clk        : in    std_logic;
+      device_in  : in    std_logic_vector(width - 1 downto 0);
+      inta       : in    std_logic;
+      device_out : out   std_logic_vector(width - 1 downto 0);
+      intr       : out   std_logic
+    );
+  end component;
 
-    COMPONENT seg7_driver IS
-      PORT (enable: in  std_logic;
-            value:  in  std_logic_vector(3 DOWNTO 0);
-            hex:    out std_logic_vector(6 DOWNTO 0));
-    END COMPONENT;
+  component interruption_controller is
+    generic (
+      interruption_sources : natural
+    );
+    port (
+      boot         : in    std_logic;
+      clk          : in    std_logic;
+      global_inta  : in    std_logic;
+      devices_intr : in    std_logic_vector(interruption_sources - 1 downto 0);
+      global_intr  : out   std_logic;
+      devices_inta : out   std_logic_vector(interruption_sources - 1 downto 0);
+      iid          : out   std_logic_vector(7 downto 0)
+    );
+  end component;
 
-    COMPONENT timer IS
-        PORT (
-            CLOCK_50: in std_logic;
-            boot: in std_logic;
-            inta: in std_logic;
-            intr: out std_logic
-        );
-    END COMPONENT;
-END PACKAGE;
+  component seg7_driver is
+    port (
+      enable : in    std_logic;
+      value  : in    std_logic_vector(3 downto 0);
+      hex    : out   std_logic_vector(6 downto 0)
+    );
+  end component;
+
+  component timer is
+    port (
+      clock_50 : in    std_logic;
+      boot     : in    std_logic;
+      inta     : in    std_logic;
+      intr     : out   std_logic
+    );
+  end component;
+
+end package io_components;

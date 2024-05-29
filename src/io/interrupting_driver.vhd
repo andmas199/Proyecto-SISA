@@ -1,57 +1,71 @@
-LIBRARY ieee;
-USE ieee.std_logic_1164.all;
-USE ieee.numeric_std.all;
+library ieee;
+  use ieee.std_logic_1164.all;
+  use ieee.numeric_std.all;
 
-ENTITY interrupting_driver IS
-    GENERIC (
-        width: natural
-    );
-    PORT (
-        boot: in std_logic;
-        clk: in std_logic;
-        device_in: in std_logic_vector(width - 1 downto 0);
-        inta: in std_logic;
-        device_out: out std_logic_vector(width - 1 downto 0);
-        intr: out std_logic
-    );
-END interrupting_driver;
+entity interrupting_driver is
+  generic (
+    width : natural
+  );
+  port (
+    boot       : in    std_logic;
+    clk        : in    std_logic;
+    device_in  : in    std_logic_vector(width - 1 downto 0);
+    inta       : in    std_logic;
+    device_out : out   std_logic_vector(width - 1 downto 0);
+    intr       : out   std_logic
+  );
+end entity interrupting_driver;
 
-ARCHITECTURE rtl OF interrupting_driver IS
-    TYPE state_t IS (CLEAR, INTERRUPTED);
-    SIGNAL state: state_t;
+architecture rtl of interrupting_driver is
 
-    SIGNAL changed: boolean;
-    SIGNAL device_buff: std_logic_vector(width - 1 downto 0);
-BEGIN
-    
-    changed <= device_buff /= device_in;
-    intr <= '1' WHEN state = INTERRUPTED ELSE '0';
+  type state_t is (clear, interrupted);
 
-    PROCESS (clk, boot)
-    BEGIN
-        IF rising_edge(clk) THEN
-            IF boot = '1' THEN
-                state <= CLEAR;
+  signal state : state_t;
+
+  signal changed     : boolean;
+  signal device_buff : std_logic_vector(width - 1 downto 0);
+
+begin
+
+  changed <= device_buff /= device_in;
+  intr    <= '1' when state = interrupted else
+             '0';
+
+  process (clk, boot) is
+  begin
+
+    if rising_edge(clk) then
+      if (boot = '1') then
+        state       <= clear;
+        device_buff <= device_in;
+      else
+        state <= state;
+
+        case state is
+
+          when clear =>
+
+            if (changed) then
+              state       <= interrupted;
+              device_buff <= device_in;
+            end if;
+
+          when interrupted =>
+
+            if (inta = '1') then
+              device_out <= device_buff;
+              if (changed) then
                 device_buff <= device_in;
-            ELSE
-                state <= state;
-                CASE state IS
-                    WHEN CLEAR =>
-                        IF changed THEN
-                            state <= INTERRUPTED;
-                            device_buff <= device_in;
-                        END IF;
-                    WHEN INTERRUPTED =>
-                        IF inta = '1' THEN
-                            device_out <= device_buff;
-                            IF changed THEN
-                                device_buff <= device_in;
-                            ELSE
-                                state <= CLEAR;
-                            END IF;
-                        END IF;
-                END CASE;
-            END IF;
-        END IF;
-    END PROCESS;
-END rtl;
+              else
+                state <= clear;
+              end if;
+            end if;
+
+        end case;
+
+      end if;
+    end if;
+
+  end process;
+
+end architecture rtl;

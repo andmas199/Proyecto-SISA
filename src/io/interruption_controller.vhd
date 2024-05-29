@@ -1,46 +1,54 @@
-LIBRARY ieee;
-USE ieee.std_logic_1164.all;
-USE ieee.numeric_std.all;
+library ieee;
+  use ieee.std_logic_1164.all;
+  use ieee.numeric_std.all;
 
-ENTITY interruption_controller IS
-    GENERIC (
-        interruption_sources: natural
-    );
-    PORT (
-        boot: in std_logic;
-        clk: in std_logic;
-        global_inta: in std_logic;
-        devices_intr: in std_logic_vector(interruption_sources - 1 downto 0);
-        global_intr: out std_logic;
-        devices_inta: out std_logic_vector(interruption_sources - 1 downto 0);
-        iid: out std_logic_vector(7 downto 0)
-    );
-END interruption_controller;
+entity interruption_controller is
+  generic (
+    interruption_sources : natural
+  );
+  port (
+    boot         : in    std_logic;
+    clk          : in    std_logic;
+    global_inta  : in    std_logic;
+    devices_intr : in    std_logic_vector(interruption_sources - 1 downto 0);
+    global_intr  : out   std_logic;
+    devices_inta : out   std_logic_vector(interruption_sources - 1 downto 0);
+    iid          : out   std_logic_vector(7 downto 0)
+  );
+end entity interruption_controller;
 
-ARCHITECTURE rtl OF interruption_controller IS
-    SIGNAL active_iid: unsigned(7 downto 0);
-BEGIN
+architecture rtl of interruption_controller is
 
-    PROCESS (clk, boot, active_iid, global_inta, devices_intr)
-    BEGIN
-        IF rising_edge(clk) THEN
-            IF boot = '1' THEN
-                devices_inta <= devices_intr;
-            ELSE
-                devices_inta <= (others => '0');
+  signal active_iid : unsigned(7 downto 0);
 
-                FOR i IN 0 to interruption_sources - 1 LOOP
-                    IF devices_intr(i) = '1' THEN
-                        active_iid <= to_unsigned(i, active_iid'length);
-                        EXIT;
-                    END IF;
-                END LOOP;   
-            END IF;
-        END IF;
+begin
 
-        devices_inta(to_integer(active_iid)) <= global_inta;
-    END PROCESS;
+  process (clk, boot, active_iid, global_inta, devices_intr) is
+  begin
 
-    global_intr <= devices_intr(to_integer(active_iid));
-    iid <= std_logic_vector(active_iid);
-END rtl;
+    if rising_edge(clk) then
+      if (boot = '1') then
+        devices_inta <= devices_intr;
+      else
+        devices_inta <= (others => '0');
+
+        for i IN 0 to interruption_sources - 1 loop
+
+          if (devices_intr(i) = '1') then
+            active_iid <= to_unsigned(i, active_iid'length);
+            EXIT;
+          end if;
+
+        end loop;
+
+      end if;
+    end if;
+
+    devices_inta(to_integer(active_iid)) <= global_inta;
+
+  end process;
+
+  global_intr <= devices_intr(to_integer(active_iid));
+  iid         <= std_logic_vector(active_iid);
+
+end architecture rtl;

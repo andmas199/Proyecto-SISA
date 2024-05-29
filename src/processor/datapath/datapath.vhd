@@ -1,142 +1,158 @@
-LIBRARY ieee;
-USE ieee.std_logic_1164.all;
-USE ieee.numeric_std.all;
+library ieee;
+  use ieee.std_logic_1164.all;
+  use ieee.numeric_std.all;
+  use work.control_l_defs.all;
+  use work.datapath_components.all;
+  use work.io_components.all;
 
-USE work.control_l_defs.all;
-USE work.datapath_components.all;
-USE work.io_components.all;
+entity datapath is
+  port (
+    clk                  : in    std_logic;
+    op_group             : in    std_logic_vector(1 downto 0);
+    op                   : in    std_logic_vector(2 downto 0);
+    wrd_1                : in    std_logic;
+    addr_a               : in    std_logic_vector(2 downto 0);
+    addr_b               : in    std_logic_vector(2 downto 0);
+    addr_d_1             : in    std_logic_vector(2 downto 0);
+    addr_d_2             : in    std_logic_vector(2 downto 0);
+    clear                : in    std_logic;
+    chg_mode             : in    std_logic;
+    immed                : in    std_logic_vector(15 downto 0);
+    d_sys                : in    std_logic;
+    wrd_2                : in    std_logic;
+    regfile_input        : in    regfile_input_1_t;
+    sel_reg_out          : in    std_logic;
+    immed_x2             : in    std_logic;
+    datard_m             : in    std_logic_vector(15 downto 0);
+    ins_dad              : in    std_logic;
+    pc                   : in    std_logic_vector(15 downto 0);
+    rb_n                 : in    std_logic;
+    addr_m               : out   std_logic_vector(15 downto 0);
+    data_wr              : out   std_logic_vector(15 downto 0);
+    alu_out              : out   std_logic_vector(15 downto 0);
+    z                    : out   std_logic;
+    rd_io                : in    std_logic_vector(15 downto 0);
+    wr_io                : out   std_logic_vector(15 downto 0);
+    intr_enabl           : out   std_logic;
+    div_zero             : out   std_logic;
+    mux_regs             : in    std_logic;
+    exc_code             : in    std_logic_vector(3 downto 0);
+    fetch_excp           : in    std_logic;
+    proc_privilege_level : out   std_logic
+  );
+end entity datapath;
 
-ENTITY datapath IS
-    PORT (clk    	: IN STD_LOGIC;
-			 op_group: IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-          op     	: IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-          wrd_1  	: IN STD_LOGIC;
-          addr_a 	: IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-			 addr_b 	: IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-          addr_d_1: IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-			 addr_d_2: IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-			 clear	: IN STD_LOGIC;
-			 chg_mode: IN STD_LOGIC;
-          immed  	: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 d_sys	: IN STD_LOGIC;
-			 wrd_2	: IN STD_LOGIC;
-			 regfile_input: IN regfile_input_1_t;
-			 sel_reg_out : IN STD_LOGIC;
-			 immed_x2: IN STD_LOGIC;
-			 datard_m: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 ins_dad : IN STD_LOGIC;
-			 pc 		: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 Rb_N		: IN STD_LOGIC;
-			 addr_m 	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 data_wr : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 alu_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 z 		: OUT STD_LOGIC;
-			 rd_io 	: IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 wr_io 	: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			 intr_enabl: OUT STD_LOGIC;
-			 div_zero: OUT STD_LOGIC;
-			 mux_regS: IN STD_LOGIC;
-			 exc_code: IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-			 fetch_excp : IN STD_LOGIC;
-			 proc_privilege_level: OUT STD_LOGIC);
-END datapath;
+architecture structure of datapath is
 
+  signal w              : std_logic_vector(15 downto 0);
+  signal reg_out        : std_logic_vector(15 downto 0);
+  signal immediate      : std_logic_vector(15 downto 0);
+  signal a              : std_logic_vector(15 downto 0);
+  signal b              : std_logic_vector(15 downto 0);
+  signal y              : std_logic_vector(15 downto 0);
+  signal a_esp          : std_logic_vector(15 downto 0);
+  signal b_esp          : std_logic_vector(15 downto 0);
+  signal d              : std_logic_vector(15 downto 0);
+  signal d_2            : std_logic_vector(15 downto 0);
+  signal wrd_gen        : std_logic;
+  signal wrd_esp        : std_logic;
+  signal pc_old         : std_logic_vector(15 downto 0);
+  signal w_old          : std_logic_vector(15 downto 0);
+  signal reg_s_m_addr   : std_logic_vector(15 downto 0);
+  signal fetch_excp_old : std_logic;
 
-ARCHITECTURE Structure OF datapath IS
+begin
 
-	SIGNAL w: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL reg_out: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL immediate: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL a: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL b: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL y: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL a_esp: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL b_esp: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL d: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL d_2: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL wrd_gen: STD_LOGIC;
-	SIGNAL wrd_esp: STD_LOGIC;
-	SIGNAL pc_old: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL w_old: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL reg_s_m_addr: STD_LOGIC_VECTOR(15 DOWNTO 0);
-	SIGNAL fetch_excp_old: STD_LOGIC;
-	
-BEGIN
-	PROCESS (clk)
-	BEGIN
-		IF rising_edge(clk) THEN
-			pc_old <= pc;
-			w_old <= w;
-			fetch_excp_old <= fetch_excp;
-		END IF;
-	END PROCESS;
-	
-	alu0: alu
-		PORT MAP (	x 	=> reg_out,
-						y 	=> y,
-						op_group => op_group,
-						op => op,
-						w 	=> w,
-						z => z,
-						div_zero => div_zero);
-	reg0: regfile
-		PORT MAP (	clk		=> clk,
-						wrd_1		=> wrd_gen,
-						wrd_2    => '0',
-						d_1		=> d,
-						d_2		=> (OTHERS => '0'),
-						addr_a	=> addr_a,
-						addr_b	=> addr_b,
-						addr_d_1 => addr_d_1,
-						addr_d_2 => "000",
-						clear		=> clear,
-						chg_mode => '0',
-						bad_alignment => '0',
-						a 			=> a,
-						b			=> b,
-						m_addr   => (OTHERS => '0'));
-	
-	regS: regfile
-		PORT MAP (	clk 		=> clk,
-						wrd_1		=> wrd_esp,
-						wrd_2		=> wrd_2,
-						d_1		=> d,
-						d_2      => d_2,
-						addr_a	=> addr_a,
-						addr_b	=> addr_b,
-						addr_d_1	=> addr_d_1,
-						addr_d_2 => addr_d_2,
-						clear		=> clear,
-						chg_mode => chg_mode,
-						a			=> a_esp,
-						b			=> b_esp,
-						intr_enabl => intr_enabl,
-						bad_alignment => mux_regS,
-						m_addr => reg_s_m_addr,
-						privilege_level => proc_privilege_level);
+  process (clk) is
+  begin
 
-	reg_s_m_addr <= pc_old WHEN fetch_excp_old = '1' ELSE w_old;
-						
-	d_2 <= "000000000000" & exc_code WHEN chg_mode = '1' ELSE b_esp;
-	data_wr <= b;
-	reg_out <= a WHEN sel_reg_out = '0' ELSE a_esp; -- 0 is normal register bank, 1 is special bank
-	wrd_esp <= wrd_1 and d_sys;
-	wrd_gen <= wrd_1 and not d_sys;
-	immediate <= immed WHEN immed_x2 = '0' ELSE immed(14 DOWNTO 0) & '0';				
-	y <= immediate WHEN Rb_N = '0' ELSE b;
+    if rising_edge(clk) then
+      pc_old         <= pc;
+      w_old          <= w;
+      fetch_excp_old <= fetch_excp;
+    end if;
 
-	--Input 1 of both register banks
-	WITH regfile_input SELECT
-		d <= w 									WHEN REG_IN_1_ALU,
-			  datard_m							WHEN REG_IN_1_MEM,
-			  pc								WHEN REG_IN_1_PC,
-		     STD_LOGIC_VECTOR(unsigned(pc) + 2) WHEN REG_IN_1_PC_UPD,
-			  rd_io								WHEN REG_IN_1_IO,
-			  (others => '-')					WHEN REG_IN_1_DONTCARE;				  
-				
+  end process;
 
-	addr_m <= pc WHEN ins_dad = '0' ELSE w;
-	alu_out <= w;
-	
-	wr_io <= b;
-END Structure;
+  alu0 : component alu
+    port map (
+      x        => reg_out,
+      y        => y,
+      op_group => op_group,
+      op       => op,
+      w        => w,
+      z        => z,
+      div_zero => div_zero
+    );
+
+  reg0 : component regfile
+    port map (
+      clk           => clk,
+      wrd_1         => wrd_gen,
+      wrd_2         => '0',
+      d_1           => d,
+      d_2           => (OTHERS => '0'),
+      addr_a        => addr_a,
+      addr_b        => addr_b,
+      addr_d_1      => addr_d_1,
+      addr_d_2      => "000",
+      clear         => clear,
+      chg_mode      => '0',
+      bad_alignment => '0',
+      a             => a,
+      b             => b,
+      m_addr        => (OTHERS => '0')
+    );
+
+  regs : component regfile
+    port map (
+      clk             => clk,
+      wrd_1           => wrd_esp,
+      wrd_2           => wrd_2,
+      d_1             => d,
+      d_2             => d_2,
+      addr_a          => addr_a,
+      addr_b          => addr_b,
+      addr_d_1        => addr_d_1,
+      addr_d_2        => addr_d_2,
+      clear           => clear,
+      chg_mode        => chg_mode,
+      a               => a_esp,
+      b               => b_esp,
+      intr_enabl      => intr_enabl,
+      bad_alignment   => mux_regs,
+      m_addr          => reg_s_m_addr,
+      privilege_level => proc_privilege_level
+    );
+
+  reg_s_m_addr <= pc_old when fetch_excp_old = '1' else
+                  w_old;
+
+  d_2       <= "000000000000" & exc_code when chg_mode = '1' else
+               b_esp;
+  data_wr   <= b;
+  reg_out   <= a when sel_reg_out = '0' else
+               a_esp; -- 0 is normal register bank, 1 is special bank
+  wrd_esp   <= wrd_1 and d_sys;
+  wrd_gen   <= wrd_1 and not d_sys;
+  immediate <= immed when immed_x2 = '0' else
+               immed(14 downto 0) & '0';
+  y         <= immediate when rb_n = '0' else
+               b;
+
+  -- Input 1 of both register banks
+  with regfile_input select d <=
+    w when REG_IN_1_ALU,
+    datard_m when REG_IN_1_MEM,
+    pc when REG_IN_1_PC,
+    std_logic_vector(unsigned(pc) + 2) when REG_IN_1_PC_UPD,
+    rd_io when REG_IN_1_IO,
+    (others => '-') when REG_IN_1_DONTCARE;
+
+  addr_m  <= pc when ins_dad = '0' else
+             w;
+  alu_out <= w;
+
+  wr_io <= b;
+
+end architecture structure;

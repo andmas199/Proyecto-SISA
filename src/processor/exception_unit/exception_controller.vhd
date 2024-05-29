@@ -1,75 +1,88 @@
-LIBRARY ieee;
-USE ieee.std_logic_1164.all;
-USE ieee.numeric_std.all;
+library ieee;
+  use ieee.std_logic_1164.all;
+  use ieee.numeric_std.all;
+  use work.exception_unit_components.all;
 
-USE work.exception_unit_components.all;
+entity exception_controller is
+  port (
+    clk            : in    std_logic;
+    invalid_inst   : in    std_logic;
+    bad_alignment  : in    std_logic;
+    div_zero       : in    std_logic;
+    ins_dad        : in    std_logic;
+    miss_tlb       : in    std_logic;
+    invalid_tlb    : in    std_logic;
+    protected_tlb  : in    std_logic;
+    readonly_tlb   : in    std_logic;
+    protected_inst : in    std_logic;
+    calls          : in    std_logic;
+    intr           : in    std_logic;
+    intr_enabl     : in    std_logic;
+    exc_code       : out   std_logic_vector(3 downto 0);
+    excp           : out   std_logic;
+    fetch_excp     : out   std_logic;
+    interrupt      : out   std_logic
+  );
+end entity exception_controller;
 
-ENTITY exception_controller IS
-	PORT (  clk : IN STD_LOGIC;
-			invalid_inst	: IN  STD_LOGIC;
-	        bad_alignment : IN  STD_LOGIC;
-			  div_zero	   : IN  STD_LOGIC;
-			  ins_dad : IN STD_LOGIC;
-			  miss_tlb : IN STD_LOGIC;
-			  invalid_tlb : IN STD_LOGIC;
-			  protected_tlb : IN STD_LOGIC;
-			  readonly_tlb : IN STD_LOGIC;
-			  protected_inst : IN STD_LOGIC;
-			  calls: IN STD_LOGIC;
-			  intr				: IN	STD_LOGIC;
-			  intr_enabl: IN STD_LOGIC;
-			  exc_code 		: OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-			  excp : OUT STD_LOGIC;
-				fetch_excp : OUT STD_LOGIC;
-			  interrupt : OUT STD_LOGIC);
-END exception_controller;
+architecture structure of exception_controller is
 
-ARCHITECTURE Structure OF exception_controller IS
-	TYPE exception_t IS RECORD
-		present: BOOLEAN;
-		code: INTEGER;
-	END RECORD;
+  type exception_t is record
+    present : BOOLEAN;
+    code    : integer;
+  end record exception_t;
 
-	SIGNAL exception, prev_exception: exception_t;
+  signal exception, prev_exception : exception_t;
 
-	FUNCTION fetch_exception (exc: exception_t) RETURN boolean IS
-	BEGIN
-		RETURN exc.present and (exc.code = 1 or exc.code = 6 or exc.code = 8 or exc.code = 10);
-	END FUNCTION;
-BEGIN
+  function fetch_exception (
+    exc: exception_t
+  ) return boolean is
+  begin
 
-	exception <=
-		(present => true, code => 0) WHEN invalid_inst = '1' ELSE
-		(present => true, code => 1) WHEN bad_alignment = '1' ELSE
-		(present => true, code => 4) WHEN div_zero = '1' ELSE
-		(present => true, code => 6) WHEN miss_tlb = '1' and ins_dad = '0' ELSE
-		(present => true, code => 7) WHEN miss_tlb = '1' and ins_dad = '1' ELSE
-		(present => true, code => 8) WHEN invalid_tlb = '1' and ins_dad = '0' ELSE
-		(present => true, code => 9) WHEN invalid_tlb = '1' and ins_dad = '1' ELSE
-		(present => true, code => 10) WHEN protected_tlb = '1' and ins_dad = '0' ELSE 
-		(present => true, code => 11) WHEN protected_tlb = '1' and ins_dad = '1' ELSE
-		(present => true, code => 12) WHEN readonly_tlb = '1' ELSE
-		(present => true, code => 13) WHEN protected_inst = '1' ELSE
-		(present => true, code => 14) WHEN calls = '1' ELSE
-		(present => true, code => 15) WHEN intr = '1' and intr_enabl = '1' else
-		(present => false, code => 0);
+    RETURN exc.present and (exc.code = 1 or exc.code = 6 or exc.code = 8 or exc.code = 10);
 
-	excp <= '1' WHEN exception.present or fetch_exception(prev_exception) ELSE '0';
-	fetch_excp <= '1' WHEN fetch_exception(prev_exception) ELSE '0';
-	interrupt <= '1' WHEN (exception.present and exception.code = 15) or (fetch_exception(prev_exception) and prev_exception.code = 15) ELSE '0';
+  end function;
 
-	PROCESS (clk)
-	BEGIN
-		IF rising_edge(clk) THEN
-			IF fetch_exception(prev_exception) THEN
-				exc_code <= std_logic_vector(to_unsigned(prev_exception.code, exc_code'length));
-			ELSIF exception.present THEN
-				exc_code <= std_logic_vector(to_unsigned(exception.code, exc_code'length));
-			ELSE
-				exc_code <= (others => '-');
-			END IF;
+begin
 
-			prev_exception <= exception;
-		END IF;
-	END PROCESS;
-END Structure;
+  exception <=
+               (present => true, code => 0) when invalid_inst = '1' else
+               (present => true, code => 1) when bad_alignment = '1' else
+               (present => true, code => 4) when div_zero = '1' else
+               (present => true, code => 6) when miss_tlb = '1' and ins_dad = '0' else
+               (present => true, code => 7) when miss_tlb = '1' and ins_dad = '1' else
+               (present => true, code => 8) when invalid_tlb = '1' and ins_dad = '0' else
+               (present => true, code => 9) when invalid_tlb = '1' and ins_dad = '1' else
+               (present => true, code => 10) when protected_tlb = '1' and ins_dad = '0' else
+               (present => true, code => 11) when protected_tlb = '1' and ins_dad = '1' else
+               (present => true, code => 12) when readonly_tlb = '1' else
+               (present => true, code => 13) when protected_inst = '1' else
+               (present => true, code => 14) when calls = '1' else
+               (present => true, code => 15) when intr = '1' and intr_enabl = '1' else
+               (present => false, code => 0);
+
+  excp       <= '1' when exception.present or fetch_exception(prev_exception) else
+                '0';
+  fetch_excp <= '1' when fetch_exception(prev_exception) else
+                '0';
+  interrupt  <= '1' when (exception.present and exception.code = 15) or (fetch_exception(prev_exception) and prev_exception.code = 15) else
+                '0';
+
+  process (clk) is
+  begin
+
+    if rising_edge(clk) then
+      if fetch_exception(prev_exception) then
+        exc_code <= std_logic_vector(to_unsigned(prev_exception.code, exc_code'length));
+      elsif (exception.present) then
+        exc_code <= std_logic_vector(to_unsigned(exception.code, exc_code'length));
+      else
+        exc_code <= (others => '-');
+      end if;
+
+      prev_exception <= exception;
+    end if;
+
+  end process;
+
+end architecture structure;

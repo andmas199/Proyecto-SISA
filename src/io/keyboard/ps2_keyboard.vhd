@@ -1,7 +1,7 @@
 
-LIBRARY ieee;
-   USE ieee.std_logic_1164.all;
-   USE ieee.std_logic_unsigned.all;
+library ieee;
+  use ieee.std_logic_1164.all;
+  use ieee.std_logic_unsigned.all;
 
 --
 -- Adaptacion a VHDL para la asignatura de PEC
@@ -118,618 +118,1032 @@ LIBRARY ieee;
 --
 ---------------------------------------------------------------------------------------
 
+entity ps2_keyboard_interface is
+  generic (
+    -- rx_read_o
+    -- rx_read_ack_i
+    -- Parameters
+    -- The timer value can be up to (2^bits) inclusive.
+    timer_60usec_value_pp : integer := 2950; -- Number of sys_clks for 60usec.
+    timer_60usec_bits_pp  : integer := 12;   -- Number of bits needed for timer
+    timer_5usec_value_pp  : integer := 186;  -- Number of sys_clks for debounce
+    timer_5usec_bits_pp   : integer := 8;    -- Number of bits needed for timer
+    trap_shift_keys_pp    : integer := 0     -- Default: No shift key trap.
+  );
+  port (
+    clk                      : in    std_logic;
+    reset                    : in    std_logic;
+    ps2_clk                  : inout std_logic;
+    ps2_data                 : inout std_logic;
+    rx_extended              : out   std_logic;
+    rx_released              : out   std_logic;
+    rx_shift_key_on          : out   std_logic;
+    rx_scan_code             : out   std_logic_vector(7 downto 0);
+    rx_ascii                 : out   std_logic_vector(7 downto 0);
+    rx_data_ready            : out   std_logic;
+    rx_read                  : in    std_logic;
+    tx_data                  : in    std_logic_vector(7 downto 0);
+    tx_write                 : in    std_logic;
+    tx_write_ack_o           : out   std_logic;
+    tx_error_no_keyboard_ack : out   std_logic
+  );
+end entity ps2_keyboard_interface;
 
-ENTITY ps2_keyboard_interface IS
-   GENERIC (
-      -- rx_read_o
-      -- rx_read_ack_i
-      -- Parameters
-      -- The timer value can be up to (2^bits) inclusive.
-      TIMER_60USEC_VALUE_PP        : INTEGER := 2950;    -- Number of sys_clks for 60usec.
-      TIMER_60USEC_BITS_PP         : INTEGER := 12;      -- Number of bits needed for timer
-      TIMER_5USEC_VALUE_PP         : INTEGER := 186;     -- Number of sys_clks for debounce
-      TIMER_5USEC_BITS_PP          : INTEGER := 8;       -- Number of bits needed for timer
-      TRAP_SHIFT_KEYS_PP           : INTEGER := 0       -- Default: No shift key trap.
-   );
-   PORT (
+architecture trans of ps2_keyboard_interface is
 
-      clk                          : IN STD_LOGIC;
-      reset                        : IN STD_LOGIC;
-      ps2_clk                      : INOUT STD_LOGIC;
-      ps2_data                     : INOUT STD_LOGIC;
-      rx_extended                  : OUT STD_LOGIC;
-      rx_released                  : OUT STD_LOGIC;
-      rx_shift_key_on              : OUT STD_LOGIC;
-      rx_scan_code                 : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-      rx_ascii                     : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-      rx_data_ready                : OUT STD_LOGIC;
-      rx_read                      : IN STD_LOGIC;
-      tx_data                      : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
-      tx_write                     : IN STD_LOGIC;
-      tx_write_ack_o               : OUT STD_LOGIC;
-      tx_error_no_keyboard_ack     : OUT STD_LOGIC
-   );
-END ENTITY ps2_keyboard_interface;
+  function to_stdlogic (
+    val      : IN boolean
+  ) return std_logic is
+  begin
 
-ARCHITECTURE trans OF ps2_keyboard_interface IS
+    if (val) then
+      RETURN('1');
+    else
+      RETURN('0');
+    end if;
 
-   FUNCTION to_stdlogic (
-      val      : IN boolean) RETURN std_logic IS
-   BEGIN
-      IF (val) THEN
-         RETURN('1');
-      ELSE
-         RETURN('0');
-      END IF;
-   END to_stdlogic;
+  end function to_stdlogic;
 
+  function xnor_br (
+    val : std_logic_vector
+  ) return std_logic is
 
-   FUNCTION xnor_br (
-      val : std_logic_vector) RETURN std_logic IS
+    variable rtn : std_logic := '0';
 
-      VARIABLE rtn : std_logic := '0';
-   BEGIN
-      FOR index IN val'RANGE LOOP
-         rtn := rtn XOR val(index);
-      END LOOP;
-      RETURN(NOT rtn);
-   END xnor_br;
+  begin
 
+    for index IN val'range loop
 
-    TYPE tipo_estado_m1 IS (m1_rx_clk_h, m1_rx_clk_l, m1_rx_falling_edge_marker, m1_rx_rising_edge_marker,
-                            m1_tx_force_clk_l, m1_tx_first_wait_clk_h, m1_tx_first_wait_clk_l, m1_tx_reset_timer,
-                            m1_tx_wait_clk_h, m1_tx_clk_h, m1_tx_clk_l, m1_tx_wait_keyboard_ack, m1_tx_done_recovery,
-                            m1_tx_error_no_keyboard_ack, m1_tx_rising_edge_marker);
-    SIGNAL m1_state : tipo_estado_m1;
-    SIGNAL m1_next_state : tipo_estado_m1;
+      rtn := rtn xor val(index);
 
+    end loop;
 
-    TYPE tipo_estado_m2 IS (m2_rx_data_ready, m2_rx_data_ready_ack);
-    SIGNAL m2_state : tipo_estado_m2;
-    SIGNAL m2_next_state : tipo_estado_m2;
+    RETURN(NOT rtn);
 
+  end function xnor_br;
 
-   -- Internal signal declarations
-   SIGNAL timer_60usec_done     : STD_LOGIC;
-   SIGNAL timer_5usec_done      : STD_LOGIC;
-   SIGNAL extended              : STD_LOGIC;
-   SIGNAL released              : STD_LOGIC;
-   SIGNAL shift_key_on          : STD_LOGIC;
+  type tipo_estado_m1 is (
+    m1_rx_clk_h, m1_rx_clk_l, m1_rx_falling_edge_marker, m1_rx_rising_edge_marker,
+    m1_tx_force_clk_l, m1_tx_first_wait_clk_h, m1_tx_first_wait_clk_l, m1_tx_reset_timer,
+    m1_tx_wait_clk_h, m1_tx_clk_h, m1_tx_clk_l, m1_tx_wait_keyboard_ack, m1_tx_done_recovery,
+    m1_tx_error_no_keyboard_ack, m1_tx_rising_edge_marker
+  );
 
-   -- NOTE: These two signals used to be one.  They
-   --       were split into two signals because of
-   --       shift key trapping.  With shift key
-   --       trapping, no event is generated externally,
-   --       but the "hold" data must still be cleared
-   --       anyway regardless, in preparation for the
-   --       next scan codes.
-   SIGNAL rx_output_event       : STD_LOGIC;        -- Used only to clear: hold_released, hold_extended
-   SIGNAL rx_output_strobe      : STD_LOGIC;        -- Used to produce the actual output.
+  signal m1_state      : tipo_estado_m1;
+  signal m1_next_state : tipo_estado_m1;
 
-   SIGNAL tx_parity_bit         : STD_LOGIC;
-   SIGNAL rx_shifting_done      : STD_LOGIC;
-   SIGNAL tx_shifting_done      : STD_LOGIC;
-   SIGNAL shift_key_plus_code   : STD_LOGIC_VECTOR(11 DOWNTO 0);
+  type tipo_estado_m2 is (m2_rx_data_ready, m2_rx_data_ready_ack);
 
-   SIGNAL q                     : STD_LOGIC_VECTOR(11 - 1 DOWNTO 0);
-   SIGNAL bit_count             : STD_LOGIC_VECTOR(3 DOWNTO 0);
-   SIGNAL enable_timer_60usec   : STD_LOGIC;
-   SIGNAL enable_timer_5usec    : STD_LOGIC;
-   SIGNAL timer_60usec_count    : STD_LOGIC_VECTOR(TIMER_60USEC_BITS_PP - 1 DOWNTO 0);
-   SIGNAL timer_5usec_count     : STD_LOGIC_VECTOR(TIMER_5USEC_BITS_PP - 1 DOWNTO 0);
-      SIGNAL ascii                 : STD_LOGIC_VECTOR(7 DOWNTO 0);        -- "REG" type only because a case statement is used.
-   SIGNAL left_shift_key        : STD_LOGIC;
-   SIGNAL right_shift_key       : STD_LOGIC;
-   SIGNAL hold_extended         : STD_LOGIC;        -- Holds prior value, cleared at rx_output_strobe
-   SIGNAL hold_released         : STD_LOGIC;        -- Holds prior value, cleared at rx_output_strobe
-   SIGNAL ps2_clk_s             : STD_LOGIC;        -- Synchronous version of this input
-   SIGNAL ps2_data_s            : STD_LOGIC;        -- Synchronous version of this input
-   SIGNAL ps2_clk_hi_z          : STD_LOGIC;        -- Without keyboard, high Z equals 1 due to pullups.
-   SIGNAL ps2_data_hi_z         : STD_LOGIC;        -- Without keyboard, high Z equals 1 due to pullups.
+  signal m2_state      : tipo_estado_m2;
+  signal m2_next_state : tipo_estado_m2;
 
-   -- Declare intermediate signals for referenced outputs
-   SIGNAL rx_shift_key_on_xhdl0 : STD_LOGIC;
-   SIGNAL tx_write_ack_o_xhdl1  : STD_LOGIC;
-BEGIN
-   -- Drive referenced outputs
-   rx_shift_key_on <= rx_shift_key_on_xhdl0;
-   tx_write_ack_o <= tx_write_ack_o_xhdl1;
+  -- Internal signal declarations
+  signal timer_60usec_done : std_logic;
+  signal timer_5usec_done  : std_logic;
+  signal extended          : std_logic;
+  signal released          : std_logic;
+  signal shift_key_on      : std_logic;
 
-   ----------------------------------------------------------------------------
-   -- Module code
+  -- NOTE: These two signals used to be one.  They
+  --       were split into two signals because of
+  --       shift key trapping.  With shift key
+  --       trapping, no event is generated externally,
+  --       but the "hold" data must still be cleared
+  --       anyway regardless, in preparation for the
+  --       next scan codes.
+  signal rx_output_event  : std_logic; -- Used only to clear: hold_released, hold_extended
+  signal rx_output_strobe : std_logic; -- Used to produce the actual output.
 
-   ps2_clk <= 'Z' WHEN (ps2_clk_hi_z = '1') ELSE
+  signal tx_parity_bit       : std_logic;
+  signal rx_shifting_done    : std_logic;
+  signal tx_shifting_done    : std_logic;
+  signal shift_key_plus_code : std_logic_vector(11 downto 0);
+
+  signal q                   : std_logic_vector(11 - 1 downto 0);
+  signal bit_count           : std_logic_vector(3 downto 0);
+  signal enable_timer_60usec : std_logic;
+  signal enable_timer_5usec  : std_logic;
+  signal timer_60usec_count  : std_logic_vector(timer_60usec_bits_pp - 1 downto 0);
+  signal timer_5usec_count   : std_logic_vector(timer_5usec_bits_pp - 1 downto 0);
+  signal ascii               : std_logic_vector(7 downto 0); -- "REG" type only because a case statement is used.
+  signal left_shift_key      : std_logic;
+  signal right_shift_key     : std_logic;
+  signal hold_extended       : std_logic;                    -- Holds prior value, cleared at rx_output_strobe
+  signal hold_released       : std_logic;                    -- Holds prior value, cleared at rx_output_strobe
+  signal ps2_clk_s           : std_logic;                    -- Synchronous version of this input
+  signal ps2_data_s          : std_logic;                    -- Synchronous version of this input
+  signal ps2_clk_hi_z        : std_logic;                    -- Without keyboard, high Z equals 1 due to pullups.
+  signal ps2_data_hi_z       : std_logic;                    -- Without keyboard, high Z equals 1 due to pullups.
+
+  -- Declare intermediate signals for referenced outputs
+  signal rx_shift_key_on_xhdl0 : std_logic;
+  signal tx_write_ack_o_xhdl1  : std_logic;
+
+begin
+
+  -- Drive referenced outputs
+  rx_shift_key_on <= rx_shift_key_on_xhdl0;
+  tx_write_ack_o  <= tx_write_ack_o_xhdl1;
+
+  ----------------------------------------------------------------------------
+  -- Module code
+
+  ps2_clk  <= 'Z' when (ps2_clk_hi_z = '1') else
               '0';
-   ps2_data <= 'Z' WHEN (ps2_data_hi_z = '1') ELSE
-               '0';
+  ps2_data <= 'Z' when (ps2_data_hi_z = '1') else
+              '0';
 
-   -- Input "synchronizing" logic -- synchronizes the inputs to the state
-   -- machine clock, thus avoiding errors related to
-   -- spurious state machine transitions.
-   PROCESS (clk)
-   BEGIN
-      IF (clk'EVENT AND clk = '1') THEN
-         ps2_clk_s <= ps2_clk;
-         ps2_data_s <= ps2_data;
-      END IF;
-   END PROCESS;
+  -- Input "synchronizing" logic -- synchronizes the inputs to the state
+  -- machine clock, thus avoiding errors related to
+  -- spurious state machine transitions.
+  process (clk) is
+  begin
 
+    if (clk'EVENT and clk = '1') then
+      ps2_clk_s  <= ps2_clk;
+      ps2_data_s <= ps2_data;
+    end if;
 
-   -- State register
-   PROCESS (clk)
-   BEGIN
-      IF (clk'EVENT AND clk = '1') THEN
-         IF (reset = '1') THEN
-            m1_state <= m1_rx_clk_h;
-         ELSE
-            m1_state <= m1_next_state;
-         END IF;
-      END IF;
-   END PROCESS;
+  end process;
 
+  -- State register
+  process (clk) is
+  begin
 
-   -- State transition logic
-   PROCESS (m1_state, q, tx_shifting_done, tx_write, ps2_clk_s, ps2_data_s, timer_60usec_done, timer_5usec_done)
-   BEGIN
+    if (clk'EVENT and clk = '1') then
+      if (reset = '1') then
+        m1_state <= m1_rx_clk_h;
+      else
+        m1_state <= m1_next_state;
+      end if;
+    end if;
 
-      -- Output signals default to this value, unless changed in a state condition.
-      ps2_clk_hi_z <= '1';
-      ps2_data_hi_z <= '1';
-      tx_error_no_keyboard_ack <= '0';
-      enable_timer_60usec <= '0';
+  end process;
 
-      enable_timer_5usec <= '0';
+  -- State transition logic
+  process (m1_state, q, tx_shifting_done, tx_write, ps2_clk_s, ps2_data_s, timer_60usec_done, timer_5usec_done) is
+  begin
 
-      CASE m1_state IS
+    -- Output signals default to this value, unless changed in a state condition.
+    ps2_clk_hi_z             <= '1';
+    ps2_data_hi_z            <= '1';
+    tx_error_no_keyboard_ack <= '0';
+    enable_timer_60usec      <= '0';
 
-         WHEN m1_rx_clk_h =>
-            enable_timer_60usec <= '1';
-            IF (tx_write = '1') THEN
-               m1_next_state <= m1_tx_reset_timer;
-            ELSIF ((NOT(ps2_clk_s)) = '1') THEN
-               m1_next_state <= m1_rx_falling_edge_marker;
-            ELSE
-               m1_next_state <= m1_rx_clk_h;
-            END IF;
+    enable_timer_5usec <= '0';
 
-         WHEN m1_rx_falling_edge_marker =>
-            enable_timer_60usec <= '0';
-            m1_next_state <= m1_rx_clk_l;
+    case m1_state is
 
-         WHEN m1_rx_rising_edge_marker =>
-            enable_timer_60usec <= '0';
-            m1_next_state <= m1_rx_clk_h;
+      when m1_rx_clk_h =>
 
-         WHEN m1_rx_clk_l =>
-            enable_timer_60usec <= '1';
-            IF (tx_write = '1') THEN
-               m1_next_state <= m1_tx_reset_timer;
-            ELSIF (ps2_clk_s = '1') THEN
-               m1_next_state <= m1_rx_rising_edge_marker;
-            ELSE
-               m1_next_state <= m1_rx_clk_l;
-            END IF;
+        enable_timer_60usec <= '1';
 
-         WHEN m1_tx_reset_timer =>
-            enable_timer_60usec <= '0';
-            m1_next_state <= m1_tx_force_clk_l;
-         -- Force the ps2_clk line low.
+        if (tx_write = '1') then
+          m1_next_state <= m1_tx_reset_timer;
+        elsif ((NOT(ps2_clk_s)) = '1') then
+          m1_next_state <= m1_rx_falling_edge_marker;
+        else
+          m1_next_state <= m1_rx_clk_h;
+        end if;
 
-         WHEN m1_tx_force_clk_l =>
-            enable_timer_60usec <= '1';
-            ps2_clk_hi_z <= '0';
-            IF (timer_60usec_done = '1') THEN
-               m1_next_state <= m1_tx_first_wait_clk_h;
-            ELSE
-               m1_next_state <= m1_tx_force_clk_l;
-            END IF;
-         -- Start bit.
+      when m1_rx_falling_edge_marker =>
 
-         -- This state must be included because the device might possibly
-         -- delay for up to 10 milliseconds before beginning its clock pulses.
-         -- During that waiting time, we cannot drive the data (q[0]) because it
-         -- is possibly 1, which would cause the keyboard to abort its receive
-         -- and the expected clocks would then never be generated.
-         WHEN m1_tx_first_wait_clk_h =>
-            enable_timer_5usec <= '1';
-            ps2_data_hi_z <= '0';
-            IF (ps2_clk_s='0' AND timer_5usec_done='1') THEN
-               m1_next_state <= m1_tx_clk_l;
-            ELSE
-               m1_next_state <= m1_tx_first_wait_clk_h;
-            END IF;
+        enable_timer_60usec <= '0';
+        m1_next_state       <= m1_rx_clk_l;
 
-         WHEN m1_tx_first_wait_clk_l =>
-            ps2_data_hi_z <= '0';
-            IF (ps2_clk_s = '0') THEN
-               m1_next_state <= m1_tx_clk_l;
-            ELSE
-               m1_next_state <= m1_tx_first_wait_clk_l;
-            END IF;
+      when m1_rx_rising_edge_marker =>
 
-         WHEN m1_tx_wait_clk_h =>
-            enable_timer_5usec <= '1';
-            ps2_data_hi_z <= q(0);
-            IF (ps2_clk_s='1' AND timer_5usec_done='1') THEN
-               m1_next_state <= m1_tx_rising_edge_marker;
-            ELSE
-               m1_next_state <= m1_tx_wait_clk_h;
-            END IF;
+        enable_timer_60usec <= '0';
+        m1_next_state       <= m1_rx_clk_h;
 
-         WHEN m1_tx_rising_edge_marker =>
-            ps2_data_hi_z <= q(0);
-            m1_next_state <= m1_tx_clk_h;
+      when m1_rx_clk_l =>
 
-         WHEN m1_tx_clk_h =>
-            ps2_data_hi_z <= q(0);
-            IF (tx_shifting_done = '1') THEN
-               m1_next_state <= m1_tx_wait_keyboard_ack;
-            ELSIF ((NOT(ps2_clk_s)) = '1') THEN
-               m1_next_state <= m1_tx_clk_l;
-            ELSE
-               m1_next_state <= m1_tx_clk_h;
-            END IF;
+        enable_timer_60usec <= '1';
 
-         WHEN m1_tx_clk_l =>
-            ps2_data_hi_z <= q(0);
-            IF (ps2_clk_s = '1') THEN
-               m1_next_state <= m1_tx_wait_clk_h;
-            ELSE
-               m1_next_state <= m1_tx_clk_l;
-            END IF;
+        if (tx_write = '1') then
+          m1_next_state <= m1_tx_reset_timer;
+        elsif (ps2_clk_s = '1') then
+          m1_next_state <= m1_rx_rising_edge_marker;
+        else
+          m1_next_state <= m1_rx_clk_l;
+        end if;
 
-         WHEN m1_tx_wait_keyboard_ack =>
-            IF (ps2_clk_s='0' AND ps2_data_s='1') THEN
-               m1_next_state <= m1_tx_error_no_keyboard_ack;
-            ELSIF (ps2_clk_s='0' AND ps2_data_s='0') THEN
-               m1_next_state <= m1_tx_done_recovery;
-            ELSE
-               m1_next_state <= m1_tx_wait_keyboard_ack;
-            END IF;
+      when m1_tx_reset_timer =>
 
-         WHEN m1_tx_done_recovery =>
-            IF (ps2_clk_s='1' AND ps2_data_s='1') THEN
-               m1_next_state <= m1_rx_clk_h;
-            ELSE
-               m1_next_state <= m1_tx_done_recovery;
-            END IF;
+        enable_timer_60usec <= '0';
+        m1_next_state       <= m1_tx_force_clk_l;
+      -- Force the ps2_clk line low.
 
-         WHEN m1_tx_error_no_keyboard_ack =>
-            tx_error_no_keyboard_ack <= '1';
-            IF (ps2_clk_s='1' AND ps2_data_s='1') THEN
-               m1_next_state <= m1_rx_clk_h;
-            ELSE
-               m1_next_state <= m1_tx_error_no_keyboard_ack;
-            END IF;
-         WHEN OTHERS =>
-            m1_next_state <= m1_rx_clk_h;
-      END CASE;
-   END PROCESS;
+      when m1_tx_force_clk_l =>
 
+        enable_timer_60usec <= '1';
+        ps2_clk_hi_z        <= '0';
 
-   -- State register
-   PROCESS (clk)
-   BEGIN
-      IF (clk'EVENT AND clk = '1') THEN
-         IF (reset = '1') THEN
-            m2_state <= m2_rx_data_ready_ack;
-         ELSE
-            m2_state <= m2_next_state;
-         END IF;
-      END IF;
-   END PROCESS;
+        if (timer_60usec_done = '1') then
+          m1_next_state <= m1_tx_first_wait_clk_h;
+        else
+          m1_next_state <= m1_tx_force_clk_l;
+        end if;
 
+      -- Start bit.
 
-   -- State transition logic
-   PROCESS (m2_state, rx_output_strobe, rx_read)
-   BEGIN
-      CASE m2_state IS
-         WHEN m2_rx_data_ready_ack =>
-            rx_data_ready <= '0';
-            IF (rx_output_strobe = '1') THEN
-               m2_next_state <= m2_rx_data_ready;
-            ELSE
-               m2_next_state <= m2_rx_data_ready_ack;
-            END IF;
-         WHEN m2_rx_data_ready =>
-            rx_data_ready <= '1';
-            IF (rx_read = '1') THEN
-               m2_next_state <= m2_rx_data_ready_ack;
-            ELSE
-               m2_next_state <= m2_rx_data_ready;
-            END IF;
-         WHEN OTHERS =>
-            m2_next_state <= m2_rx_data_ready_ack;
-      END CASE;
-   END PROCESS;
+      -- This state must be included because the device might possibly
+      -- delay for up to 10 milliseconds before beginning its clock pulses.
+      -- During that waiting time, we cannot drive the data (q[0]) because it
+      -- is possibly 1, which would cause the keyboard to abort its receive
+      -- and the expected clocks would then never be generated.
+      when m1_tx_first_wait_clk_h =>
 
+        enable_timer_5usec <= '1';
+        ps2_data_hi_z      <= '0';
 
-   -- This is the bit counter
-   PROCESS (clk)
-   BEGIN
-      IF (clk'EVENT AND clk = '1') THEN
-         IF (reset='1' OR rx_shifting_done='1' OR (m1_state = m1_tx_wait_keyboard_ack)) THEN        -- After tx is done.
-            bit_count <= "0000";
-         ELSIF (timer_60usec_done = '1' AND (m1_state = m1_rx_clk_h) AND ((ps2_clk_s)) = '1') THEN        -- rx watchdog timer reset
-            bit_count <= "0000";
-         ELSIF ((m1_state = m1_rx_falling_edge_marker) OR (m1_state = m1_tx_rising_edge_marker)) THEN        -- increment for tx
-            bit_count <= bit_count + "0001";
-         END IF;
-      END IF;
-   END PROCESS;
+        if (ps2_clk_s='0' and timer_5usec_done='1') then
+          m1_next_state <= m1_tx_clk_l;
+        else
+          m1_next_state <= m1_tx_first_wait_clk_h;
+        end if;
 
-   -- This signal is high for one clock at the end of the timer count.
-   rx_shifting_done <= to_stdlogic((bit_count = "1011"));
-   tx_shifting_done <= to_stdlogic((bit_count = "1010"));
+      when m1_tx_first_wait_clk_l =>
 
-   -- This is the signal which enables loading of the shift register.
-   -- It also indicates "ack" to the device writing to the transmitter.
-   tx_write_ack_o_xhdl1 <= to_stdlogic(((tx_write = '1' AND (m1_state = m1_rx_clk_h)) OR (tx_write = '1' AND (m1_state = m1_rx_clk_l))));
+        ps2_data_hi_z <= '0';
 
-   -- This is the ODD parity bit for the transmitted word.
-   tx_parity_bit <= XNOR_BR(tx_data);
+        if (ps2_clk_s = '0') then
+          m1_next_state <= m1_tx_clk_l;
+        else
+          m1_next_state <= m1_tx_first_wait_clk_l;
+        end if;
 
-   -- This is the shift register
-   PROCESS (clk)
-   BEGIN
-      IF (clk'EVENT AND clk = '1') THEN
-         IF (reset = '1') THEN
-            q <= "00000000000";
-         ELSIF (tx_write_ack_o_xhdl1 = '1') THEN
-            q <= ('1' & tx_parity_bit & tx_data & '0');
-         ELSIF ((m1_state = m1_rx_falling_edge_marker) OR (m1_state = m1_tx_rising_edge_marker)) THEN
-            q <= (ps2_data_s & q(11 - 1 DOWNTO 1));
-         END IF;
-      END IF;
-   END PROCESS;
+      when m1_tx_wait_clk_h =>
 
+        enable_timer_5usec <= '1';
+        ps2_data_hi_z      <= q(0);
 
-   -- This is the 60usec timer counter
-   PROCESS (clk)
-   BEGIN
-      IF (clk'EVENT AND clk = '1') THEN
-         IF ((NOT(enable_timer_60usec)) = '1') THEN
-            timer_60usec_count <= "000000000000";
-         ELSIF ((NOT(timer_60usec_done)) = '1') THEN
-            timer_60usec_count <= timer_60usec_count + "000000000001";
-         END IF;
-      END IF;
-   END PROCESS;
+        if (ps2_clk_s='1' and timer_5usec_done='1') then
+          m1_next_state <= m1_tx_rising_edge_marker;
+        else
+          m1_next_state <= m1_tx_wait_clk_h;
+        end if;
 
-   timer_60usec_done <= to_stdlogic(timer_60usec_count = (TIMER_60USEC_VALUE_PP - 1));
+      when m1_tx_rising_edge_marker =>
 
-   -- This is the 5usec timer counter
-   PROCESS (clk)
-   BEGIN
-      IF (clk'EVENT AND clk = '1') THEN
-         IF ((NOT(enable_timer_5usec)) = '1') THEN
-            timer_5usec_count <= "00000000";
-         ELSIF ((NOT(timer_5usec_done)) = '1') THEN
-            timer_5usec_count <= timer_5usec_count + "00000001";
-         END IF;
-      END IF;
-   END PROCESS;
+        ps2_data_hi_z <= q(0);
+        m1_next_state <= m1_tx_clk_h;
 
-   timer_5usec_done <= to_stdlogic(timer_5usec_count = (TIMER_5USEC_VALUE_PP - 1));
+      when m1_tx_clk_h =>
 
-   -- Create the signals which indicate special scan codes received.
-   -- These are the "unlatched versions."
-   extended <= to_stdlogic((("00000000" & q(8 DOWNTO 1)) = "0000000011100000") AND rx_shifting_done = '1');
-   released <= to_stdlogic((("00000000" & q(8 DOWNTO 1)) = "0000000011110000") AND rx_shifting_done = '1');
+        ps2_data_hi_z <= q(0);
 
-   -- Store the special scan code status bits
-   -- Not the final output, but an intermediate storage place,
-   -- until the entire set of output data can be assembled.
-   PROCESS (clk)
-   BEGIN
-      IF (clk'EVENT AND clk = '1') THEN
-         IF (reset='1' OR rx_output_event='1') THEN
-            hold_extended <= '0';
-            hold_released <= '0';
-         ELSE
-            IF (rx_shifting_done='1' AND extended='1') THEN
-               hold_extended <= '1';
-            END IF;
-            IF (rx_shifting_done='1' AND released='1') THEN
-               hold_released <= '1';
-            END IF;
-         END IF;
-      END IF;
-   END PROCESS;
+        if (tx_shifting_done = '1') then
+          m1_next_state <= m1_tx_wait_keyboard_ack;
+        elsif ((NOT(ps2_clk_s)) = '1') then
+          m1_next_state <= m1_tx_clk_l;
+        else
+          m1_next_state <= m1_tx_clk_h;
+        end if;
 
+      when m1_tx_clk_l =>
 
-   -- These bits contain the status of the two shift keys
-   PROCESS (clk)
-   BEGIN
-      IF (clk'EVENT AND clk = '1') THEN
-         IF (reset = '1') THEN
-            left_shift_key <= '0';
-         ELSIF ((("00000000" & q(8 DOWNTO 1)) = "0000000000010010") AND rx_shifting_done = '1' AND (NOT(hold_released)) = '1') THEN
-            left_shift_key <= '1';
-         ELSIF ((("00000000" & q(8 DOWNTO 1)) = "0000000000010010") AND rx_shifting_done = '1' AND hold_released = '1') THEN
-            left_shift_key <= '0';
-         END IF;
-      END IF;
-   END PROCESS;
+        ps2_data_hi_z <= q(0);
 
+        if (ps2_clk_s = '1') then
+          m1_next_state <= m1_tx_wait_clk_h;
+        else
+          m1_next_state <= m1_tx_clk_l;
+        end if;
 
-   PROCESS (clk)
-   BEGIN
-      IF (clk'EVENT AND clk = '1') THEN
-         IF (reset = '1') THEN
-            right_shift_key <= '0';
-         ELSIF ((("00000000" & q(8 DOWNTO 1)) = "0000000001011001") AND rx_shifting_done = '1' AND (NOT(hold_released)) = '1') THEN
-            right_shift_key <= '1';
-         ELSIF ((("00000000" & q(8 DOWNTO 1)) = "0000000001011001") AND rx_shifting_done = '1' AND hold_released = '1') THEN
-            right_shift_key <= '0';
-         END IF;
-      END IF;
-   END PROCESS;
+      when m1_tx_wait_keyboard_ack =>
 
+        if (ps2_clk_s='0' and ps2_data_s='1') then
+          m1_next_state <= m1_tx_error_no_keyboard_ack;
+        elsif (ps2_clk_s='0' and ps2_data_s='0') then
+          m1_next_state <= m1_tx_done_recovery;
+        else
+          m1_next_state <= m1_tx_wait_keyboard_ack;
+        end if;
 
-   rx_shift_key_on_xhdl0 <= to_stdlogic(left_shift_key='1' OR right_shift_key='1');
+      when m1_tx_done_recovery =>
 
-   -- Output the special scan code flags, the scan code and the ascii
-   PROCESS (clk)
-   BEGIN
-      IF (clk'EVENT AND clk = '1') THEN
-         IF (reset = '1') THEN
-            rx_extended <= '0';
-            rx_released <= '0';
-            rx_scan_code <= "00000000";
-            rx_ascii <= "00000000";
-         ELSIF (rx_output_strobe = '1') THEN
-            rx_extended <= hold_extended;
-            rx_released <= hold_released;
-            rx_scan_code <= q(8 DOWNTO 1);
-            rx_ascii <= ascii;
-         END IF;
-      END IF;
-   END PROCESS;
+        if (ps2_clk_s='1' and ps2_data_s='1') then
+          m1_next_state <= m1_rx_clk_h;
+        else
+          m1_next_state <= m1_tx_done_recovery;
+        end if;
 
+      when m1_tx_error_no_keyboard_ack =>
 
-   -- Store the final rx output data only when all extend and release codes
-   -- are received and the next (actual key) scan code is also ready.
-   -- (the presence of rx_extended or rx_released refers to the
-   -- the current latest scan code received, not the previously latched flags.)
-   rx_output_event <= to_stdlogic((rx_shifting_done='1' AND extended='0' AND released='0'));
+        tx_error_no_keyboard_ack <= '1';
 
-   rx_output_strobe <= to_stdlogic((rx_shifting_done='1' AND extended='0' AND released='0' AND ((TRAP_SHIFT_KEYS_PP = 0) OR ((("00000000" & q(8 DOWNTO 1)) /= "0000000001011001") AND (("00000000" & q(8 DOWNTO 1)) /= "0000000000010010")))));
+        if (ps2_clk_s='1' and ps2_data_s='1') then
+          m1_next_state <= m1_rx_clk_h;
+        else
+          m1_next_state <= m1_tx_error_no_keyboard_ack;
+        end if;
 
-   -- This part translates the scan code into an ASCII value...
-   -- Only the ASCII codes which I considered important have been included.
-   -- if you want more, just add the appropriate case statement lines...
-   -- (You will need to know the keyboard scan codes you wish to assign.)
-   -- The entries are listed in ascending order of ASCII value.
-   shift_key_plus_code <= ("000" & rx_shift_key_on_xhdl0 & q(8 DOWNTO 1));
-   PROCESS (shift_key_plus_code)
-   BEGIN
-      CASE shift_key_plus_code IS
-         WHEN x"066" => ascii <= x"08";  -- Backspace ("backspace" key)
-         WHEN x"00d" => ascii <= x"09";  -- Horizontal Tab
-         WHEN x"05a" => ascii <= x"0d";  -- Carriage return ("enter" key)
-         WHEN x"076" => ascii <= x"1b";  -- Escape ("esc" key)
-         WHEN x"029" => ascii <= x"20";  -- Space
-         WHEN x"116" => ascii <= x"21";  -- !
-         WHEN x"152" => ascii <= x"22";  -- "
-         WHEN x"126" => ascii <= x"23";  -- #
-         WHEN x"125" => ascii <= x"24";  -- $
-         WHEN x"12e" => ascii <= x"25";  -- %
-         WHEN x"13d" => ascii <= x"26";  -- &
-         WHEN x"052" => ascii <= x"27";  -- '
-         WHEN x"146" => ascii <= x"28";  -- (
-         WHEN x"145" => ascii <= x"29";  -- )
-         WHEN x"13e" => ascii <= x"2a";  -- *
-         WHEN x"155" => ascii <= x"2b";  -- +
-         WHEN x"041" => ascii <= x"2c";  -- ,
-         WHEN x"04e" => ascii <= x"2d";  -- -
-         WHEN x"049" => ascii <= x"2e";  -- .
-         WHEN x"04a" => ascii <= x"2f";  -- /
-         WHEN x"045" => ascii <= x"30";  -- 0
-         WHEN x"016" => ascii <= x"31";  -- 1
-         WHEN x"01e" => ascii <= x"32";  -- 2
-         WHEN x"026" => ascii <= x"33";  -- 3
-         WHEN x"025" => ascii <= x"34";  -- 4
-         WHEN x"02e" => ascii <= x"35";  -- 5
-         WHEN x"036" => ascii <= x"36";  -- 6
-         WHEN x"03d" => ascii <= x"37";  -- 7
-         WHEN x"03e" => ascii <= x"38";  -- 8
-         WHEN x"046" => ascii <= x"39";  -- 9
-         WHEN x"14c" => ascii <= x"3a";  -- :
-         WHEN x"04c" => ascii <= x"3b";  -- ;
-         WHEN x"141" => ascii <= x"3c";  -- <
-         WHEN x"055" => ascii <= x"3d";  -- =
-         WHEN x"149" => ascii <= x"3e";  -- >
-         WHEN x"14a" => ascii <= x"3f";  -- ?
-         WHEN x"11e" => ascii <= x"40";  -- @
-         WHEN x"11c" => ascii <= x"41";  -- A
-         WHEN x"132" => ascii <= x"42";  -- B
-         WHEN x"121" => ascii <= x"43";  -- C
-         WHEN x"123" => ascii <= x"44";  -- D
-         WHEN x"124" => ascii <= x"45";  -- E
-         WHEN x"12b" => ascii <= x"46";  -- F
-         WHEN x"134" => ascii <= x"47";  -- G
-         WHEN x"133" => ascii <= x"48";  -- H
-         WHEN x"143" => ascii <= x"49";  -- I
-         WHEN x"13b" => ascii <= x"4a";  -- J
-         WHEN x"142" => ascii <= x"4b";  -- K
-         WHEN x"14b" => ascii <= x"4c";  -- L
-         WHEN x"13a" => ascii <= x"4d";  -- M
-         WHEN x"131" => ascii <= x"4e";  -- N
-         WHEN x"144" => ascii <= x"4f";  -- O
-         WHEN x"14d" => ascii <= x"50";  -- P
-         WHEN x"115" => ascii <= x"51";  -- Q
-         WHEN x"12d" => ascii <= x"52";  -- R
-         WHEN x"11b" => ascii <= x"53";  -- S
-         WHEN x"12c" => ascii <= x"54";  -- T
-         WHEN x"13c" => ascii <= x"55";  -- U
-         WHEN x"12a" => ascii <= x"56";  -- V
-         WHEN x"11d" => ascii <= x"57";  -- W
-         WHEN x"122" => ascii <= x"58";  -- X
-         WHEN x"135" => ascii <= x"59";  -- Y
-         WHEN x"11a" => ascii <= x"5a";  -- Z
-         WHEN x"054" => ascii <= x"5b";  -- [
-         WHEN x"05d" => ascii <= x"5c";  -- \
-         WHEN x"05b" => ascii <= x"5d";  -- ]
-         WHEN x"136" => ascii <= x"5e";  -- ^
-         WHEN x"14e" => ascii <= x"5f";  -- _
-         WHEN x"00e" => ascii <= x"60";  -- `
-         WHEN x"01c" => ascii <= x"61";  -- a
-         WHEN x"032" => ascii <= x"62";  -- b
-         WHEN x"021" => ascii <= x"63";  -- c
-         WHEN x"023" => ascii <= x"64";  -- d
-         WHEN x"024" => ascii <= x"65";  -- e
-         WHEN x"02b" => ascii <= x"66";  -- f
-         WHEN x"034" => ascii <= x"67";  -- g
-         WHEN x"033" => ascii <= x"68";  -- h
-         WHEN x"043" => ascii <= x"69";  -- i
-         WHEN x"03b" => ascii <= x"6a";  -- j
-         WHEN x"042" => ascii <= x"6b";  -- k
-         WHEN x"04b" => ascii <= x"6c";  -- l
-         WHEN x"03a" => ascii <= x"6d";  -- m
-         WHEN x"031" => ascii <= x"6e";  -- n
-         WHEN x"044" => ascii <= x"6f";  -- o
-         WHEN x"04d" => ascii <= x"70";  -- p
-         WHEN x"015" => ascii <= x"71";  -- q
-         WHEN x"02d" => ascii <= x"72";  -- r
-         WHEN x"01b" => ascii <= x"73";  -- s
-         WHEN x"02c" => ascii <= x"74";  -- t
-         WHEN x"03c" => ascii <= x"75";  -- u
-         WHEN x"02a" => ascii <= x"76";  -- v
-         WHEN x"01d" => ascii <= x"77";  -- w
-         WHEN x"022" => ascii <= x"78";  -- x
-         WHEN x"035" => ascii <= x"79";  -- y
-         WHEN x"01a" => ascii <= x"7a";  -- z
-         WHEN x"154" => ascii <= x"7b";  -- {
-         WHEN x"15d" => ascii <= x"7c";  -- |
-         WHEN x"15b" => ascii <= x"7d";  -- }
-         WHEN x"10e" => ascii <= x"7e";  -- ~
-         WHEN x"071" => ascii <= x"7f";  -- (Delete OR DEL on numeric keypad)
-            --extras
-         WHEN x"005" => ascii <= x"81";  -- f1
-         WHEN x"006" => ascii <= x"82";  -- f2
-         WHEN x"004" => ascii <= x"83";  -- f3
-         WHEN x"00c" => ascii <= x"84";  -- f4
-         WHEN x"003" => ascii <= x"85";  -- f5
-         WHEN x"00b" => ascii <= x"86";  -- f6
-         WHEN x"083" => ascii <= x"87";  -- f7
-         WHEN x"00a" => ascii <= x"88";  -- f8
-         WHEN x"001" => ascii <= x"89";  -- f9
-         WHEN x"009" => ascii <= x"8a";  -- f10
-         WHEN x"078" => ascii <= x"8b";  -- f11
-         WHEN x"007" => ascii <= x"8c";  -- f12
+      when OTHERS =>
 
-         WHEN x"075" => ascii <= x"90";  -- KP UP
-         WHEN x"072" => ascii <= x"91";  -- KP DOWN
-         WHEN x"06B" => ascii <= x"92";  -- KP LEFT
-         WHEN x"074" => ascii <= x"93";  -- KP RIGHT
+        m1_next_state <= m1_rx_clk_h;
 
-         WHEN OTHERS => ascii <= "00000000";
-      END CASE;
-   END PROCESS;
+    end case;
 
+  end process;
 
-END ARCHITECTURE trans;
+  -- State register
+  process (clk) is
+  begin
+
+    if (clk'EVENT and clk = '1') then
+      if (reset = '1') then
+        m2_state <= m2_rx_data_ready_ack;
+      else
+        m2_state <= m2_next_state;
+      end if;
+    end if;
+
+  end process;
+
+  -- State transition logic
+  process (m2_state, rx_output_strobe, rx_read) is
+  begin
+
+    case m2_state is
+
+      when m2_rx_data_ready_ack =>
+
+        rx_data_ready <= '0';
+
+        if (rx_output_strobe = '1') then
+          m2_next_state <= m2_rx_data_ready;
+        else
+          m2_next_state <= m2_rx_data_ready_ack;
+        end if;
+
+      when m2_rx_data_ready =>
+
+        rx_data_ready <= '1';
+
+        if (rx_read = '1') then
+          m2_next_state <= m2_rx_data_ready_ack;
+        else
+          m2_next_state <= m2_rx_data_ready;
+        end if;
+
+      when OTHERS =>
+
+        m2_next_state <= m2_rx_data_ready_ack;
+
+    end case;
+
+  end process;
+
+  -- This is the bit counter
+  process (clk) is
+  begin
+
+    if (clk'EVENT and clk = '1') then
+      if (reset='1' or rx_shifting_done='1' or (m1_state = m1_tx_wait_keyboard_ack)) then                 -- After tx is done.
+        bit_count <= "0000";
+      elsif (timer_60usec_done = '1' and (m1_state = m1_rx_clk_h) and ((ps2_clk_s)) = '1') then           -- rx watchdog timer reset
+        bit_count <= "0000";
+      elsif ((m1_state = m1_rx_falling_edge_marker) or (m1_state = m1_tx_rising_edge_marker)) then        -- increment for tx
+        bit_count <= bit_count + "0001";
+      end if;
+    end if;
+
+  end process;
+
+  -- This signal is high for one clock at the end of the timer count.
+  rx_shifting_done <= to_stdlogic((bit_count = "1011"));
+  tx_shifting_done <= to_stdlogic((bit_count = "1010"));
+
+  -- This is the signal which enables loading of the shift register.
+  -- It also indicates "ack" to the device writing to the transmitter.
+  tx_write_ack_o_xhdl1 <= to_stdlogic(((tx_write = '1' and (m1_state = m1_rx_clk_h)) or (tx_write = '1' and (m1_state = m1_rx_clk_l))));
+
+  -- This is the ODD parity bit for the transmitted word.
+  tx_parity_bit <= xnor_br(tx_data);
+
+  -- This is the shift register
+  process (clk) is
+  begin
+
+    if (clk'EVENT and clk = '1') then
+      if (reset = '1') then
+        q <= "00000000000";
+      elsif (tx_write_ack_o_xhdl1 = '1') then
+        q <= ('1' & tx_parity_bit & tx_data & '0');
+      elsif ((m1_state = m1_rx_falling_edge_marker) or (m1_state = m1_tx_rising_edge_marker)) then
+        q <= (ps2_data_s & q(11 - 1 downto 1));
+      end if;
+    end if;
+
+  end process;
+
+  -- This is the 60usec timer counter
+  process (clk) is
+  begin
+
+    if (clk'EVENT and clk = '1') then
+      if ((NOT(enable_timer_60usec)) = '1') then
+        timer_60usec_count <= "000000000000";
+      elsif ((NOT(timer_60usec_done)) = '1') then
+        timer_60usec_count <= timer_60usec_count + "000000000001";
+      end if;
+    end if;
+
+  end process;
+
+  timer_60usec_done <= to_stdlogic(timer_60usec_count = (timer_60usec_value_pp - 1));
+
+  -- This is the 5usec timer counter
+  process (clk) is
+  begin
+
+    if (clk'EVENT and clk = '1') then
+      if ((NOT(enable_timer_5usec)) = '1') then
+        timer_5usec_count <= "00000000";
+      elsif ((NOT(timer_5usec_done)) = '1') then
+        timer_5usec_count <= timer_5usec_count + "00000001";
+      end if;
+    end if;
+
+  end process;
+
+  timer_5usec_done <= to_stdlogic(timer_5usec_count = (timer_5usec_value_pp - 1));
+
+  -- Create the signals which indicate special scan codes received.
+  -- These are the "unlatched versions."
+  extended <= to_stdlogic((("00000000" & q(8 downto 1)) = "0000000011100000") and rx_shifting_done = '1');
+  released <= to_stdlogic((("00000000" & q(8 downto 1)) = "0000000011110000") and rx_shifting_done = '1');
+
+  -- Store the special scan code status bits
+  -- Not the final output, but an intermediate storage place,
+  -- until the entire set of output data can be assembled.
+  process (clk) is
+  begin
+
+    if (clk'EVENT and clk = '1') then
+      if (reset='1' or rx_output_event='1') then
+        hold_extended <= '0';
+        hold_released <= '0';
+      else
+        if (rx_shifting_done='1' and extended='1') then
+          hold_extended <= '1';
+        end if;
+        if (rx_shifting_done='1' and released='1') then
+          hold_released <= '1';
+        end if;
+      end if;
+    end if;
+
+  end process;
+
+  -- These bits contain the status of the two shift keys
+  process (clk) is
+  begin
+
+    if (clk'EVENT and clk = '1') then
+      if (reset = '1') then
+        left_shift_key <= '0';
+      elsif ((("00000000" & q(8 downto 1)) = "0000000000010010") and rx_shifting_done = '1' and (NOT(hold_released)) = '1') then
+        left_shift_key <= '1';
+      elsif ((("00000000" & q(8 downto 1)) = "0000000000010010") and rx_shifting_done = '1' and hold_released = '1') then
+        left_shift_key <= '0';
+      end if;
+    end if;
+
+  end process;
+
+  process (clk) is
+  begin
+
+    if (clk'EVENT and clk = '1') then
+      if (reset = '1') then
+        right_shift_key <= '0';
+      elsif ((("00000000" & q(8 downto 1)) = "0000000001011001") and rx_shifting_done = '1' and (NOT(hold_released)) = '1') then
+        right_shift_key <= '1';
+      elsif ((("00000000" & q(8 downto 1)) = "0000000001011001") and rx_shifting_done = '1' and hold_released = '1') then
+        right_shift_key <= '0';
+      end if;
+    end if;
+
+  end process;
+
+  rx_shift_key_on_xhdl0 <= to_stdlogic(left_shift_key='1' or right_shift_key='1');
+
+  -- Output the special scan code flags, the scan code and the ascii
+  process (clk) is
+  begin
+
+    if (clk'EVENT and clk = '1') then
+      if (reset = '1') then
+        rx_extended  <= '0';
+        rx_released  <= '0';
+        rx_scan_code <= "00000000";
+        rx_ascii     <= "00000000";
+      elsif (rx_output_strobe = '1') then
+        rx_extended  <= hold_extended;
+        rx_released  <= hold_released;
+        rx_scan_code <= q(8 downto 1);
+        rx_ascii     <= ascii;
+      end if;
+    end if;
+
+  end process;
+
+  -- Store the final rx output data only when all extend and release codes
+  -- are received and the next (actual key) scan code is also ready.
+  -- (the presence of rx_extended or rx_released refers to the
+  -- the current latest scan code received, not the previously latched flags.)
+  rx_output_event <= to_stdlogic((rx_shifting_done='1' and extended='0' and released='0'));
+
+  rx_output_strobe <= to_stdlogic((rx_shifting_done='1' and extended='0' and released='0' and ((trap_shift_keys_pp = 0) or ((("00000000" & q(8 downto 1)) /= "0000000001011001") and (("00000000" & q(8 downto 1)) /= "0000000000010010")))));
+
+  -- This part translates the scan code into an ASCII value...
+  -- Only the ASCII codes which I considered important have been included.
+  -- if you want more, just add the appropriate case statement lines...
+  -- (You will need to know the keyboard scan codes you wish to assign.)
+  -- The entries are listed in ascending order of ASCII value.
+  shift_key_plus_code <= ("000" & rx_shift_key_on_xhdl0 & q(8 downto 1));
+
+  process (shift_key_plus_code) is
+  begin
+
+    case shift_key_plus_code is
+
+      when x"066" =>
+
+        ascii <= x"08";         -- Backspace ("backspace" key)
+
+      when x"00d" =>
+
+        ascii <= x"09";         -- Horizontal Tab
+
+      when x"05a" =>
+
+        ascii <= x"0d";         -- Carriage return ("enter" key)
+
+      when x"076" =>
+
+        ascii <= x"1b";         -- Escape ("esc" key)
+
+      when x"029" =>
+
+        ascii <= x"20";         -- Space
+
+      when x"116" =>
+
+        ascii <= x"21";         -- !
+
+      when x"152" =>
+
+        ascii <= x"22";         -- "
+
+      when x"126" =>
+
+        ascii <= x"23";         -- #
+
+      when x"125" =>
+
+        ascii <= x"24";         -- $
+
+      when x"12e" =>
+
+        ascii <= x"25";         -- %
+
+      when x"13d" =>
+
+        ascii <= x"26";         -- &
+
+      when x"052" =>
+
+        ascii <= x"27";         -- '
+
+      when x"146" =>
+
+        ascii <= x"28";         -- (
+
+      when x"145" =>
+
+        ascii <= x"29";         -- )
+
+      when x"13e" =>
+
+        ascii <= x"2a";         -- *
+
+      when x"155" =>
+
+        ascii <= x"2b";         -- +
+
+      when x"041" =>
+
+        ascii <= x"2c";         -- ,
+
+      when x"04e" =>
+
+        ascii <= x"2d";         -- -
+
+      when x"049" =>
+
+        ascii <= x"2e";         -- .
+
+      when x"04a" =>
+
+        ascii <= x"2f";         -- /
+
+      when x"045" =>
+
+        ascii <= x"30";         -- 0
+
+      when x"016" =>
+
+        ascii <= x"31";         -- 1
+
+      when x"01e" =>
+
+        ascii <= x"32";         -- 2
+
+      when x"026" =>
+
+        ascii <= x"33";         -- 3
+
+      when x"025" =>
+
+        ascii <= x"34";         -- 4
+
+      when x"02e" =>
+
+        ascii <= x"35";         -- 5
+
+      when x"036" =>
+
+        ascii <= x"36";         -- 6
+
+      when x"03d" =>
+
+        ascii <= x"37";         -- 7
+
+      when x"03e" =>
+
+        ascii <= x"38";         -- 8
+
+      when x"046" =>
+
+        ascii <= x"39";         -- 9
+
+      when x"14c" =>
+
+        ascii <= x"3a";         -- :
+
+      when x"04c" =>
+
+        ascii <= x"3b";         -- ;
+
+      when x"141" =>
+
+        ascii <= x"3c";         -- <
+
+      when x"055" =>
+
+        ascii <= x"3d";         -- =
+
+      when x"149" =>
+
+        ascii <= x"3e";         -- >
+
+      when x"14a" =>
+
+        ascii <= x"3f";         -- ?
+
+      when x"11e" =>
+
+        ascii <= x"40";         -- @
+
+      when x"11c" =>
+
+        ascii <= x"41";         -- A
+
+      when x"132" =>
+
+        ascii <= x"42";         -- B
+
+      when x"121" =>
+
+        ascii <= x"43";         -- C
+
+      when x"123" =>
+
+        ascii <= x"44";         -- D
+
+      when x"124" =>
+
+        ascii <= x"45";         -- E
+
+      when x"12b" =>
+
+        ascii <= x"46";         -- F
+
+      when x"134" =>
+
+        ascii <= x"47";         -- G
+
+      when x"133" =>
+
+        ascii <= x"48";         -- H
+
+      when x"143" =>
+
+        ascii <= x"49";         -- I
+
+      when x"13b" =>
+
+        ascii <= x"4a";         -- J
+
+      when x"142" =>
+
+        ascii <= x"4b";         -- K
+
+      when x"14b" =>
+
+        ascii <= x"4c";         -- L
+
+      when x"13a" =>
+
+        ascii <= x"4d";         -- M
+
+      when x"131" =>
+
+        ascii <= x"4e";         -- N
+
+      when x"144" =>
+
+        ascii <= x"4f";         -- O
+
+      when x"14d" =>
+
+        ascii <= x"50";         -- P
+
+      when x"115" =>
+
+        ascii <= x"51";         -- Q
+
+      when x"12d" =>
+
+        ascii <= x"52";         -- R
+
+      when x"11b" =>
+
+        ascii <= x"53";         -- S
+
+      when x"12c" =>
+
+        ascii <= x"54";         -- T
+
+      when x"13c" =>
+
+        ascii <= x"55";         -- U
+
+      when x"12a" =>
+
+        ascii <= x"56";         -- V
+
+      when x"11d" =>
+
+        ascii <= x"57";         -- W
+
+      when x"122" =>
+
+        ascii <= x"58";         -- X
+
+      when x"135" =>
+
+        ascii <= x"59";         -- Y
+
+      when x"11a" =>
+
+        ascii <= x"5a";         -- Z
+
+      when x"054" =>
+
+        ascii <= x"5b";         -- [
+
+      when x"05d" =>
+
+        ascii <= x"5c";         -- \
+
+      when x"05b" =>
+
+        ascii <= x"5d";         -- ]
+
+      when x"136" =>
+
+        ascii <= x"5e";         -- ^
+
+      when x"14e" =>
+
+        ascii <= x"5f";         -- _
+
+      when x"00e" =>
+
+        ascii <= x"60";         -- `
+
+      when x"01c" =>
+
+        ascii <= x"61";         -- a
+
+      when x"032" =>
+
+        ascii <= x"62";         -- b
+
+      when x"021" =>
+
+        ascii <= x"63";         -- c
+
+      when x"023" =>
+
+        ascii <= x"64";         -- d
+
+      when x"024" =>
+
+        ascii <= x"65";         -- e
+
+      when x"02b" =>
+
+        ascii <= x"66";         -- f
+
+      when x"034" =>
+
+        ascii <= x"67";         -- g
+
+      when x"033" =>
+
+        ascii <= x"68";         -- h
+
+      when x"043" =>
+
+        ascii <= x"69";         -- i
+
+      when x"03b" =>
+
+        ascii <= x"6a";         -- j
+
+      when x"042" =>
+
+        ascii <= x"6b";         -- k
+
+      when x"04b" =>
+
+        ascii <= x"6c";         -- l
+
+      when x"03a" =>
+
+        ascii <= x"6d";         -- m
+
+      when x"031" =>
+
+        ascii <= x"6e";         -- n
+
+      when x"044" =>
+
+        ascii <= x"6f";         -- o
+
+      when x"04d" =>
+
+        ascii <= x"70";         -- p
+
+      when x"015" =>
+
+        ascii <= x"71";         -- q
+
+      when x"02d" =>
+
+        ascii <= x"72";         -- r
+
+      when x"01b" =>
+
+        ascii <= x"73";         -- s
+
+      when x"02c" =>
+
+        ascii <= x"74";         -- t
+
+      when x"03c" =>
+
+        ascii <= x"75";         -- u
+
+      when x"02a" =>
+
+        ascii <= x"76";         -- v
+
+      when x"01d" =>
+
+        ascii <= x"77";         -- w
+
+      when x"022" =>
+
+        ascii <= x"78";         -- x
+
+      when x"035" =>
+
+        ascii <= x"79";         -- y
+
+      when x"01a" =>
+
+        ascii <= x"7a";         -- z
+
+      when x"154" =>
+
+        ascii <= x"7b";         -- {
+
+      when x"15d" =>
+
+        ascii <= x"7c";         -- |
+
+      when x"15b" =>
+
+        ascii <= x"7d";         -- }
+
+      when x"10e" =>
+
+        ascii <= x"7e";         -- ~
+
+      when x"071" =>
+
+        ascii <= x"7f";         -- (Delete OR DEL on numeric keypad)
+
+      -- extras
+      when x"005" =>
+
+        ascii <= x"81";         -- f1
+
+      when x"006" =>
+
+        ascii <= x"82";         -- f2
+
+      when x"004" =>
+
+        ascii <= x"83";         -- f3
+
+      when x"00c" =>
+
+        ascii <= x"84";         -- f4
+
+      when x"003" =>
+
+        ascii <= x"85";         -- f5
+
+      when x"00b" =>
+
+        ascii <= x"86";         -- f6
+
+      when x"083" =>
+
+        ascii <= x"87";         -- f7
+
+      when x"00a" =>
+
+        ascii <= x"88";         -- f8
+
+      when x"001" =>
+
+        ascii <= x"89";         -- f9
+
+      when x"009" =>
+
+        ascii <= x"8a";         -- f10
+
+      when x"078" =>
+
+        ascii <= x"8b";         -- f11
+
+      when x"007" =>
+
+        ascii <= x"8c";         -- f12
+
+      when x"075" =>
+
+        ascii <= x"90";         -- KP UP
+
+      when x"072" =>
+
+        ascii <= x"91";         -- KP DOWN
+
+      when x"06B" =>
+
+        ascii <= x"92";         -- KP LEFT
+
+      when x"074" =>
+
+        ascii <= x"93";         -- KP RIGHT
+
+      when OTHERS =>
+
+        ascii <= "00000000";
+
+    end case;
+
+  end process;
+
+end architecture trans;
 
 
 

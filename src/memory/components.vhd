@@ -1,44 +1,48 @@
-LIBRARY ieee;
-USE ieee.std_logic_1164.all;
+library ieee;
+  use ieee.std_logic_1164.all;
 
-PACKAGE memory_components IS
+package memory_components is
 
-    COMPONENT MemoryController IS
-        PORT (CLOCK_50  : IN  STD_LOGIC;
-            addr      : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-            wr_data   : IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-            rd_data   : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-            we        : IN  STD_LOGIC;
-            byte_m    : IN  STD_LOGIC;
-            vga_addr  : out std_logic_vector(12 downto 0);
-            vga_we    : out std_logic;
-            vga_wr_data : out std_logic_vector(15 downto 0);
-            vga_rd_data : in std_logic_vector(15 downto 0);
-            vga_byte_m : out std_logic;
-            SRAM_ADDR : OUT   STD_LOGIC_VECTOR(17 DOWNTO 0);
-            SRAM_DQ   : INOUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-            SRAM_UB_N : OUT   STD_LOGIC;
-            SRAM_LB_N : OUT   STD_LOGIC;
-            SRAM_CE_N : OUT   STD_LOGIC := '1';
-            SRAM_OE_N : OUT   STD_LOGIC := '1';
-            SRAM_WE_N : OUT   STD_LOGIC := '1';
-				bad_alignment : OUT STD_LOGIC);
-    END COMPONENT;
+  component memorycontroller is
+    port (
+      clock_50      : in    std_logic;
+      addr          : in    std_logic_vector(15 downto 0);
+      wr_data       : in    std_logic_vector(15 downto 0);
+      rd_data       : out   std_logic_vector(15 downto 0);
+      we            : in    std_logic;
+      byte_m        : in    std_logic;
+      vga_addr      : out   std_logic_vector(12 downto 0);
+      vga_we        : out   std_logic;
+      vga_wr_data   : out   std_logic_vector(15 downto 0);
+      vga_rd_data   : in    std_logic_vector(15 downto 0);
+      vga_byte_m    : out   std_logic;
+      sram_addr     : out   std_logic_vector(17 downto 0);
+      sram_dq       : inout std_logic_vector(15 downto 0);
+      sram_ub_n     : out   std_logic;
+      sram_lb_n     : out   std_logic;
+      sram_ce_n     : out   std_logic := '1';
+      sram_oe_n     : out   std_logic := '1';
+      sram_we_n     : out   std_logic := '1';
+      bad_alignment : out   std_logic
+    );
+  end component;
 
-    COMPONENT SRAMController is
-        PORT (clk         : IN    STD_LOGIC;
-              SRAM_ADDR   : OUT   STD_LOGIC_VECTOR(17 DOWNTO 0);
-              SRAM_DQ     : INOUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-              SRAM_UB_N   : OUT   STD_LOGIC;
-              SRAM_LB_N   : OUT   STD_LOGIC;
-              SRAM_CE_N   : OUT   STD_LOGIC;
-              SRAM_OE_N   : OUT   STD_LOGIC;
-              SRAM_WE_N   : OUT   STD_LOGIC;
-              address     : IN    STD_LOGIC_VECTOR(15 DOWNTO 0) := "0000000000000000";
-              dataReaded  : OUT   STD_LOGIC_VECTOR(15 DOWNTO 0);
-              dataToWrite : IN    STD_LOGIC_VECTOR(15 DOWNTO 0);
-              WR          : IN    STD_LOGIC;
-              byte_m      : IN    STD_LOGIC := '0');
-    END COMPONENT;
+  component sramcontroller is
+    port (
+      clk         : in    std_logic;
+      sram_addr   : out   std_logic_vector(17 downto 0);
+      sram_dq     : inout std_logic_vector(15 downto 0);
+      sram_ub_n   : out   std_logic;
+      sram_lb_n   : out   std_logic;
+      sram_ce_n   : out   std_logic;
+      sram_oe_n   : out   std_logic;
+      sram_we_n   : out   std_logic;
+      address     : in    std_logic_vector(15 downto 0) := "0000000000000000";
+      datareaded  : out   std_logic_vector(15 downto 0);
+      datatowrite : in    std_logic_vector(15 downto 0);
+      wr          : in    std_logic;
+      byte_m      : in    std_logic := '0'
+    );
+  end component;
 
-END PACKAGE;
+end package memory_components;
